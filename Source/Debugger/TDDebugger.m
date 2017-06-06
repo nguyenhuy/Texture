@@ -16,6 +16,7 @@
 
 #import <AsyncDisplayKit/TDDebugger.h>
 #import <AsyncDisplayKit/TDElementDomainController.h>
+#import <AsyncDisplayKit/TDElementPropsDomainController.h>
 
 @implementation TDDebugger
 
@@ -35,6 +36,10 @@
   TDElementDomainController *elementController = [TDElementDomainController defaultInstance];
   [self addController:elementController];
   [elementController startMonitoringWithApplication:application];
+  
+  TDElementPropsDomainController *elementPropsController = [[TDElementPropsDomainController alloc] init];
+  elementPropsController.dataSource = elementController;
+  [self addController:elementPropsController];
 }
 
 @end

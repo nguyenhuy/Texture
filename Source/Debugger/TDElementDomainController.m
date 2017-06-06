@@ -20,10 +20,11 @@
 #import <PonyDebugger/PDRuntimeTypes.h>
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
+#import <AsyncDisplayKit/ASRectTable.h>
+
 #import <AsyncDisplayKit/PDDOMTypes+UIKit.h>
 #import <AsyncDisplayKit/TDDOMContext.h>
 #import <AsyncDisplayKit/NSObject+TextureDebugger.h>
-#import <AsyncDisplayKit/ASRectTable.h>
 
 #import <UIKit/UIKit.h>
 
@@ -90,13 +91,9 @@ static const int kPDDOMNodeTypeDocument = 9;
 
 - (void)domain:(PDDOMDomain *)domain highlightNodeWithNodeId:(NSNumber *)nodeId highlightConfig:(PDDOMHighlightConfig *)highlightConfig callback:(void (^)(id))callback;
 {
-  NSObject *object = [_context.idToObjectMap objectForKey:nodeId];
-  if (object != nil) {
-    [self configureHighlightOverlayWithConfig:highlightConfig];
-    
-    CGRect frameInWindow = [_context.idToFrameInWindow rectForKey:nodeId];
-    [self revealHighlightOverlayAtRect:CGRectIsNull(frameInWindow) ? CGRectZero : frameInWindow];
-  }
+  [self configureHighlightOverlayWithConfig:highlightConfig];
+  CGRect frameInWindow = [_context.idToFrameInWindow rectForKey:nodeId];
+  [self revealHighlightOverlayAtRect:CGRectIsNull(frameInWindow) ? CGRectZero : frameInWindow];
   
   callback(nil);
 }
@@ -142,6 +139,13 @@ static const int kPDDOMNodeTypeDocument = 9;
   rootNode.children = application ? @[ [application td_generateDOMNodeWithContext:context] ] : nil;
   rootNode.childNodeCount = @(rootNode.children.count);
   return rootNode;
+}
+
+#pragma mark TDElementPropsDomainControllerDataSource
+
+- (TDDOMContext *)contextForElementPropsDomainController:(TDElementPropsDomainController *)controller
+{
+  return _context;
 }
 
 @end

@@ -17,11 +17,16 @@
 #import <PonyDebugger/PDDOMDomain.h>
 #import <PonyDebugger/PDDomainController.h>
 
+#import <AsyncDisplayKit/TDElementPropsDomainController.h>
+
+@class TDDOMContext;
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TDElementDomainController : PDDomainController <PDDOMCommandDelegate>
+@interface TDElementDomainController : PDDomainController <PDDOMCommandDelegate, TDElementPropsDomainControllerDataSource>
 
 @property (nonatomic, strong) PDDOMDomain *domain;
+@property (nonatomic, readonly) TDDOMContext *context;
 
 + (TDElementDomainController *)defaultInstance;
 
