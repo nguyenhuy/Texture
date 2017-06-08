@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class PDCSSProperty, PDDOMNode, TDDOMContext;
+@class PDCSSRuleMatch, PDDOMNode, TDDOMContext;
 
 @interface NSObject (PDDOMNodeProviding)
 
@@ -30,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface ASLayoutElementStyle (PDCSSPropertiesProviding)
+@interface ASLayoutElementStyle (PDCSSRuleMatchesProviding)
 
-- (NSArray<PDCSSProperty *> *)td_generateCSSProperties;
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches;
 
 @end
 

@@ -66,30 +66,10 @@
   NSArray<PDCSSRuleMatch *> *matchedRules;
   if (object && [object conformsToProtocol:@protocol(ASLayoutElement)]) {
     id<ASLayoutElement> element = (id<ASLayoutElement>)object;
-    NSString *ruleName = @"style";
-//    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
-    
-    PDCSSStyle *style = [[PDCSSStyle alloc] init];
-//    style.styleSheetId = styleSheetId; // Set if editable
-    style.cssProperties = [element.style td_generateCSSProperties];
-    style.shorthandEntries = @[];
-    
-    PDCSSSelectorList *selectorList = [PDCSSSelectorList selectorListWithSelectors:@[ [PDCSSSelector selectorWithValue:ruleName] ]];
-    
-    PDCSSRule *rule = [[PDCSSRule alloc] init];
-//    rule.styleSheetId = styleSheetId;
-    rule.selectorList = selectorList;
-    rule.origin = PDCSSStyleSheetOriginRegular;
-    rule.style = style;
-    
-    PDCSSRuleMatch *match = [[PDCSSRuleMatch alloc] init];
-    match.rule = rule;
-    match.matchingSelectors = @[ @(0) ];
-    
-    matchedRules = @[match];
+    matchedRules = [element.style td_generateCSSRuleMatches];
   }
   
-  callback(matchedRules, @[], @[], nil);
+  callback(matchedRules, nil, nil, nil);
 }
 
 #pragma mark Private methods

@@ -292,7 +292,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-#pragma mark PDCSSPropertiesProviding
+#pragma mark PDCSSRuleMatchesProviding
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSPropertiesFromASLayoutElementSize(ASLayoutElementSize size)
 {
@@ -320,14 +320,44 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSProper
            ];
 }
 
-@implementation ASLayoutElementStyle  (PDCSSPropertiesProviding)
-
-- (NSArray<PDCSSProperty *> *)td_generateCSSProperties
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSPropertiesFromASAbsoluteLayoutElement(id<ASAbsoluteLayoutElement> element)
 {
-  NSMutableArray<PDCSSProperty *> *result = [NSMutableArray arrayWithArray:PDCSSPropertiesFromASLayoutElementSize(self.size)];
-  [result addObjectsFromArray:PDCSSPropertiesFromASStackLayoutElement(self)];
-  [result addObject:[PDCSSProperty propertyWithName:@"layoutPosition" value:NSStringFromCGPoint(self.layoutPosition)]]; // ASAbsoluteLayoutElement
-  return result;
+  return @[ [PDCSSProperty propertyWithName:@"layoutPosition" value:NSStringFromCGPoint(element.layoutPosition)] ];
+}
+
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchWithNameAndProperties(NSString *name, NSArray<PDCSSProperty *> *properties)
+{
+  PDCSSStyle *style = [[PDCSSStyle alloc] init];
+  style.cssProperties = properties;
+  style.shorthandEntries = @[];
+  
+  PDCSSSelectorList *selectorList = [PDCSSSelectorList selectorListWithSelectors:@[ [PDCSSSelector selectorWithValue:name] ]];
+  
+  PDCSSRule *rule = [[PDCSSRule alloc] init];
+  rule.selectorList = selectorList;
+  rule.origin = PDCSSStyleSheetOriginRegular;
+  rule.style = style;
+  
+  //    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
+  //    style.styleSheetId = styleSheetId; // Set if editable
+  //    rule.styleSheetId = styleSheetId;
+  
+  PDCSSRuleMatch *match = [[PDCSSRuleMatch alloc] init];
+  match.rule = rule;
+  match.matchingSelectors = @[ @(0) ];
+  
+  return match;
+}
+
+@implementation ASLayoutElementStyle (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  return @[
+           PDCSSRuleMatchWithNameAndProperties(@"size", PDCSSPropertiesFromASLayoutElementSize(self.size)),
+           PDCSSRuleMatchWithNameAndProperties(@"stack_layout_element", PDCSSPropertiesFromASStackLayoutElement(self)),
+           PDCSSRuleMatchWithNameAndProperties(@"absolute_layout_element", PDCSSPropertiesFromASAbsoluteLayoutElement(self)),
+           ];
 }
 
 @end
