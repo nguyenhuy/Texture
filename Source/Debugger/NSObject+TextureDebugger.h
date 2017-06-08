@@ -15,16 +15,24 @@
 #if AS_TEXTURE_DEBUGGER
 
 #import <Foundation/Foundation.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
+#import <AsyncDisplayKit/ASDimensionInternal.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class PDDOMNode, TDDOMContext;
+@class PDCSSProperty, PDDOMNode, TDDOMContext;
 
-@interface NSObject (TextureDebugger)
+@interface NSObject (PDDOMNodeProviding)
 
 - (PDDOMNode *)td_generateDOMNodeWithContext:(TDDOMContext *)context;
 - (CGRect)td_frameInWindow;
 - (NSArray *)td_children;
+
+@end
+
+@interface ASLayoutElementStyle (PDCSSPropertiesProviding)
+
+- (NSArray<PDCSSProperty *> *)td_generateCSSProperties;
 
 @end
 

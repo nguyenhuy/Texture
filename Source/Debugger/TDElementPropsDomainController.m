@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 #import <AsyncDisplayKit/TDDOMContext.h>
+#import <AsyncDisplayKit/NSObject+TextureDebugger.h>
 
 @implementation TDElementPropsDomainController
 
@@ -64,25 +65,16 @@
   
   NSArray<PDCSSRuleMatch *> *matchedRules;
   if (object && [object conformsToProtocol:@protocol(ASLayoutElement)]) {
+    id<ASLayoutElement> element = (id<ASLayoutElement>)object;
     NSString *ruleName = @"style";
 //    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
     
-    NSMutableArray<PDCSSProperty *> *cssProperties = [NSMutableArray array];
-    PDCSSProperty *prop = [[PDCSSProperty alloc] init];
-    prop.name = @"flex";
-    prop.value = @"1.0";
-    [cssProperties addObject:prop];
-    
     PDCSSStyle *style = [[PDCSSStyle alloc] init];
 //    style.styleSheetId = styleSheetId; // Set if editable
-    style.cssProperties = cssProperties;
+    style.cssProperties = [element.style td_generateCSSProperties];
     style.shorthandEntries = @[];
     
-    PDCSSSelector *selector = [[PDCSSSelector alloc] init];
-    selector.value = ruleName;
-    
-    PDCSSSelectorList *selectorList = [[PDCSSSelectorList alloc] init];
-    selectorList.selectors = @[selector];
+    PDCSSSelectorList *selectorList = [PDCSSSelectorList selectorListWithSelectors:@[ [PDCSSSelector selectorWithValue:ruleName] ]];
     
     PDCSSRule *rule = [[PDCSSRule alloc] init];
 //    rule.styleSheetId = styleSheetId;
@@ -92,7 +84,7 @@
     
     PDCSSRuleMatch *match = [[PDCSSRuleMatch alloc] init];
     match.rule = rule;
-    match.matchingSelectors = @[@(0)];
+    match.matchingSelectors = @[ @(0) ];
     
     matchedRules = @[match];
   }

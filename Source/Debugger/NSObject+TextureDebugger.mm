@@ -16,11 +16,13 @@
 
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASLayoutElementStylePrivate.h>
 #import <AsyncDisplaykit/ASRectTable.h>
 #import <AsyncDisplayKit/NSObject+TextureDebugger.h>
 #import <AsyncDisplayKit/TDDOMContext.h>
 
 #import <PonyDebugger/PDDOMTypes.h>
+#import <PonyDebugger/PDCSSTypes.h>
 
 #import <queue>
 
@@ -29,13 +31,15 @@ static const int kPDDOMNodeTypeElement = 1;
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark PDDOMNodeProviding
+
 @interface NSObject (TDDOMNodeGenerating)
 
 + (NSString *)td_nodeName;
 
 @end
 
-@implementation NSObject (TextureDebugger)
+@implementation NSObject (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -75,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation UIApplication (TextureDebugger)
+@implementation UIApplication (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -89,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation CALayer (TextureDebugger)
+@implementation CALayer (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -119,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation UIView (TextureDebugger)
+@implementation UIView (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -149,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation UIWindow (TextureDebugger)
+@implementation UIWindow (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -158,7 +162,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation ASLayoutSpec (TextureDebugger)
+@implementation ASLayoutSpec (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -167,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation ASDisplayNode (TextureDebugger)
+@implementation ASDisplayNode (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -258,7 +262,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation ASCollectionNode (TextureDebugger)
+@implementation ASCollectionNode (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -273,7 +277,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation ASTableNode (TextureDebugger)
+@implementation ASTableNode (PDDOMNodeProviding)
 
 + (NSString *)td_nodeName
 {
@@ -284,6 +288,46 @@ NS_ASSUME_NONNULL_BEGIN
 {
   // Only show visible nodes for now. This requires user to refresh the browser to update the DOM.
   return self.visibleNodes;
+}
+
+@end
+
+#pragma mark PDCSSPropertiesProviding
+
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSPropertiesFromASLayoutElementSize(ASLayoutElementSize size)
+{
+  return @[
+           [PDCSSProperty propertyWithName:@"width" value:NSStringFromASDimension(size.width)],
+           [PDCSSProperty propertyWithName:@"height" value:NSStringFromASDimension(size.height)],
+           [PDCSSProperty propertyWithName:@"minWidth" value:NSStringFromASDimension(size.minWidth)],
+           [PDCSSProperty propertyWithName:@"maxWidth" value:NSStringFromASDimension(size.maxWidth)],
+           [PDCSSProperty propertyWithName:@"minHeight" value:NSStringFromASDimension(size.minHeight)],
+           [PDCSSProperty propertyWithName:@"maxHeight" value:NSStringFromASDimension(size.maxHeight)],
+           ];
+}
+
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSPropertiesFromASStackLayoutElement(id<ASStackLayoutElement> element)
+{
+  return @[
+           [PDCSSProperty propertyWithName:@"spacingBefore" value:@(element.spacingBefore).stringValue],
+           [PDCSSProperty propertyWithName:@"spacingAfter" value:@(element.spacingAfter).stringValue],
+           [PDCSSProperty propertyWithName:@"flexGrow" value:@(element.flexGrow).stringValue],
+           [PDCSSProperty propertyWithName:@"flexShrink" value:@(element.flexShrink).stringValue],
+           [PDCSSProperty propertyWithName:@"flexBasis" value:NSStringFromASDimension(element.flexBasis)],
+           [PDCSSProperty propertyWithName:@"alignSelf" value:@(element.alignSelf).stringValue], // Enum
+           [PDCSSProperty propertyWithName:@"ascender" value:@(element.ascender).stringValue],
+           [PDCSSProperty propertyWithName:@"descender" value:@(element.descender).stringValue],
+           ];
+}
+
+@implementation ASLayoutElementStyle  (PDCSSPropertiesProviding)
+
+- (NSArray<PDCSSProperty *> *)td_generateCSSProperties
+{
+  NSMutableArray<PDCSSProperty *> *result = [NSMutableArray arrayWithArray:PDCSSPropertiesFromASLayoutElementSize(self.size)];
+  [result addObjectsFromArray:PDCSSPropertiesFromASStackLayoutElement(self)];
+  [result addObject:[PDCSSProperty propertyWithName:@"layoutPosition" value:NSStringFromCGPoint(self.layoutPosition)]]; // ASAbsoluteLayoutElement
+  return result;
 }
 
 @end
