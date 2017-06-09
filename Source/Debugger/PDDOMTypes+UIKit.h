@@ -19,19 +19,19 @@
 
 @interface NSDictionary (PDDOMRGBA)
 
--(UIColor *)UIColor;
+- (UIColor *)UIColor;
 
 @end
 
 @interface NSDictionary (PDDOMHighlightConfig)
 
--(UIColor *)contentUIColor;
+- (UIColor *)contentUIColor;
 
--(UIColor *)paddingUIColor;
+- (UIColor *)paddingUIColor;
 
--(UIColor *)borderUIColor;
+- (UIColor *)borderUIColor;
 
--(UIColor *)marginUIColor;
+- (UIColor *)marginUIColor;
 
 @end
 

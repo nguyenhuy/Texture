@@ -29,13 +29,11 @@
 // Constants defined in the DOM Level 2 Core: http://www.w3.org/TR/DOM-Level-2-Core/core.html#ID-1950641247
 static const int kPDDOMNodeTypeElement = 1;
 
-NS_ASSUME_NONNULL_BEGIN
-
 #pragma mark PDDOMNodeProviding
 
 @interface NSObject (TDDOMNodeGenerating)
 
-+ (NSString *)td_nodeName;
++ (nonnull NSString *)td_nodeName;
 
 @end
 
@@ -113,6 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CGRect)td_frameInWindow
 {
+  // FIXME this is probably wrong :(
   return [self convertRect:self.bounds toLayer:nil];
 }
 
@@ -191,7 +190,7 @@ NS_ASSUME_NONNULL_BEGIN
    * - Generate the rest of the DOM tree:
    *      ASDisplayNode has a different way to generate DOM children.
    *      That is, from an unflattened layout, a DOM child is generated from the layout element of each sublayout in the layout tree.
-   *      In addition, since non-display-node layout elements (e.g layout specs) don't (and shouldn't) store their calculated layout, 
+   *      In addition, since non-display-node layout elements (e.g layout specs) don't (and shouldn't) store their calculated layout,
    *      they can't generate their own DOM children. So it's the responsibility of the root display node to fill out the gaps.
    * - Calculate the frame in window of some layout elements in the layout tree:
    *      Non-display-node layout elements can't determine their own frame because they don't have a backing store.
@@ -292,7 +291,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-#pragma mark PDCSSRuleMatchesProviding
+#pragma mark PDCSSRuleMatchesProviding - Helpers and Commons
 
 ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSArray<PDCSSProperty *> *PDCSSPropertiesFromASLayoutElementSize(ASLayoutElementSize size)
 {
@@ -349,19 +348,248 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchWithNam
   return match;
 }
 
-@implementation ASLayoutElementStyle (PDCSSRuleMatchesProviding)
 
-- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColor *color)
 {
-  return @[
-           PDCSSRuleMatchWithNameAndProperties(@"size", PDCSSPropertiesFromASLayoutElementSize(self.size)),
-           PDCSSRuleMatchWithNameAndProperties(@"stack_layout_element", PDCSSPropertiesFromASStackLayoutElement(self)),
-           PDCSSRuleMatchWithNameAndProperties(@"absolute_layout_element", PDCSSPropertiesFromASAbsoluteLayoutElement(self)),
-           ];
+  const CGFloat *components = CGColorGetComponents(color.CGColor);
+  return [NSString stringWithFormat:@"#%02lX%02lX%02lX%02lX",
+          lroundf(components[0] * 255),
+          lroundf(components[1] * 255),
+          lroundf(components[2] * 255),
+          lroundf(components[3] * 255)];
+}
+
+@implementation NSObject (PDCSSRuleMatchesProviding)
+
+- (NSMutableArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  return [NSMutableArray array];
 }
 
 @end
 
-NS_ASSUME_NONNULL_END
+@implementation ASLayoutElementStyle (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:PDCSSRuleMatchWithNameAndProperties(@"absolute_layout_element", PDCSSPropertiesFromASAbsoluteLayoutElement(self))];
+  [result addObject:PDCSSRuleMatchWithNameAndProperties(@"size", PDCSSPropertiesFromASLayoutElementSize(self.size))];
+  [result addObject:PDCSSRuleMatchWithNameAndProperties(@"stack_layout_element", PDCSSPropertiesFromASStackLayoutElement(self))];
+  return result;
+}
+
+@end
+
+#pragma mark PDCSSRuleMatchesProviding - Layout specs
+
+@implementation ASLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObjectsFromArray:[self.style td_generateCSSRuleMatches]];
+  return result;
+}
+
+@end
+
+@implementation ASStackLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[
+                                          [PDCSSProperty propertyWithName:@"direction" value:@(self.direction).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"spacing" value:@(self.spacing).stringValue],
+                                          [PDCSSProperty propertyWithName:@"justifyContent" value:@(self.justifyContent).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"alignItems" value:@(self.alignItems).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"flexWrap" value:@(self.flexWrap).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"alignContent" value:@(self.alignContent).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"concurrent" value:@(self.concurrent).stringValue],
+                                          ];
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"stack_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+@implementation ASInsetLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[ [PDCSSProperty propertyWithName:@"insets" value:NSStringFromUIEdgeInsets(self.insets)] ];
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"inset_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+@implementation ASCenterLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[
+                                          [PDCSSProperty propertyWithName:@"centeringOptions" value:@(self.centeringOptions).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"sizingOptions" value:@(self.sizingOptions).stringValue], // Enum
+                                          ];
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"center_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+@implementation ASRatioLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[ [PDCSSProperty propertyWithName:@"ratio" value:@(self.ratio).stringValue] ];
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"ratio_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+@implementation ASRelativeLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[
+                                          [PDCSSProperty propertyWithName:@"horizontalPosition" value:@(self.horizontalPosition).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"verticalPosition" value:@(self.verticalPosition).stringValue], // Enum
+                                          [PDCSSProperty propertyWithName:@"sizingOption" value:@(self.sizingOption).stringValue], // Enum
+                                          ];
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"relative_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+@implementation ASAbsoluteLayoutSpec (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *specProps = @[ [PDCSSProperty propertyWithName:@"sizing" value:@(self.sizing).stringValue] ]; // Enum
+  PDCSSRuleMatch *specRule = PDCSSRuleMatchWithNameAndProperties(@"absolute_layout_spec", specProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithArray:[super td_generateCSSRuleMatches]];
+  [result addObject:specRule];
+  return result;
+}
+
+@end
+
+#pragma mark PDCSSRuleMatchesProviding - Display nodes
+
+@implementation ASDisplayNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[ [PDCSSProperty propertyWithName:@"hitTestSlop" value:NSStringFromUIEdgeInsets(self.hitTestSlop)] ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"display_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObjectsFromArray:[self.style td_generateCSSRuleMatches]];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
+
+@implementation ASTextNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[
+                                         [PDCSSProperty propertyWithName:@"attributedText" value:self.attributedText.string],
+                                         [PDCSSProperty propertyWithName:@"truncationAttributedText" value:self.truncationAttributedText.string],
+                                         [PDCSSProperty propertyWithName:@"additionalTruncationMessage" value:self.additionalTruncationMessage.string],
+                                         [PDCSSProperty propertyWithName:@"truncationMode" value:@(self.truncationMode).stringValue], // Enum
+                                         [PDCSSProperty propertyWithName:@"truncated" value:@(self.truncated).stringValue], // BOOL
+                                         [PDCSSProperty propertyWithName:@"maximumNumberOfLines" value:@(self.maximumNumberOfLines).stringValue],
+                                         [PDCSSProperty propertyWithName:@"lineCount" value:@(self.lineCount).stringValue],
+                                         [PDCSSProperty propertyWithName:@"placeholderEnabled" value:@(self.placeholderEnabled).stringValue], // BOOL
+                                         [PDCSSProperty propertyWithName:@"placeholderColor" value:NSHexStringFromColor(self.placeholderColor)],
+                                         [PDCSSProperty propertyWithName:@"placeholderInsets" value:NSStringFromUIEdgeInsets(self.placeholderInsets)],
+                                         [PDCSSProperty propertyWithName:@"shadowPadding" value:NSStringFromUIEdgeInsets(self.shadowPadding)],
+                                         ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"text_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
+
+@implementation ASImageNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[ [PDCSSProperty propertyWithName:@"placeholderColor" value:NSHexStringFromColor(self.placeholderColor)] ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"image_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
+
+@implementation ASNetworkImageNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[ [PDCSSProperty propertyWithName:@"URL" value:self.URL.absoluteString] ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"network_image_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
+
+@implementation ASVideoNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[ [PDCSSProperty propertyWithName:@"assetURL" value:self.assetURL.absoluteString] ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"video_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
+
+@implementation ASVideoPlayerNode (PDCSSRuleMatchesProviding)
+
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches
+{
+  NSArray<PDCSSProperty *> *nodeProps = @[ [PDCSSProperty propertyWithName:@"assetURL" value:self.assetURL.absoluteString] ];
+  PDCSSRuleMatch *nodeRule = PDCSSRuleMatchWithNameAndProperties(@"video_player_node", nodeProps);
+  
+  NSMutableArray<PDCSSRuleMatch *> *result = [super td_generateCSSRuleMatches];
+  [result addObject:nodeRule];
+  return result;
+}
+
+@end
 
 #endif

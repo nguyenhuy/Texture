@@ -62,13 +62,7 @@
 {
   NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
   NSLog(@"matched styles for element with id: %@ - %@", nodeId, [object description]);
-  
-  NSArray<PDCSSRuleMatch *> *matchedRules;
-  if (object && [object conformsToProtocol:@protocol(ASLayoutElement)]) {
-    id<ASLayoutElement> element = (id<ASLayoutElement>)object;
-    matchedRules = [element.style td_generateCSSRuleMatches];
-  }
-  
+  NSArray<PDCSSRuleMatch *> *matchedRules = [object td_generateCSSRuleMatches];
   callback(matchedRules, nil, nil, nil);
 }
 

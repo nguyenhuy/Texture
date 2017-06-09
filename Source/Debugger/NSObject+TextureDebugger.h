@@ -30,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface ASLayoutElementStyle (PDCSSRuleMatchesProviding)
+@interface NSObject (PDCSSRuleMatchesProviding)
 
-- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches;
+- (NSMutableArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches;
 
 @end
 
