@@ -62,8 +62,14 @@
 {
   NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
   NSLog(@"matched styles for element with id: %@ - %@", nodeId, [object description]);
-  NSArray<PDCSSRuleMatch *> *matchedRules = [object td_generateCSSRuleMatches];
-  callback(matchedRules, nil, nil, nil);
+  NSArray<PDCSSRuleMatch *> *matches = [object td_generateCSSRuleMatches];
+  
+  for (PDCSSRuleMatch *match in matches) {
+    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, match.rule.selectorList.selectors[0].text];
+    match.rule.style.styleSheetId = styleSheetId;
+  }
+  
+  callback(matches, nil, nil, nil);
 }
 
 #pragma mark Private methods

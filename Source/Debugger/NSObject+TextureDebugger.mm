@@ -330,16 +330,12 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchWithNam
   style.cssProperties = properties;
   style.shorthandEntries = @[];
   
-  PDCSSSelectorList *selectorList = [PDCSSSelectorList selectorListWithSelectors:@[ [PDCSSSelector selectorWithValue:name] ]];
+  PDCSSSelectorList *selectorList = [PDCSSSelectorList selectorListWithSelectors:@[ [PDCSSValue valueWithText:name] ]];
   
   PDCSSRule *rule = [[PDCSSRule alloc] init];
   rule.selectorList = selectorList;
   rule.origin = PDCSSStyleSheetOriginRegular;
   rule.style = style;
-  
-  //    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
-  //    style.styleSheetId = styleSheetId; // Set if editable
-  //    rule.styleSheetId = styleSheetId;
   
   PDCSSRuleMatch *match = [[PDCSSRuleMatch alloc] init];
   match.rule = rule;
