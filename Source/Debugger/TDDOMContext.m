@@ -15,7 +15,7 @@
 #import <AsyncDisplaykit/ASRectTable.h>
 
 @implementation TDDOMContext {
-  NSUInteger _counter;
+  NSInteger _counter;
 }
 
 - (instancetype)init
@@ -26,6 +26,11 @@
     _idToFrameInWindow = [ASRectTable rectTableForStrongObjectPointers];
   }
   return self;
+}
+
++ (NSNumber *)idFromString:(NSString *)idString
+{
+  return @([idString integerValue]);
 }
 
 - (NSNumber *)idForObject:(NSObject *)object

@@ -163,7 +163,10 @@
   
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
-    [rootNode layoutThatFits:ASSizeRangeMake(kSize)];
+    ASLayout *layout = [rootNode layoutThatFits:ASSizeRangeMake(kSize)];
+    XCTAssertTrue(layout != nil, @"%@", [layout description]);
+    layout = [layout filteredNodeLayoutTree];
+    XCTAssertTrue(layout != nil, @"%@", [layout description]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
       XCTAssertNoThrow([rootNode.view layoutIfNeeded]);

@@ -24,7 +24,7 @@
 
 #import <AsyncDisplayKit/PDDOMTypes+UIKit.h>
 #import <AsyncDisplayKit/TDDOMContext.h>
-#import <AsyncDisplayKit/NSObject+TextureDebugger.h>
+#import <AsyncDisplayKit/NSObject+PDDOMNodeProviding.h>
 
 #import <UIKit/UIKit.h>
 

@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong) NSMapTable<NSNumber *, id> *idToFrameInWindow;
 
++ (NSNumber *)idFromString:(NSString *)idString;
+
 - (NSNumber *)idForObject:(NSObject *)object;
 
 @end

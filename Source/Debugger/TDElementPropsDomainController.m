@@ -23,7 +23,7 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 
 #import <AsyncDisplayKit/TDDOMContext.h>
-#import <AsyncDisplayKit/NSObject+TextureDebugger.h>
+#import <AsyncDisplayKit/NSObject+PDCSSRuleMatchesProviding.h>
 
 @implementation TDElementPropsDomainController
 
@@ -61,15 +61,39 @@
 - (void)domain:(PDCSSDomain *)domain getMatchedStylesForNodeWithNodeId:(NSNumber *)nodeId includePseudo:(NSNumber *)includePseudo includeInherited:(NSNumber *)includeInherited callback:(void (^)(NSArray<PDCSSRuleMatch *> *, NSArray *, NSArray *, id))callback
 {
   NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
-  NSLog(@"matched styles for element with id: %@ - %@", nodeId, [object description]);
-  NSArray<PDCSSRuleMatch *> *matches = [object td_generateCSSRuleMatches];
-  
-  for (PDCSSRuleMatch *match in matches) {
-    NSString *styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, match.rule.selectorList.selectors[0].text];
-    match.rule.style.styleSheetId = styleSheetId;
+  NSArray<PDCSSRuleMatch *> *matches = [object td_generateCSSRuleMatchesWithContext:[self context]];
+  callback(matches, nil, nil, nil);
+}
+
+- (void)domain:(PDCSSDomain *)domain setStyleTextsWithEdits:(NSArray<PDCSSStyleDeclarationEdit *> *)edits callback:(void (^)(NSArray<PDCSSStyle *> *, id))callback
+{
+  NSMutableArray<PDCSSStyle *> *result = [NSMutableArray array];
+  for (PDCSSStyleDeclarationEdit *edit in edits) {
+    NSArray<NSString *> *stringComponents = [[edit valueForKey:@"text"] componentsSeparatedByString:@":"];
+    ASDisplayNodeAssertTrue(stringComponents.count == 2);
+    
+    NSString *propertyName = [stringComponents[0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    NSMutableCharacterSet *valueTrimmingCharacterSet = [NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
+    [valueTrimmingCharacterSet addCharactersInString:@";"];
+    NSString *propertyValue = [stringComponents[1] stringByTrimmingCharactersInSet:valueTrimmingCharacterSet];
+    
+    PDCSSProperty *property = [PDCSSProperty propertyWithName:propertyName value:propertyValue];
+    
+    stringComponents = [[edit valueForKey:@"styleSheetId"] componentsSeparatedByString:@"."];
+    ASDisplayNodeAssertTrue(stringComponents.count == 2);
+    
+    NSNumber *nodeId = [TDDOMContext idFromString:stringComponents[0]];
+    NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
+    ASDisplayNodeAssertNotNil(object, @"Object with given ID not found");
+    
+    NSString *ruleMatchName = stringComponents[1];
+    
+    [object td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
+    // TODO add the updated PDCSSStyle
   }
   
-  callback(matches, nil, nil, nil);
+  callback(result, nil);
 }
 
 #pragma mark Private methods

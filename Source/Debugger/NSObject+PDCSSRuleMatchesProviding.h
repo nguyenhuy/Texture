@@ -1,5 +1,5 @@
 //
-//  NSObject+TextureDebugger.h
+//  NSObject+PDCSSRuleMatchesProviding.h
 //  Texture
 //
 //  Copyright (c) 2017-present, Pinterest, Inc.  All rights reserved.
@@ -20,19 +20,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class PDCSSRuleMatch, PDDOMNode, TDDOMContext;
-
-@interface NSObject (PDDOMNodeProviding)
-
-- (PDDOMNode *)td_generateDOMNodeWithContext:(TDDOMContext *)context;
-- (CGRect)td_frameInWindow;
-- (NSArray *)td_children;
-
-@end
+@class TDDOMContext, PDCSSRuleMatch, PDCSSProperty;
 
 @interface NSObject (PDCSSRuleMatchesProviding)
 
-- (NSMutableArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatches;
+- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context;
+
+- (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName;
 
 @end
 

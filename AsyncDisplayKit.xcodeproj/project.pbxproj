@@ -432,12 +432,14 @@
 		E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5B078001E69F4EB00C24B5B /* ASElementMap.m in Sources */ = {isa = PBXBuildFile; fileRef = E5B077FE1E69F4EB00C24B5B /* ASElementMap.m */; };
 		E5B5B9D11E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E5B5B9D01E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h */; };
+		E5C2D7A61EEF5FBF007B865E /* NSObject+PDCSSRuleMatchesProviding.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C2D7A51EEF5FBF007B865E /* NSObject+PDCSSRuleMatchesProviding.h */; };
+		E5C2D7A81EEF5FD8007B865E /* NSObject+PDCSSRuleMatchesProviding.m in Sources */ = {isa = PBXBuildFile; fileRef = E5C2D7A71EEF5FD8007B865E /* NSObject+PDCSSRuleMatchesProviding.m */; };
 		E5C347B11ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C347B01ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h */; };
 		E5C347B31ECB40AA00EC4BE4 /* ASTableNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */; };
 		E5E281741E71C833006B67C2 /* ASCollectionLayoutState.h in Headers */ = {isa = PBXBuildFile; fileRef = E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5E281761E71C845006B67C2 /* ASCollectionLayoutState.m in Sources */ = {isa = PBXBuildFile; fileRef = E5E281751E71C845006B67C2 /* ASCollectionLayoutState.m */; };
-		E5EEAAB81EE7527D00FC07DA /* NSObject+TextureDebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */; };
-		E5EEAAB91EE7527D00FC07DA /* NSObject+TextureDebugger.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */; };
+		E5EEAAB81EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAA1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.h */; };
+		E5EEAAB91EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAB1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.mm */; };
 		E5EEAABA1EE7527D00FC07DA /* PDDOMTypes+UIKit.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */; };
 		E5EEAABB1EE7527D00FC07DA /* PDDOMTypes+UIKit.m in Sources */ = {isa = PBXBuildFile; fileRef = E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */; };
 		E5EEAABC1EE7527D00FC07DA /* TDDebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */; };
@@ -904,12 +906,14 @@
 		E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASElementMap.h; sourceTree = "<group>"; };
 		E5B077FE1E69F4EB00C24B5B /* ASElementMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASElementMap.m; sourceTree = "<group>"; };
 		E5B5B9D01E9BAD9800A6B726 /* ASCollectionLayoutContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASCollectionLayoutContext+Private.h"; sourceTree = "<group>"; };
+		E5C2D7A51EEF5FBF007B865E /* NSObject+PDCSSRuleMatchesProviding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+PDCSSRuleMatchesProviding.h"; path = "Debugger/NSObject+PDCSSRuleMatchesProviding.h"; sourceTree = "<group>"; };
+		E5C2D7A71EEF5FD8007B865E /* NSObject+PDCSSRuleMatchesProviding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+PDCSSRuleMatchesProviding.m"; path = "Debugger/NSObject+PDCSSRuleMatchesProviding.m"; sourceTree = "<group>"; };
 		E5C347B01ECB3D9200EC4BE4 /* ASBatchFetchingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASBatchFetchingDelegate.h; sourceTree = "<group>"; };
 		E5C347B21ECB40AA00EC4BE4 /* ASTableNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASTableNode+Beta.h"; sourceTree = "<group>"; };
 		E5E281731E71C833006B67C2 /* ASCollectionLayoutState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutState.h; sourceTree = "<group>"; };
 		E5E281751E71C845006B67C2 /* ASCollectionLayoutState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASCollectionLayoutState.m; sourceTree = "<group>"; };
-		E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+TextureDebugger.h"; path = "Debugger/NSObject+TextureDebugger.h"; sourceTree = "<group>"; };
-		E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSObject+TextureDebugger.mm"; path = "Debugger/NSObject+TextureDebugger.mm"; sourceTree = "<group>"; };
+		E5EEAAAA1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+PDDOMNodeProviding.h"; path = "Debugger/NSObject+PDDOMNodeProviding.h"; sourceTree = "<group>"; };
+		E5EEAAAB1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSObject+PDDOMNodeProviding.mm"; path = "Debugger/NSObject+PDDOMNodeProviding.mm"; sourceTree = "<group>"; };
 		E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "PDDOMTypes+UIKit.h"; path = "Debugger/PDDOMTypes+UIKit.h"; sourceTree = "<group>"; };
 		E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "PDDOMTypes+UIKit.m"; path = "Debugger/PDDOMTypes+UIKit.m"; sourceTree = "<group>"; };
 		E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDDebugger.h; path = Debugger/TDDebugger.h; sourceTree = "<group>"; };
@@ -1611,16 +1615,18 @@
 		E56FF9AD1EC9A75D008C34EC /* Debugger */ = {
 			isa = PBXGroup;
 			children = (
-				E5EEAAAA1EE7527D00FC07DA /* NSObject+TextureDebugger.h */,
-				E5EEAAAB1EE7527D00FC07DA /* NSObject+TextureDebugger.mm */,
-				E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */,
-				E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */,
+				E5EEAAAA1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.h */,
+				E5EEAAAB1EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.mm */,
+				E5C2D7A51EEF5FBF007B865E /* NSObject+PDCSSRuleMatchesProviding.h */,
+				E5C2D7A71EEF5FD8007B865E /* NSObject+PDCSSRuleMatchesProviding.m */,
 				E5EEAAAE1EE7527D00FC07DA /* TDDebugger.h */,
 				E5EEAAAF1EE7527D00FC07DA /* TDDebugger.m */,
 				E5EEAAB21EE7527D00FC07DA /* TDElementDomainController.h */,
 				E5EEAAB31EE7527D00FC07DA /* TDElementDomainController.m */,
 				E5EEAAB61EE7527D00FC07DA /* TDDOMContext.h */,
 				E5EEAAB71EE7527D00FC07DA /* TDDOMContext.m */,
+				E5EEAAAC1EE7527D00FC07DA /* PDDOMTypes+UIKit.h */,
+				E5EEAAAD1EE7527D00FC07DA /* PDDOMTypes+UIKit.m */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -1680,7 +1686,7 @@
 				69F10C871C84C35D0026140C /* ASRangeControllerUpdateRangeProtocol+Beta.h in Headers */,
 				B350623C1B010EFD0018CF92 /* _ASAsyncTransaction.h in Headers */,
 				68355B411CB57A6C001D4E68 /* ASImageContainerProtocolCategories.h in Headers */,
-				E5EEAAB81EE7527D00FC07DA /* NSObject+TextureDebugger.h in Headers */,
+				E5EEAAB81EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.h in Headers */,
 				7630FFA81C9E267E007A7C0E /* ASVideoNode.h in Headers */,
 				B350623F1B010EFD0018CF92 /* _ASAsyncTransactionContainer.h in Headers */,
 				B13CA1011C52004900E031AB /* ASCollectionNode+Beta.h in Headers */,
@@ -1843,6 +1849,7 @@
 				CCA282CC1E9EB73E0037E8B7 /* ASTipNode.h in Headers */,
 				25E327571C16819500A2170C /* ASPagerNode.h in Headers */,
 				CCCCCCDB1EC3EF060087FE10 /* ASTextLine.h in Headers */,
+				E5C2D7A61EEF5FBF007B865E /* NSObject+PDCSSRuleMatchesProviding.h in Headers */,
 				9C70F20E1CDBE9E5007D6C76 /* NSArray+Diffing.h in Headers */,
 				CCCCCCE71EC3F0FC0087FE10 /* NSAttributedString+ASText.h in Headers */,
 				CCCCCCDF1EC3EF060087FE10 /* ASTextRunDelegate.h in Headers */,
@@ -2134,6 +2141,7 @@
 				B30BF6541C59D889004FCD53 /* ASLayoutManager.m in Sources */,
 				690C35671E0567C600069B91 /* ASDimensionDeprecated.mm in Sources */,
 				92DD2FE71BF4D0850074C9DD /* ASMapNode.mm in Sources */,
+				E5C2D7A81EEF5FD8007B865E /* NSObject+PDCSSRuleMatchesProviding.m in Sources */,
 				E5EEAABD1EE7527D00FC07DA /* TDDebugger.m in Sources */,
 				CCA282B91E9EA8E40037E8B7 /* AsyncDisplayKit+Tips.m in Sources */,
 				636EA1A51C7FF4EF00EE152F /* ASDefaultPlayButton.m in Sources */,
@@ -2282,7 +2290,7 @@
 				044284FD1BAA365100D16268 /* UICollectionViewLayout+ASConvenience.m in Sources */,
 				CC0F885B1E42807F00576FED /* ASCollectionViewFlowLayoutInspector.m in Sources */,
 				690ED5981E36D118000627C0 /* ASControlNode+tvOS.m in Sources */,
-				E5EEAAB91EE7527D00FC07DA /* NSObject+TextureDebugger.mm in Sources */,
+				E5EEAAB91EE7527D00FC07DA /* NSObject+PDDOMNodeProviding.mm in Sources */,
 				254C6B8A1BF94F8A003EC431 /* ASTextKitRenderer+TextChecking.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
