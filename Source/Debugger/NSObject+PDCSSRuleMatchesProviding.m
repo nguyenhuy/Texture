@@ -29,10 +29,12 @@
 
 #pragma mark - Helpers and Commons
 
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchForNodeWithId(NSNumber *nodeId, NSString *ruleName, NSArray<PDCSSProperty *> *properties)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchForNodeWithId(NSNumber *nodeId, NSString *ruleName, NSArray<PDCSSProperty *> *properties, BOOL editable)
 {
   PDCSSStyle *style = [[PDCSSStyle alloc] init];
-  style.styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
+  if (editable) {
+    style.styleSheetId = [NSString stringWithFormat:@"%@.%@", nodeId.stringValue, ruleName];
+  }
   style.cssProperties = properties;
   style.shorthandEntries = @[];
   
@@ -62,11 +64,18 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 @interface NSObject (PDCSSPropertiesProviding)
 
+- (BOOL)td_areCSSPropertiesEditable;
+
 - (NSArray<PDCSSProperty *> *)td_CSSProperties;
 
 @end
 
 @implementation NSObject (PDCSSRuleMatchesProviding)
+
+- (BOOL)td_areCSSPropertiesEditable
+{
+  return YES;
+}
 
 - (NSArray<PDCSSProperty *> *)td_CSSProperties
 {
@@ -81,7 +90,10 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   }
   
   NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray array];
-  [result addObject:PDCSSRuleMatchForNodeWithId(_id, TDRuleMatchNameProps, [self td_CSSProperties])];
+  [result addObject:PDCSSRuleMatchForNodeWithId(_id,
+                                                TDRuleMatchNameProps,
+                                                [self td_CSSProperties],
+                                                [self td_areCSSPropertiesEditable])];
   return result;
 }
 
@@ -121,6 +133,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 @implementation ASLayoutSpec (PDCSSRuleMatchesProviding)
 
+- (BOOL)td_areCSSPropertiesEditable
+{
+  return NO;
+}
+
 - (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context
 {
   NSNumber *_id = [context idForObject:self];
@@ -128,9 +145,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
     return @[];
   }
   
+  NSString *styleRuleMatchName = TDRuleMatchNameStyle;
   NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithObject:PDCSSRuleMatchForNodeWithId(_id,
-                                                                                                         TDRuleMatchNameStyle,
-                                                                                                         [self.style td_CSSProperties])];
+                                                                                                         styleRuleMatchName,
+                                                                                                         [self.style td_CSSProperties],
+                                                                                                         [self td_areCSSPropertiesEditable])];
   [result addObjectsFromArray:[super td_generateCSSRuleMatchesWithContext:context]];
   return result;
 }
@@ -138,10 +157,9 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
   if ([TDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
-    [self.style td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
-  } else {
-    [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
+    property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
   }
+  [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
 }
 
 @end
@@ -241,7 +259,8 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   
   NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithObject:PDCSSRuleMatchForNodeWithId(_id,
                                                                                                          TDRuleMatchNameStyle,
-                                                                                                         [self.style td_CSSProperties])];
+                                                                                                         [self.style td_CSSProperties],
+                                                                                                         [self td_areCSSPropertiesEditable])];
   [result addObjectsFromArray:[super td_generateCSSRuleMatchesWithContext:context]];
   return result;
 }
