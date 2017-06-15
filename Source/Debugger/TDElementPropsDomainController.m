@@ -69,19 +69,24 @@
 {
   NSMutableArray<PDCSSStyle *> *result = [NSMutableArray array];
   for (PDCSSStyleDeclarationEdit *edit in edits) {
-    NSArray<NSString *> *stringComponents = [[edit valueForKey:@"text"] componentsSeparatedByString:@":"];
-    ASDisplayNodeAssertTrue(stringComponents.count == 2);
+    NSString *text = [edit valueForKey:@"text"];
+    NSRange range = [text rangeOfString:@":"];
+    if (range.location == NSNotFound) {
+      continue;
+    }
     
-    NSString *propertyName = [stringComponents[0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *propertyName = [[text substringToIndex:range.location] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     NSMutableCharacterSet *valueTrimmingCharacterSet = [NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
     [valueTrimmingCharacterSet addCharactersInString:@";"];
-    NSString *propertyValue = [stringComponents[1] stringByTrimmingCharactersInSet:valueTrimmingCharacterSet];
+    NSString *propertyValue = [[text substringFromIndex:range.location + range.length] stringByTrimmingCharactersInSet:valueTrimmingCharacterSet];
     
     PDCSSProperty *property = [PDCSSProperty propertyWithName:propertyName value:propertyValue];
     
-    stringComponents = [[edit valueForKey:@"styleSheetId"] componentsSeparatedByString:@"."];
-    ASDisplayNodeAssertTrue(stringComponents.count == 2);
+    NSArray<NSString *> *stringComponents = [[edit valueForKey:@"styleSheetId"] componentsSeparatedByString:@"."];
+    if (stringComponents.count != 2) {
+      continue;
+    }
     
     NSNumber *nodeId = [TDDOMContext idFromString:stringComponents[0]];
     NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
