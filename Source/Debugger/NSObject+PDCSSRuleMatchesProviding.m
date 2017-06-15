@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/TDDOMContext.h>
 
 #import <PonyDebugger/PDCSSTypes.h>
+#import <PonyDebugger/NSObject+KVSC.h>
 
 #define TDRuleMatchNameProps @"props"
 #define TDRuleMatchNameStyle @"style"
@@ -99,7 +100,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
-  [self setValue:property.value forKey:property.name];
+  [self PD_setValueString:property.value forKeyPath:property.name];
 }
 
 @end
@@ -268,7 +269,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
   if ([TDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
-    [self.style td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
+    property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
+    [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
+    [self setNeedsLayout];
+    [self.supernode setNeedsLayout];
+    [self.supernode layoutIfNeeded];
   } else {
     [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
   }
