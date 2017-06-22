@@ -123,7 +123,14 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
-  [self PD_setValueString:property.value forKeyPath:property.name];
+  const char *typeEncoding = [NSObject PD_typeEncodingForKeyPath:property.name onObject:self];
+  
+  if (typeEncoding && !strcmp(typeEncoding, @encode(ASDimension))) {
+    ASDimension dimension = ASDimensionMake(property.value);
+    [self setValue:[NSValue value:&dimension withObjCType:@encode(ASDimension)] forKeyPath:property.name];
+  } else {
+    [self PD_setValueString:property.value forKeyPath:property.name];
+  }
 }
 
 @end
@@ -177,14 +184,6 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   }
   
   return [super td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
-}
-
-- (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
-{
-  if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
-    property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
-  }
-  [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
 }
 
 @end
@@ -316,13 +315,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 {
   if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
     property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
-    [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
-    [self setNeedsLayout];
-    [self.supernode setNeedsLayout];
-    [self.supernode layoutIfNeeded];
-  } else {
-    [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
   }
+  [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
+  [self setNeedsLayout];
+  [self.supernode setNeedsLayout];
+  [self.supernode layoutIfNeeded];
 }
 
 @end
@@ -336,7 +333,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   [result addObject:[PDCSSProperty propertyWithName:@"truncationAttributedText" value:self.truncationAttributedText.string]];
   [result addObject:[PDCSSProperty propertyWithName:@"additionalTruncationMessage" value:self.additionalTruncationMessage.string]];
   [result addObject:[PDCSSProperty propertyWithName:@"truncationMode" value:@(self.truncationMode).stringValue]]; // Enum
-  [result addObject:[PDCSSProperty propertyWithName:@"truncated" value:@(self.truncated).stringValue]]; // BOOL
+  [result addObject:[PDCSSProperty propertyWithName:@"truncated" value:(self.truncated ? @"YES" : @"NO")]];
   [result addObject:[PDCSSProperty propertyWithName:@"maximumNumberOfLines" value:@(self.maximumNumberOfLines).stringValue]];
   [result addObject:[PDCSSProperty propertyWithName:@"lineCount" value:@(self.lineCount).stringValue]];
   [result addObject:[PDCSSProperty propertyWithName:@"placeholderEnabled" value:@(self.placeholderEnabled).stringValue]]; // BOOL
