@@ -77,7 +77,7 @@
   
   TDDebugger *debugger = [TDDebugger defaultInstance];
   [debugger enableLayoutElementDebuggingWithApplication:application];
-  [debugger connectToURL:[NSURL URLWithString:@"ws://localhost:9000/device"]];
+  [debugger autoConnect];
   
   return YES;
 }
