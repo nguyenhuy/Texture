@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context;
 
+- (nullable PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId;
+
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName;
 
 @end

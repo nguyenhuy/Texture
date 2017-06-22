@@ -76,7 +76,7 @@
   [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
   
   TDDebugger *debugger = [TDDebugger defaultInstance];
-  [debugger enableLayoutElementDebuggingWithApplication:application];;
+  [debugger enableLayoutElementDebuggingWithApplication:application];
   [debugger connectToURL:[NSURL URLWithString:@"ws://localhost:9000/device"]];
   
   return YES;

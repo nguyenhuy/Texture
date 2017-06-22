@@ -88,14 +88,16 @@
       continue;
     }
     
-    NSNumber *nodeId = [TDDOMContext idFromString:stringComponents[0]];
-    NSObject *object = [[self context].idToObjectMap objectForKey:nodeId];
+    NSNumber *objectId = [TDDOMContext idFromString:stringComponents[0]];
+    NSObject *object = [[self context].idToObjectMap objectForKey:objectId];
     ASDisplayNodeAssertNotNil(object, @"Object with given ID not found");
     
     NSString *ruleMatchName = stringComponents[1];
     
     [object td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
-    // TODO add the updated PDCSSStyle
+    
+    PDCSSRuleMatch *updatedRuleMatch = [object td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
+    [result addObject:updatedRuleMatch.rule.style];
   }
   
   callback(result, nil);

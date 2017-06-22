@@ -25,12 +25,12 @@
 #import <PonyDebugger/PDCSSTypes.h>
 #import <PonyDebugger/NSObject+KVSC.h>
 
-#define TDRuleMatchNameProps @"props"
-#define TDRuleMatchNameStyle @"style"
+#define kTDRuleMatchNameProps @"props"
+#define kTDRuleMatchNameStyle @"style"
 
 #pragma mark - Helpers and Commons
 
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch *PDCSSRuleMatchForNodeWithId(NSNumber *nodeId, NSString *ruleName, NSArray<PDCSSProperty *> *properties, BOOL editable)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT PDCSSRuleMatch * PDCSSRuleMatchForNodeWithId(NSNumber *nodeId, NSString *ruleName, NSArray<PDCSSProperty *> *properties, BOOL editable)
 {
   PDCSSStyle *style = [[PDCSSStyle alloc] init];
   if (editable) {
@@ -65,6 +65,8 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 @interface NSObject (PDCSSPropertiesProviding)
 
+- (NSArray<NSString *> *)td_ruleMatchNames;
+
 - (BOOL)td_areCSSPropertiesEditable;
 
 - (NSArray<PDCSSProperty *> *)td_CSSProperties;
@@ -80,23 +82,43 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 - (NSArray<PDCSSProperty *> *)td_CSSProperties
 {
-  return [NSMutableArray array];
+  return @[];
+}
+
+- (NSArray<NSString *> *)td_ruleMatchNames
+{
+  return @[ kTDRuleMatchNameProps ];
 }
 
 - (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context
 {
-  NSNumber *_id = [context idForObject:self];
-  if (_id == nil) {
+  NSNumber *objectId = [context idForObject:self];
+  if (objectId == nil) {
     return @[];
   }
   
   NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray array];
-  [result addObject:PDCSSRuleMatchForNodeWithId(_id,
-                                                TDRuleMatchNameProps,
-                                                [self td_CSSProperties],
-                                                [self td_areCSSPropertiesEditable])];
+  for (NSString *ruleMatchName in [self td_ruleMatchNames]) {
+    PDCSSRuleMatch *ruleMatch = [self td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
+    if (ruleMatch != nil) {
+      [result addObject:ruleMatch];
+    }
+  }
   return result;
 }
+
+- (PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId
+{
+  if ([kTDRuleMatchNameProps isEqualToString:ruleMatchName]) {
+    return PDCSSRuleMatchForNodeWithId(objectId,
+                                       ruleMatchName,
+                                       [self td_CSSProperties],
+                                       [self td_areCSSPropertiesEditable]);
+  }
+  
+  return nil;
+}
+
 
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
@@ -139,25 +161,26 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   return NO;
 }
 
-- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context
+- (NSArray<NSString *> *)td_ruleMatchNames
 {
-  NSNumber *_id = [context idForObject:self];
-  if (_id == nil) {
-    return @[];
+  return @[ kTDRuleMatchNameProps, kTDRuleMatchNameStyle ];
+}
+
+- (PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId
+{
+  if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
+    return PDCSSRuleMatchForNodeWithId(objectId,
+                                       ruleMatchName,
+                                       [self.style td_CSSProperties],
+                                       [self td_areCSSPropertiesEditable]);
   }
   
-  NSString *styleRuleMatchName = TDRuleMatchNameStyle;
-  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithObject:PDCSSRuleMatchForNodeWithId(_id,
-                                                                                                         styleRuleMatchName,
-                                                                                                         [self.style td_CSSProperties],
-                                                                                                         [self td_areCSSPropertiesEditable])];
-  [result addObjectsFromArray:[super td_generateCSSRuleMatchesWithContext:context]];
-  return result;
+  return [super td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
 }
 
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
-  if ([TDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
+  if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
     property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
   }
   [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
@@ -251,24 +274,26 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
   return result;
 }
 
-- (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context
+- (NSArray<NSString *> *)td_ruleMatchNames
 {
-  NSNumber *_id = [context idForObject:self];
-  if (_id == nil) {
-    return @[];
+  return @[ kTDRuleMatchNameProps, kTDRuleMatchNameStyle ];
+}
+
+- (PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId
+{
+  if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
+    return PDCSSRuleMatchForNodeWithId(objectId,
+                                       ruleMatchName,
+                                       [self.style td_CSSProperties],
+                                       [self td_areCSSPropertiesEditable]);
   }
   
-  NSMutableArray<PDCSSRuleMatch *> *result = [NSMutableArray arrayWithObject:PDCSSRuleMatchForNodeWithId(_id,
-                                                                                                         TDRuleMatchNameStyle,
-                                                                                                         [self.style td_CSSProperties],
-                                                                                                         [self td_areCSSPropertiesEditable])];
-  [result addObjectsFromArray:[super td_generateCSSRuleMatchesWithContext:context]];
-  return result;
+  return [super td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
 }
 
 - (void)td_applyCSSProperty:(PDCSSProperty *)property withRuleMatchName:(NSString *)ruleMatchName
 {
-  if ([TDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
+  if ([kTDRuleMatchNameStyle isEqualToString:ruleMatchName]) {
     property.name = [NSString stringWithFormat:@"%@.%@", @"style", property.name];
     [super td_applyCSSProperty:property withRuleMatchName:ruleMatchName];
     [self setNeedsLayout];
