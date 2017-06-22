@@ -27,6 +27,7 @@
 
 #define kTDRuleMatchNameProps @"props"
 #define kTDRuleMatchNameStyle @"style"
+#define kTDRuleMatchNameMeasurement @"measurement"
 
 #pragma mark - Helpers and Commons
 
@@ -67,18 +68,13 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 - (NSArray<NSString *> *)td_ruleMatchNames;
 
-- (BOOL)td_areCSSPropertiesEditable;
+- (BOOL)td_isRuleMatchWithNameEditable:(NSString *)ruleMatchName;
 
 - (NSArray<PDCSSProperty *> *)td_CSSProperties;
 
 @end
 
 @implementation NSObject (PDCSSRuleMatchesProviding)
-
-- (BOOL)td_areCSSPropertiesEditable
-{
-  return YES;
-}
 
 - (NSArray<PDCSSProperty *> *)td_CSSProperties
 {
@@ -88,6 +84,11 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 - (NSArray<NSString *> *)td_ruleMatchNames
 {
   return @[ kTDRuleMatchNameProps ];
+}
+
+- (BOOL)td_isRuleMatchWithNameEditable:(NSString *)ruleMatchName
+{
+  return YES;
 }
 
 - (NSArray<PDCSSRuleMatch *> *)td_generateCSSRuleMatchesWithContext:(TDDOMContext *)context
@@ -113,7 +114,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
     return PDCSSRuleMatchForNodeWithId(objectId,
                                        ruleMatchName,
                                        [self td_CSSProperties],
-                                       [self td_areCSSPropertiesEditable]);
+                                       [self td_isRuleMatchWithNameEditable:ruleMatchName]);
   }
   
   return nil;
@@ -156,14 +157,14 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 @implementation ASLayoutSpec (PDCSSRuleMatchesProviding)
 
-- (BOOL)td_areCSSPropertiesEditable
-{
-  return NO;
-}
-
 - (NSArray<NSString *> *)td_ruleMatchNames
 {
   return @[ kTDRuleMatchNameProps, kTDRuleMatchNameStyle ];
+}
+
+- (BOOL)td_isRuleMatchWithNameEditable:(NSString *)ruleMatchName
+{
+  return NO;
 }
 
 - (PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId
@@ -172,7 +173,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
     return PDCSSRuleMatchForNodeWithId(objectId,
                                        ruleMatchName,
                                        [self.style td_CSSProperties],
-                                       [self td_areCSSPropertiesEditable]);
+                                       [self td_isRuleMatchWithNameEditable:ruleMatchName]);
   }
   
   return [super td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
@@ -276,7 +277,13 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
 
 - (NSArray<NSString *> *)td_ruleMatchNames
 {
-  return @[ kTDRuleMatchNameProps, kTDRuleMatchNameStyle ];
+  return @[ kTDRuleMatchNameProps, kTDRuleMatchNameStyle, kTDRuleMatchNameMeasurement ];
+}
+
+- (BOOL)td_isRuleMatchWithNameEditable:(NSString *)ruleMatchName
+{
+  // Measurement rule match is not editable, others are.
+  return ([kTDRuleMatchNameMeasurement isEqualToString:ruleMatchName] == NO);
 }
 
 - (PDCSSRuleMatch *)td_generateCSSRuleMatchWithName:(NSString *)ruleMatchName objectId:(NSNumber *)objectId
@@ -285,7 +292,21 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSHexStringFromColor(UIColo
     return PDCSSRuleMatchForNodeWithId(objectId,
                                        ruleMatchName,
                                        [self.style td_CSSProperties],
-                                       [self td_areCSSPropertiesEditable]);
+                                       [self td_isRuleMatchWithNameEditable:ruleMatchName]);
+  }
+  
+  if ([kTDRuleMatchNameMeasurement isEqualToString:ruleMatchName]) {
+    NSArray<PDCSSProperty *> *cssProps = @[
+                                           [PDCSSProperty propertyWithName:@"sizeRange"
+                                                                     value:NSStringFromASSizeRange(self.constrainedSizeForCalculatedLayout)],
+                                           [PDCSSProperty propertyWithName:@"calculatedSize"
+                                                                     value:NSStringFromCGSize(self.calculatedSize)]
+                                           ];
+    
+    return PDCSSRuleMatchForNodeWithId(objectId,
+                                       ruleMatchName,
+                                       cssProps,
+                                       [self td_isRuleMatchWithNameEditable:ruleMatchName]);
   }
   
   return [super td_generateCSSRuleMatchWithName:ruleMatchName objectId:objectId];
