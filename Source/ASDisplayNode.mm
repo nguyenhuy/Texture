@@ -1072,7 +1072,21 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Return the (original) unflattened layout if it needs to be stored. The layout will be flattened later on (@see _locked_setCalculatedDisplayNodeLayout:).
   // Otherwise, flatten it right away.
   if (! [ASDisplayNode shouldStoreUnflattenedLayouts]) {
-    layout = [layout filteredNodeLayoutTree];
+    NSTimeInterval duration = 0;
+    {
+      ASDN::ScopeTimer t(duration);
+      layout = [layout filteredNodeLayoutTree];
+    }
+    
+    ASPerformBlockOnMainThread(^{
+      static NSTimeInterval gTotal;
+      static NSUInteger gCount;
+      
+      gTotal += duration;
+      ++gCount;
+      
+      NSLog(@"Flattenning algo: average %.02f (ms), for %lu times, total %0.2f (ms)", (gTotal * 1000) / gCount, gCount, gTotal * 1000);
+    });
   }
   
   return layout;
