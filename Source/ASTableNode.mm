@@ -645,6 +645,13 @@
   return indexPathsArray;
 }
 
+#pragma mark - ASRangeManagingNode
+
+- (ASLayoutContext)layoutContext
+{
+  return self.constrainedSizeForCalculatedLayout;
+}
+
 #pragma mark - Editing
 
 - (void)reloadDataWithCompletion:(void (^)())completion

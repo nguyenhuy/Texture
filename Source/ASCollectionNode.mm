@@ -701,6 +701,13 @@
   return [self.dataController.pendingMap contextForSection:section];
 }
 
+#pragma mark - ASRangeManagingNode
+
+- (ASLayoutContext)layoutContext
+{
+  return self.constrainedSizeForCalculatedLayout;
+}
+
 #pragma mark - Editing
 
 - (void)registerSupplementaryNodeOfKind:(NSString *)elementKind

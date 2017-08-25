@@ -21,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol ASRangeManagingNode <NSObject>
 
+// TODO: Documentation
+@property (nonatomic, assign, readonly) ASLayoutContext layoutContext;
+
 /**
  * Retrieve the index path for the given node, if it's a member of this container.
  *

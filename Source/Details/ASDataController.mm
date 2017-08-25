@@ -541,7 +541,8 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 
       // Step 1.1: Update the mutable copies to match the data source's state
       [self _updateSectionsInMap:mutableMap changeSet:changeSet];
-      ASPrimitiveTraitCollection existingTraitCollection = [self.node primitiveTraitCollection];
+      ASPrimitiveTraitCollection existingTraitCollection = self.node.layoutContext.traitCollection;
+      // TODO: Assert and/or bail if no trait collection exists
       [self _updateElementsInMap:mutableMap changeSet:changeSet traitCollection:existingTraitCollection shouldFetchSizeRanges:(! canDelegate) previousMap:previousMap];
 
       // Step 1.2: Clone the new data
