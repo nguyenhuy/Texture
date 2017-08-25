@@ -11,7 +11,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASCellNode;
 
@@ -20,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Basically ASTableNode or ASCollectionNode.
  */
-@protocol ASRangeManagingNode <NSObject, ASTraitEnvironment>
+@protocol ASRangeManagingNode <NSObject>
 
 /**
  * Retrieve the index path for the given node, if it's a member of this container.

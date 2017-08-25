@@ -37,7 +37,6 @@
 }
 
 ASLayoutElementStyleExtensibilityForwarding
-ASPrimitiveTraitCollectionDefaults
 
 - (ASTraitCollection *)asyncTraitCollection
 {

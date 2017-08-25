@@ -147,16 +147,6 @@ ASLayoutElementLayoutCalculationDefaults
   return [_childrenArray countByEnumeratingWithState:state objects:buffer count:len];
 }
 
-#pragma mark - ASTraitEnvironment
-
-- (ASTraitCollection *)asyncTraitCollection
-{
-  ASDN::MutexLocker l(__instanceLock__);
-  return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
-}
-
-ASPrimitiveTraitCollectionDefaults
-
 #pragma mark - ASLayoutElementStyleExtensibility
 
 ASLayoutElementStyleExtensibilityForwarding

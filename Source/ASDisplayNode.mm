@@ -1046,12 +1046,6 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     layoutSpec.isMutable = NO;
   }
   
-  // Manually propagate the trait collection here so that any layoutSpec children of layoutSpec will get a traitCollection
-  {
-    ASDN::SumScopeTimer t(_layoutSpecTotalTime, measureLayoutSpec);
-    ASTraitCollectionPropagateDown(layoutElement, self.primitiveTraitCollection);
-  }
-  
   BOOL measureLayoutComputation = _measurementOptions & ASDisplayNodePerformanceMeasurementOptionLayoutComputation;
   if (measureLayoutComputation) {
     _layoutComputationNumberOfPasses++;
@@ -2005,10 +1999,6 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
           }
         }
       }
-      
-      // Now that we have a supernode, propagate its traits to self.
-      ASTraitCollectionPropagateDown(self, newSupernode.primitiveTraitCollection);
-      
     } else {
       // If a node will be removed from the supernode it should go out from the layout pending state to remove all
       // layout pending state related properties on the node

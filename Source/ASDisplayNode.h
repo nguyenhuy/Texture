@@ -830,6 +830,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
  */
+// TODO Deprecate this with contextForCalculatedLayout
 @property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout;
 
 

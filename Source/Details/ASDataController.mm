@@ -802,26 +802,6 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
 }
 
-# pragma mark - ASPrimitiveTraitCollection
-
-- (void)environmentDidChange
-{
-  ASPerformBlockOnMainThread(^{
-    if (!_initialReloadDataHasBeenCalled) {
-      return;
-    }
-
-    // Can't update the trait collection right away because _visibleMap may not be up-to-date,
-    // i.e there might be some elements that were allocated using the old trait collection but haven't been added to _visibleMap
-    [self _scheduleBlockOnMainSerialQueue:^{
-      ASPrimitiveTraitCollection newTraitCollection = [self.node primitiveTraitCollection];
-      for (ASCollectionElement *element in _visibleMap) {
-        element.traitCollection = newTraitCollection;
-      }
-    }];
-  });
-}
-
 # pragma mark - Helper methods
 
 - (void)_scheduleBlockOnMainSerialQueue:(dispatch_block_t)block

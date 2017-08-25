@@ -42,7 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class ASLayout;
 @class _ASHierarchyChangeSet;
 @protocol ASRangeManagingNode;
-@protocol ASTraitEnvironment;
 @protocol ASSectionContext;
 
 typedef NSUInteger ASDataControllerAnimationOptions;
@@ -263,16 +262,6 @@ extern NSString * const ASCollectionInvalidUpdateException;
 @property (nonatomic, readonly) BOOL isProcessingUpdates;
 - (void)onDidFinishProcessingUpdates:(nullable void (^)(void))completion;
 - (void)waitUntilAllUpdatesAreProcessed;
-
-/**
- * Notifies the data controller object that its environment has changed. The object will request its environment delegate for new information
- * and propagate the information to all visible elements, including ones that are being prepared in background.
- *
- * @discussion If called before the initial @c reloadData, this method will do nothing and the trait collection of the initial load will be requested from the environment delegate.
- *
- * @discussion This method can be called on any threads.
- */
-- (void)environmentDidChange;
 
 @end
 

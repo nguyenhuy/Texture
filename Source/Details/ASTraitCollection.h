@@ -21,7 +21,6 @@
 
 @class ASTraitCollection;
 @protocol ASLayoutElement;
-@protocol ASTraitEnvironment;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -67,57 +66,6 @@ extern NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollecti
 extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
 
 ASDISPLAYNODE_EXTERN_C_END
-
-/**
- * Abstraction on top of UITraitCollection for propagation within AsyncDisplayKit-Layout
- */
-@protocol ASTraitEnvironment <NSObject>
-
-/**
- * Returns a struct-representation of the environment's ASEnvironmentDisplayTraits. This only exists as a internal
- * convenience method. Users should access the trait collections through the NSObject based asyncTraitCollection API
- */
-- (ASPrimitiveTraitCollection)primitiveTraitCollection;
-
-/**
- * Sets a trait collection on this environment state.
- */
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
-
-/**
- */
-- (ASTraitCollection *)asyncTraitCollection;
-
-@end
-
-#define ASPrimitiveTraitCollectionDefaults \
-- (ASPrimitiveTraitCollection)primitiveTraitCollection\
-{\
-  return _primitiveTraitCollection.load();\
-}\
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
-{\
-  _primitiveTraitCollection = traitCollection;\
-}\
-
-#define ASLayoutElementCollectionTableSetTraitCollection(lock) \
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection\
-{\
-  ASDN::MutexLocker l(lock);\
-\
-  ASPrimitiveTraitCollection oldTraits = self.primitiveTraitCollection;\
-  [super setPrimitiveTraitCollection:traitCollection];\
-\
-  /* Extra Trait Collection Handling */\
-\
-  /* If the node is not loaded  yet don't do anything as otherwise the access of the view will trigger a load */\
-  if (! self.isNodeLoaded) { return; }\
-\
-  ASPrimitiveTraitCollection currentTraits = self.primitiveTraitCollection;\
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(currentTraits, oldTraits) == NO) {\
-    [self.dataController environmentDidChange];\
-  }\
-}\
 
 #pragma mark - ASTraitCollection
 

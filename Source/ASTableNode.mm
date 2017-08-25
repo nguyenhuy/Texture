@@ -180,7 +180,7 @@
 
 #pragma mark Setter / Getter
 
-// TODO: Implement this without the view. Then revisit ASLayoutElementCollectionTableSetTraitCollection
+// TODO: Implement this without the view.
 - (ASDataController *)dataController
 {
   return self.view.dataController;
@@ -463,10 +463,6 @@
     [self.rangeController updateCurrentRangeWithMode:rangeMode];
   }
 }
-
-#pragma mark ASEnvironment
-
-ASLayoutElementCollectionTableSetTraitCollection(_environmentStateLock)
 
 #pragma mark - Range Tuning
 

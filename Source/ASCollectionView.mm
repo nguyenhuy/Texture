@@ -891,7 +891,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   NSAssert(_batchUpdateCount >= 0, @"endUpdatesAnimated:completion: called without having a balanced beginUpdates call");
   
   [_changeSet addCompletionHandler:completion];
-  
+
+  // TODO:
+  // 1. Don't proceed if the trait collection is not there
+  // 2. Same thing in ASTableView
   if (_batchUpdateCount == 0) {
     _ASHierarchyChangeSet *changeSet = _changeSet;
 

@@ -97,28 +97,6 @@
 
 ASLayoutElementStyleExtensibilityForwarding
 
-#pragma mark ASPrimitiveTraitCollection
-
-- (ASPrimitiveTraitCollection)primitiveTraitCollection
-{
-  return _primitiveTraitCollection.load();
-}
-
-- (void)setPrimitiveTraitCollection:(ASPrimitiveTraitCollection)traitCollection
-{
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, _primitiveTraitCollection.load()) == NO) {
-    _primitiveTraitCollection = traitCollection;
-    ASDisplayNodeLogEvent(self, @"asyncTraitCollectionDidChange: %@", NSStringFromASPrimitiveTraitCollection(traitCollection));
-
-    [self asyncTraitCollectionDidChange];
-  }
-}
-
-- (ASTraitCollection *)asyncTraitCollection
-{
-  return [ASTraitCollection traitCollectionWithASPrimitiveTraitCollection:self.primitiveTraitCollection];
-}
-
 #pragma mark - ASLayoutElementAsciiArtProtocol
 
 - (NSString *)asciiArtString

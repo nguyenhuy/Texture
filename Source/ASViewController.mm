@@ -122,34 +122,21 @@
   _node.frame = frame;
   _node.autoresizingMask = autoresizingMask;
   self.view = view;
-  
-  // ensure that self.node has a valid trait collection before a subclass's implementation of viewDidLoad.
-  // Any subnodes added in viewDidLoad will then inherit the proper environment.
-  ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-  [self propagateNewTraitCollection:traitCollection];
 }
 
 - (void)viewWillLayoutSubviews
 {
   [super viewWillLayoutSubviews];
-  
-  // Before layout, make sure that our trait collection containerSize actually matches the size of our bounds.
-  // If not, we need to update the traits and propagate them.
 
-  CGSize boundsSize = self.view.bounds.size;
-  if (CGSizeEqualToSize(self.node.primitiveTraitCollection.containerSize, boundsSize) == NO) {
-    [UIView performWithoutAnimation:^{
-      ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-      traitCollection.containerSize = boundsSize;
-        
-      // this method will call measure
-      [self propagateNewTraitCollection:traitCollection];
-    }];
-  } else {
-    // Call layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
-    // If the node's constrained size didn't change between the last layout pass it's a no-op
-    [_node layoutThatFits:[self nodeConstrainedSize]];
-  }
+  as_activity_scope_verbose(as_activity_create("-[ASViewController viewWillLayoutSubViews]", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
+
+  ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
+  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+
+  // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
+  // If the node's layout context didn't change between the last layout pass it's a no-op
+  [_node layoutThatFits:layoutContext];
 }
 
 - (void)viewDidLayoutSubviews
@@ -254,11 +241,6 @@ ASVisibilityDepthImplementation;
 
 #pragma mark - Layout Helpers
 
-- (ASSizeRange)nodeConstrainedSize
-{
-  return ASSizeRangeMake(self.view.bounds.size);
-}
-
 - (ASInterfaceState)interfaceState
 {
   return _node.interfaceState;
@@ -279,43 +261,23 @@ ASVisibilityDepthImplementation;
   return asyncTraitCollection;
 }
 
-- (void)propagateNewTraitCollection:(ASPrimitiveTraitCollection)traitCollection
-{
-  ASPrimitiveTraitCollection oldTraitCollection = self.node.primitiveTraitCollection;
-  
-  if (ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection, oldTraitCollection) == NO) {
-    as_activity_scope_verbose(as_activity_create("Propagate ASViewController trait collection", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-    as_log_debug(ASNodeLog(), "Propagating new traits for %@: %@", self, NSStringFromASPrimitiveTraitCollection(traitCollection));
-    self.node.primitiveTraitCollection = traitCollection;
-    
-    NSArray<id<ASLayoutElement>> *children = [self.node sublayoutElements];
-    for (id<ASLayoutElement> child in children) {
-      ASTraitCollectionPropagateDown(child, traitCollection);
-    }
-    
-    // Once we've propagated all the traits, layout this node.
-    // Remeasure the node with the latest constrained size – old constrained size may be incorrect.
-    as_activity_scope_verbose(as_activity_create("Layout ASViewController node with new traits", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-    [_node layoutThatFits:[self nodeConstrainedSize]];
-  }
-}
-
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
   [super traitCollectionDidChange:previousTraitCollection];
   
   ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
   traitCollection.containerSize = self.view.bounds.size;
-  [self propagateNewTraitCollection:traitCollection];
+  // TODO: Run another layout pass with this new trait collection
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-  
-  ASPrimitiveTraitCollection traitCollection = _node.primitiveTraitCollection;
-  traitCollection.containerSize = self.view.bounds.size;
-  [self propagateNewTraitCollection:traitCollection];
+
+  // TODO: Get the trait collection from node's layout context for calculated layout
+//  ASPrimitiveTraitCollection traitCollection = _node.primitiveTraitCollection;
+//  traitCollection.containerSize = self.view.bounds.size;
+  // TODO: Run another layout pass with this new trait collection
 }
 
 @end

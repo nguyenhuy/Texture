@@ -22,16 +22,6 @@
 
 #pragma mark - ASPrimitiveTraitCollection
 
-extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection) {
-  if (element) {
-    element.primitiveTraitCollection = traitCollection;
-  }
-  
-  for (id<ASLayoutElement> subelement in element.sublayoutElements) {
-    ASTraitCollectionPropagateDown(subelement, traitCollection);
-  }
-}
-
 ASPrimitiveTraitCollection ASPrimitiveTraitCollectionMakeDefault()
 {
   return (ASPrimitiveTraitCollection) {
