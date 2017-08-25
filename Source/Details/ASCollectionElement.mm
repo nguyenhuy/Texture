@@ -36,7 +36,6 @@
          supplementaryElementKind:(NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize
                        owningNode:(id<ASRangeManagingNode>)owningNode
-                  traitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   NSAssert(nodeBlock != nil, @"Node block must not be nil");
   self = [super init];
@@ -44,9 +43,9 @@
     _nodeModel = nodeModel;
     _nodeBlock = nodeBlock;
     _supplementaryElementKind = [supplementaryElementKind copy];
+    // TODO Assert that the trait collection is there
     _constrainedSize = constrainedSize;
     _owningNode = owningNode;
-    _traitCollection = traitCollection;
   }
   return self;
 }
@@ -63,7 +62,6 @@
     }
     node.owningNode = _owningNode;
     node.collectionElement = self;
-    ASTraitCollectionPropagateDown(node, _traitCollection);
     node.nodeModel = _nodeModel;
     _node = node;
   }
@@ -74,23 +72,6 @@
 {
   std::lock_guard<std::mutex> l(_lock);
   return _node;
-}
-
-- (void)setTraitCollection:(ASPrimitiveTraitCollection)traitCollection
-{
-  ASCellNode *nodeIfNeedsPropagation;
-  
-  {
-    std::lock_guard<std::mutex> l(_lock);
-    if (! ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(_traitCollection, traitCollection)) {
-      _traitCollection = traitCollection;
-      nodeIfNeedsPropagation = _node;
-    }
-  }
-  
-  if (nodeIfNeedsPropagation != nil) {
-    ASTraitCollectionPropagateDown(nodeIfNeedsPropagation, traitCollection);
-  }
 }
 
 @end

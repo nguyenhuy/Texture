@@ -59,12 +59,6 @@ extern BOOL ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(ASPrim
  */
 extern NSString *NSStringFromASPrimitiveTraitCollection(ASPrimitiveTraitCollection traits);
 
-/**
- * This function will walk the layout element hierarchy and updates the layout element trait collection for every
- * layout element within the hierarchy.
- */
-extern void ASTraitCollectionPropagateDown(id<ASLayoutElement> element, ASPrimitiveTraitCollection traitCollection);
-
 ASDISPLAYNODE_EXTERN_C_END
 
 #pragma mark - ASTraitCollection

@@ -27,17 +27,16 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionElement : NSObject
 
 @property (nonatomic, readonly, copy, nullable) NSString *supplementaryElementKind;
+// TODO Rename to layoutContext
 @property (nonatomic, assign) ASSizeRange constrainedSize;
 @property (nonatomic, readonly, weak) id<ASRangeManagingNode> owningNode;
-@property (nonatomic, assign) ASPrimitiveTraitCollection traitCollection;
 @property (nonatomic, readonly, nullable) id nodeModel;
 
 - (instancetype)initWithNodeModel:(nullable id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(nullable NSString *)supplementaryElementKind
                   constrainedSize:(ASSizeRange)constrainedSize
-                       owningNode:(id<ASRangeManagingNode>)owningNode
-                  traitCollection:(ASPrimitiveTraitCollection)traitCollection;
+                       owningNode:(id<ASRangeManagingNode>)owningNode;
 
 /**
  * @return The node, running the node block if necessary. The node block will be discarded
