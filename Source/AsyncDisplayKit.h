@@ -95,6 +95,7 @@
 #import <AsyncDisplayKit/_ASDisplayLayer.h>
 #import <AsyncDisplayKit/_ASDisplayView.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/ASTextNode+Beta.h>
 #import <AsyncDisplayKit/ASTextNodeTypes.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>

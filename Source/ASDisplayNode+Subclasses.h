@@ -173,9 +173,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** @name Layout calculation */
 
 /**
- * @abstract Calculate a layout based on given size range.
+ * @abstract Calculate a layout based on given context.
  *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ * @param layoutContext The context the receiver should measure against.
  *
  * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
  *
@@ -185,18 +185,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This method should not be called directly outside of ASDisplayNode; use -layoutThatFits: or -calculatedLayout instead.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize;
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext;
 
 /**
  * ASDisplayNode's implementation of -layoutThatFits:parentSize: calls this method to resolve the node's size
- * against parentSize, intersect it with constrainedSize, and call -calculateLayoutThatFits: with the result.
+ * against parentSize, intersect it with the size range in the layout context, and call -calculateLayoutThatFits: with the result.
  *
  * In certain advanced cases, you may want to customize this logic. Overriding this method allows you to receive all
  * three parameters and do the computation yourself.
  *
  * @warning Overriding this method should be done VERY rarely.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 
@@ -219,7 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @abstract Return a layout spec that describes the layout of the receiver and its children.
  *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ * @param layoutContext The context the receiver should measure against.
  *
  * @discussion Subclasses that override should expect this method to be called on a non-main thread. The returned layout spec
  * is used to calculate an ASLayout and cached by ASDisplayNode for quick access during -layout. Other expensive work that needs to
@@ -232,7 +232,7 @@ NS_ASSUME_NONNULL_BEGIN
  * exception. A future version of the framework may support using both, calling them serially, with the .layoutSpecBlock
  * superseding any values set by the method override.
  */
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize;
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext;
 
 /**
  * @abstract Invalidate previously measured and cached layout.

@@ -81,10 +81,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
 
 @optional
 
-/**
- The constrained size range for layout. Called only if collection layout delegate is not provided.
- */
-- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath;
+- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath;
 
 - (NSArray<NSString *> *)dataController:(ASDataController *)dataController supplementaryNodeKindsInSections:(NSIndexSet *)sections;
 
@@ -92,10 +89,7 @@ extern NSString * const ASCollectionInvalidUpdateException;
 
 - (ASCellNodeBlock)dataController:(ASDataController *)dataController supplementaryNodeBlockOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
 
-/**
- The constrained size range for layout. Called only if no data controller layout delegate is provided.
- */
-- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
 
 - (nullable id<ASSectionContext>)dataController:(ASDataController *)dataController contextForSection:(NSInteger)section;
 

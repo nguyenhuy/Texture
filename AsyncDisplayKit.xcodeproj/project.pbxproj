@@ -456,6 +456,7 @@
 		E58E9E461E941D74004CFC59 /* ASCollectionLayoutDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = E58E9E411E941D74004CFC59 /* ASCollectionLayoutDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E58E9E491E941DA5004CFC59 /* ASCollectionLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = E58E9E471E941DA5004CFC59 /* ASCollectionLayout.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E58E9E4A1E941DA5004CFC59 /* ASCollectionLayout.mm in Sources */ = {isa = PBXBuildFile; fileRef = E58E9E481E941DA5004CFC59 /* ASCollectionLayout.mm */; };
+		E59E5EF81F54B449007FCAE5 /* ASDisplayNode+Deprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = E59E5EF71F54B449007FCAE5 /* ASDisplayNode+Deprecated.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E5ABAC7B1E8564EE007AC15C /* ASRectTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E5ABAC791E8564EE007AC15C /* ASRectTable.h */; };
 		E5ABAC7C1E8564EE007AC15C /* ASRectTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E5ABAC7A1E8564EE007AC15C /* ASRectTable.m */; };
 		E5B077FF1E69F4EB00C24B5B /* ASElementMap.h in Headers */ = {isa = PBXBuildFile; fileRef = E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -958,6 +959,7 @@
 		E58E9E411E941D74004CFC59 /* ASCollectionLayoutDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayoutDelegate.h; sourceTree = "<group>"; };
 		E58E9E471E941DA5004CFC59 /* ASCollectionLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASCollectionLayout.h; sourceTree = "<group>"; };
 		E58E9E481E941DA5004CFC59 /* ASCollectionLayout.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASCollectionLayout.mm; sourceTree = "<group>"; };
+		E59E5EF71F54B449007FCAE5 /* ASDisplayNode+Deprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDisplayNode+Deprecated.h"; sourceTree = "<group>"; };
 		E5ABAC791E8564EE007AC15C /* ASRectTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASRectTable.h; sourceTree = "<group>"; };
 		E5ABAC7A1E8564EE007AC15C /* ASRectTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASRectTable.m; sourceTree = "<group>"; };
 		E5B077FD1E69F4EB00C24B5B /* ASElementMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASElementMap.h; sourceTree = "<group>"; };
@@ -1100,6 +1102,7 @@
 				058D09D7195D050800B7D73C /* ASControlNode+Subclasses.h */,
 				058D09D8195D050800B7D73C /* ASDisplayNode.h */,
 				058D09D9195D050800B7D73C /* ASDisplayNode.mm */,
+				E59E5EF71F54B449007FCAE5 /* ASDisplayNode+Deprecated.h */,
 				68B027791C1A79CC0041016B /* ASDisplayNode+Beta.h */,
 				90FC784E1E4BFE1B00383C5A /* ASDisplayNode+Yoga.mm */,
 				058D09DA195D050800B7D73C /* ASDisplayNode+Subclasses.h */,
@@ -1751,6 +1754,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A6C000D1FAB4E2100D05926 /* ASCornerLayoutSpec.h in Headers */,
+				E59E5EF81F54B449007FCAE5 /* ASDisplayNode+Deprecated.h in Headers */,
 				E55A4EA71F54670200B13FAA /* ASDimension+Deprecated.h in Headers */,
 				E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */,
 				E5B225281F1790D6001E1431 /* ASHashing.h in Headers */,

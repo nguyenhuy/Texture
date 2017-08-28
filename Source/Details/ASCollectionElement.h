@@ -17,6 +17,8 @@
 
 #import <AsyncDisplayKit/ASDataController.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
+// TODO Remove this
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 @class ASDisplayNode;
 @protocol ASRangeManagingNode;

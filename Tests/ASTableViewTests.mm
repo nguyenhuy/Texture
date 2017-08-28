@@ -127,12 +127,12 @@
 
 @implementation ASTestTextCellNode
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
 {
   if ([NSThread isMainThread]) {
     _numberOfLayoutsOnMainThread++;
   }
-  return [super layoutSpecThatFits:constrainedSize];
+  return [super layoutSpecThatFits:layoutContext];
 }
 
 @end

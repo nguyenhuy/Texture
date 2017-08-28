@@ -73,8 +73,8 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     unsigned int supplementaryNodeKindsInSections:1;
     unsigned int supplementaryNodesOfKindInSection:1;
     unsigned int supplementaryNodeBlockOfKindAtIndexPath:1;
-    unsigned int constrainedSizeForNodeAtIndexPath:1;
-    unsigned int constrainedSizeForSupplementaryNodeOfKindAtIndexPath:1;
+    unsigned int layoutContextForNodeAtIndexPath:1;
+    unsigned int layoutContextForSupplementaryNodeOfKindAtIndexPath:1;
     unsigned int contextForSection:1;
   } _dataSourceFlags;
 }
@@ -99,8 +99,8 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   _dataSourceFlags.supplementaryNodeKindsInSections = [_dataSource respondsToSelector:@selector(dataController:supplementaryNodeKindsInSections:)];
   _dataSourceFlags.supplementaryNodesOfKindInSection = [_dataSource respondsToSelector:@selector(dataController:supplementaryNodesOfKind:inSection:)];
   _dataSourceFlags.supplementaryNodeBlockOfKindAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:supplementaryNodeBlockOfKind:atIndexPath:)];
-  _dataSourceFlags.constrainedSizeForNodeAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForNodeAtIndexPath:)];
-  _dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:constrainedSizeForSupplementaryNodeOfKind:atIndexPath:)];
+  _dataSourceFlags.layoutContextForNodeAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:layoutContextForNodeAtIndexPath:)];
+  _dataSourceFlags.layoutContextForSupplementaryNodeOfKindAtIndexPath = [_dataSource respondsToSelector:@selector(dataController:layoutContextForSupplementaryNodeOfKind:atIndexPath:)];
   _dataSourceFlags.contextForSection = [_dataSource respondsToSelector:@selector(dataController:contextForSection:)];
   
 #if ASEVENTLOG_ENABLE
@@ -399,31 +399,29 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 }
 
 /**
- * Returns constrained size for the node of the given kind and at the given index path.
+ * Returns layout context for the node of the given kind and at the given index path.
  * NOTE: index path must be in the data-source index space.
  */
-- (ASSizeRange)constrainedSizeForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)layoutContextForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
-  //      ASPrimitiveTraitCollection existingTraitCollection = self.node.layoutContext.traitCollection;
-  // TODO: Insert the trait collection to layoutContext, if needed
-  
+
   id<ASDataControllerSource> dataSource = _dataSource;
   if (dataSource == nil || indexPath == nil) {
-    return ASSizeRangeZero;
+    return ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault());
   }
   
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
-    ASDisplayNodeAssert(_dataSourceFlags.constrainedSizeForNodeAtIndexPath, @"-dataController:constrainedSizeForNodeAtIndexPath: must also be implemented");
-    return [dataSource dataController:self constrainedSizeForNodeAtIndexPath:indexPath];
+    ASDisplayNodeAssert(_dataSourceFlags.layoutContextForNodeAtIndexPath, @"-dataController:constrainedSizeForNodeAtIndexPath: must also be implemented");
+    return [dataSource dataController:self layoutContextForNodeAtIndexPath:indexPath];
   }
   
-  if (_dataSourceFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath){
-    return [dataSource dataController:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
+  if (_dataSourceFlags.layoutContextForSupplementaryNodeOfKindAtIndexPath){
+    return [dataSource dataController:self layoutContextForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
   }
   
   ASDisplayNodeAssert(NO, @"Unknown constrained size for node of kind %@ by data source %@", kind, dataSource);
-  return ASSizeRangeZero;
+  return ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault());
 }
 
 #pragma mark - Batching (External API)

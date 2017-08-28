@@ -240,8 +240,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableViewWillBeginBatchFetch:1;
     unsigned int shouldBatchFetchForTableView:1;
     unsigned int shouldBatchFetchForTableNode:1;
-    unsigned int tableViewConstrainedSizeForRow:1;
-    unsigned int tableNodeConstrainedSizeForRow:1;
+    unsigned int tableNodeLayoutContextForRow:1;
+    unsigned int tableViewConstrainedSizeForRowDeprecated:1;
+    unsigned int tableNodeConstrainedSizeForRowDeprecated:1;
     unsigned int tableViewWillSelectRow:1;
     unsigned int tableNodeWillSelectRow:1;
     unsigned int tableViewDidSelectRow:1;
@@ -490,8 +491,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDelegateFlags.shouldBatchFetchForTableNode = [_asyncDelegate respondsToSelector:@selector(shouldBatchFetchForTableNode:)];
     _asyncDelegateFlags.scrollViewWillBeginDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewWillBeginDragging:)];
     _asyncDelegateFlags.scrollViewDidEndDragging = [_asyncDelegate respondsToSelector:@selector(scrollViewDidEndDragging:willDecelerate:)];
-    _asyncDelegateFlags.tableViewConstrainedSizeForRow = [_asyncDelegate respondsToSelector:@selector(tableView:constrainedSizeForRowAtIndexPath:)];
-    _asyncDelegateFlags.tableNodeConstrainedSizeForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:constrainedSizeForRowAtIndexPath:)];
+    _asyncDelegateFlags.tableNodeLayoutContextForRow = [_asyncDelegate respondsToSelector:@selector(tableNode:layoutContextForRowAtIndexPath:withTraitCollection:)];
+    _asyncDelegateFlags.tableViewConstrainedSizeForRowDeprecated = [_asyncDelegate respondsToSelector:@selector(tableView:constrainedSizeForRowAtIndexPath:)];
+    _asyncDelegateFlags.tableNodeConstrainedSizeForRowDeprecated = [_asyncDelegate respondsToSelector:@selector(tableNode:constrainedSizeForRowAtIndexPath:)];
 
     _asyncDelegateFlags.tableViewWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableView:willSelectRowAtIndexPath:)];
     _asyncDelegateFlags.tableNodeWillSelectRow = [_asyncDelegate respondsToSelector:@selector(tableNode:willSelectRowAtIndexPath:)];
@@ -1714,28 +1716,34 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return block;
 }
 
-- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
-  ASSizeRange constrainedSize = ASSizeRangeZero;
-  if (_asyncDelegateFlags.tableNodeConstrainedSizeForRow) {
-    GET_TABLENODE_OR_RETURN(tableNode, constrainedSize);
-    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:tableNode constrainedSizeForRowAtIndexPath:indexPath];
-    // ignore widths in the returned size range (for TableView)
-    constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
-                                      CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height));
-  } else if (_asyncDelegateFlags.tableViewConstrainedSizeForRow) {
+  ASTableNode *tableNode = self.tableNode;
+  ASPrimitiveTraitCollection traitCollection = tableNode ? tableNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext result;
+  if (_asyncDelegateFlags.tableNodeLayoutContextForRow) {
+    result = [_asyncDelegate tableNode:tableNode layoutContextForRowAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableView:self constrainedSizeForRowAtIndexPath:indexPath];
-#pragma clang diagnostic pop
+  } else if (_asyncDelegateFlags.tableNodeConstrainedSizeForRowDeprecated) {
+    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:tableNode constrainedSizeForRowAtIndexPath:indexPath];
     // ignore widths in the returned size range (for TableView)
-    constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
-                                      CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height));
+    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
+                                 CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height),
+                                 traitCollection);
+  } else if (_asyncDelegateFlags.tableViewConstrainedSizeForRowDeprecated) {
+    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableView:self constrainedSizeForRowAtIndexPath:indexPath];
+    // ignore widths in the returned size range (for TableView)
+    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
+                                 CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height),
+                                 traitCollection);
+#pragma clang diagnostic pop
   } else {
-    constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, 0),
-                                      CGSizeMake(_nodesConstrainedWidth, CGFLOAT_MAX));
+    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, 0),
+                                 CGSizeMake(_nodesConstrainedWidth, CGFLOAT_MAX),
+                                 traitCollection);
   }
-  return constrainedSize;
+  return result;
 }
 
 - (NSUInteger)dataController:(ASDataController *)dataController rowsInSection:(NSUInteger)section
@@ -1798,15 +1806,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
   
   CGFloat contentViewWidth = tableViewCell.contentView.bounds.size.width;
-  ASSizeRange constrainedSize = node.constrainedSizeForCalculatedLayout;
+  ASLayoutContext layoutContext = node.contextForCalculatedLayout;
   
   // Table view cells should always fill its content view width.
   // Normally the content view width equals to the constrained size width (which equals to the table view width).
   // If there is a mismatch between these values, for example after the table view entered or left editing mode,
   // content view width is preferred and used to re-measure the cell node.
-  if (CGSizeEqualToSize(node.calculatedSize, CGSizeZero) == NO && contentViewWidth != constrainedSize.max.width) {
-    constrainedSize.min.width = contentViewWidth;
-    constrainedSize.max.width = contentViewWidth;
+  if (CGSizeEqualToSize(node.calculatedSize, CGSizeZero) == NO && contentViewWidth != layoutContext.max.width) {
+    layoutContext.min.width = contentViewWidth;
+    layoutContext.max.width = contentViewWidth;
 
     // Re-measurement is done on main to ensure thread affinity. In the worst case, this is as fast as UIKit's implementation.
     //
@@ -1815,7 +1823,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     // Also, in many cases, some nodes may not need to be re-measured at all, such as when user enters and then immediately leaves editing mode.
     // To avoid premature optimization and making such assumption, as well as to keep ASTableView simple, re-measurement is strictly done on main.
     CGSize oldSize = node.bounds.size;
-    const CGSize calculatedSize = [node layoutThatFits:constrainedSize].size;
+    const CGSize calculatedSize = [node layoutThatFits:layoutContext].size;
     node.frame = { .size = calculatedSize };
 
     // If the node height changed, trigger a height requery.

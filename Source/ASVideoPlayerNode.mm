@@ -743,9 +743,9 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 #pragma mark - Layout
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
 {
-  CGSize maxSize = constrainedSize.max;
+  CGSize maxSize = layoutContext.max;
 
   // Prevent crashes through if infinite width or height
   if (isinf(maxSize.width) || isinf(maxSize.height)) {

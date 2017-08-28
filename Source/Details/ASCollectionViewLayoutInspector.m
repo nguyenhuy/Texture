@@ -25,7 +25,7 @@
 
 // Returns a constrained size to let the cells layout itself as far as possible based on the scrollable direction
 // of the collection view
-ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionView) {
+ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection) {
   CGSize maxSize = collectionView.bounds.size;
   UIEdgeInsets contentInset = collectionView.contentInset;
   if (ASScrollDirectionContainsHorizontalDirection(collectionView.scrollableDirections)) {
@@ -35,15 +35,16 @@ ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionVi
     maxSize.width -= (contentInset.left + contentInset.right);
     maxSize.height = CGFLOAT_MAX;
   }
-  return ASSizeRangeMake(CGSizeZero, maxSize);
+  return ASLayoutContextMake(CGSizeZero, maxSize, traitCollection);
 }
 
 #pragma mark - ASCollectionViewLayoutInspector
 
 @implementation ASCollectionViewLayoutInspector {
   struct {
+    unsigned int implementsLayoutContextForItemAtIndexPathWithTraitCollection:1;
     unsigned int implementsConstrainedSizeForNodeAtIndexPathDeprecated:1;
-    unsigned int implementsConstrainedSizeForNodeAtIndexPath:1;
+    unsigned int implementsConstrainedSizeForItemAtIndexPathDeprecated:1;
   } _delegateFlags;
 }
 
@@ -54,26 +55,37 @@ ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionVi
   if (delegate == nil) {
     memset(&_delegateFlags, 0, sizeof(_delegateFlags));
   } else {
+    _delegateFlags.implementsLayoutContextForItemAtIndexPathWithTraitCollection = [delegate respondsToSelector:@selector(collectionNode:layoutContextForItemAtIndexPath:withTraitCollection:)];
     _delegateFlags.implementsConstrainedSizeForNodeAtIndexPathDeprecated = [delegate respondsToSelector:@selector(collectionView:constrainedSizeForNodeAtIndexPath:)];
-    _delegateFlags.implementsConstrainedSizeForNodeAtIndexPath = [delegate respondsToSelector:@selector(collectionNode:constrainedSizeForItemAtIndexPath:)];
+    _delegateFlags.implementsConstrainedSizeForItemAtIndexPathDeprecated = [delegate respondsToSelector:@selector(collectionNode:constrainedSizeForItemAtIndexPath:)];
   }
 }
 
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
-  if (_delegateFlags.implementsConstrainedSizeForNodeAtIndexPath) {
-    return [collectionView.asyncDelegate collectionNode:collectionView.collectionNode constrainedSizeForItemAtIndexPath:indexPath];
-  } else if (_delegateFlags.implementsConstrainedSizeForNodeAtIndexPathDeprecated) {
+  ASCollectionNode *collectionNode = collectionView.collectionNode;
+  ASLayoutContext result;
+  if (_delegateFlags.implementsLayoutContextForItemAtIndexPathWithTraitCollection) {
+    result = [collectionView.asyncDelegate collectionNode:collectionNode layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath];
+  } else if (_delegateFlags.implementsConstrainedSizeForItemAtIndexPathDeprecated) {
+    result = [collectionView.asyncDelegate collectionNode:collectionNode constrainedSizeForItemAtIndexPath:indexPath];
+    result.traitCollection = traitCollection;
+  } else if (_delegateFlags.implementsConstrainedSizeForNodeAtIndexPathDeprecated) {
+    result = [collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath];
+    result.traitCollection = traitCollection;
 #pragma clang diagnostic pop
   } else {
     // With 2.0 `collectionView:constrainedSizeForNodeAtIndexPath:` was moved to the delegate. Assert if not implemented on the delegate but on the data source
     ASDisplayNodeAssert([collectionView.asyncDataSource respondsToSelector:@selector(collectionView:constrainedSizeForNodeAtIndexPath:)] == NO, @"collectionView:constrainedSizeForNodeAtIndexPath: was moved from the ASCollectionDataSource to the ASCollectionDelegate.");
+    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
   }
-  
-  return NodeConstrainedSizeForScrollDirection(collectionView);
+
+  if (ASLayoutContextEqualToLayoutContext(result, ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection))) {
+    result = NodeLayoutContextForScrollDirection(collectionView, traitCollection);
+  }
+  return result;
 }
 
 - (ASScrollDirection)scrollableDirections

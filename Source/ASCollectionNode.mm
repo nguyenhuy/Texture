@@ -705,7 +705,7 @@
 
 - (ASLayoutContext)layoutContext
 {
-  return self.constrainedSizeForCalculatedLayout;
+  return self.contextForCalculatedLayout;
 }
 
 #pragma mark - Editing

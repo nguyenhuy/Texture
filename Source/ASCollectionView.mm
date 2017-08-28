@@ -228,6 +228,9 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   } _asyncDataSourceFlags;
   
   struct {
+    unsigned int layoutContextForNodeAtIndexPathWithTraitCollection:1;
+    unsigned int constrainedSizeForNodeAtIndexPath:1;
+    unsigned int layoutContextForSupplementaryNodeOfKindAtIndexPathWithTraitCollection:1;
     unsigned int constrainedSizeForSupplementaryNodeOfKindAtIndexPath:1;
     unsigned int supplementaryNodesOfKindInSection:1;
     unsigned int didChangeCollectionViewDataSource:1;
@@ -596,7 +599,10 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 - (void)setLayoutInspector:(id<ASCollectionViewLayoutInspecting>)layoutInspector
 {
   _layoutInspector = layoutInspector;
-  
+
+  _layoutInspectorFlags.layoutContextForNodeAtIndexPathWithTraitCollection = [_layoutInspector respondsToSelector:@selector(collectionView:layoutContextForNodeAtIndexPath:withTraitCollection:)];
+  _layoutInspectorFlags.constrainedSizeForNodeAtIndexPath = [_layoutInspector respondsToSelector:@selector(collectionView:constrainedSizeForNodeAtIndexPath:)];
+  _layoutInspectorFlags.layoutContextForSupplementaryNodeOfKindAtIndexPathWithTraitCollection = [_layoutInspector respondsToSelector:@selector(collectionView:layoutContextForSupplementaryNodeOfKind:atIndexPath:withTraitCollection:)];
   _layoutInspectorFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath = [_layoutInspector respondsToSelector:@selector(collectionView:constrainedSizeForSupplementaryNodeOfKind:atIndexPath:)];
   _layoutInspectorFlags.supplementaryNodesOfKindInSection = [_layoutInspector respondsToSelector:@selector(collectionView:supplementaryNodesOfKind:inSection:)];
   _layoutInspectorFlags.didChangeCollectionViewDataSource = [_layoutInspector respondsToSelector:@selector(didChangeCollectionViewDataSource:)];
@@ -1654,7 +1660,6 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
       break;
   }
   
-  // To ensure _maxSizeForNodesConstrainedSize is up-to-date for every usage, this call to super must be done last
   [super layoutSubviews];
     
   if (_zeroContentInsets) {
@@ -1922,19 +1927,44 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
-  return [self.layoutInspector collectionView:self constrainedSizeForNodeAtIndexPath:indexPath];
+  ASCollectionNode *collectionNode = self.collectionNode;
+  ASPrimitiveTraitCollection traitCollection = collectionNode ? collectionNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext result;
+  if (_layoutInspectorFlags.layoutContextForNodeAtIndexPathWithTraitCollection) {
+    result = [self.layoutInspector collectionView:self layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  } else if (_layoutInspectorFlags.constrainedSizeForNodeAtIndexPath) {
+    result = [self.layoutInspector collectionView:self constrainedSizeForNodeAtIndexPath:indexPath];
+    result.traitCollection = traitCollection;
+#pragma clang diagnostic pop
+  } else {
+    ASDisplayNodeAssert(NO, @"-collectionView:layoutContextForNodeAtIndexPath: must be implemented.");
+    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+  }
+  return result;
 }
 
-- (ASSizeRange)dataController:(ASDataController *)dataController constrainedSizeForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
-  if (_layoutInspectorFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
-    return [self.layoutInspector collectionView:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
+  ASCollectionNode *collectionNode = self.collectionNode;
+  ASPrimitiveTraitCollection traitCollection = collectionNode ? collectionNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext result;
+  if (_layoutInspectorFlags.layoutContextForSupplementaryNodeOfKindAtIndexPathWithTraitCollection) {
+    result = [self.layoutInspector collectionView:self layoutContextForSupplementaryNodeOfKind:kind atIndexPath:indexPath withTraitCollection:traitCollection];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  } else if (_layoutInspectorFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
+    result = [self.layoutInspector collectionView:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
+    result.traitCollection = traitCollection;
+#pragma clang diagnostic pop
+  } else {
+    ASDisplayNodeAssert(NO, @"To support supplementary nodes in ASCollectionView, it must have a layoutInspector for layout inspection. (See ASCollectionViewFlowLayoutInspector for an example.)");
+    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
   }
-  
-  ASDisplayNodeAssert(NO, @"To support supplementary nodes in ASCollectionView, it must have a layoutInspector for layout inspection. (See ASCollectionViewFlowLayoutInspector for an example.)");
-  return ASSizeRangeMake(CGSizeZero, CGSizeZero);
+  return result;
 }
 
 - (NSUInteger)dataController:(ASDataController *)dataController supplementaryNodesOfKind:(NSString *)kind inSection:(NSUInteger)section

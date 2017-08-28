@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - ASSizeRange
 
 // TODO Mass rename ASSizeRange in the framework and deprecated needed APIs
+// TODO Deprecate all funcs in this header
 typedef ASLayoutContext ASSizeRange;
 
 /**

@@ -62,7 +62,7 @@
   return self;
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
 {
   return _layoutSpecUnderTest;
 }

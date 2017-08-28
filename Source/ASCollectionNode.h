@@ -696,15 +696,19 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 /**
- * Provides the constrained size range for measuring the given item.
+ * Provides the layout context for measuring the given item.
  *
  * @param collectionNode The sender.
  *
  * @param indexPath The index path of the item.
  *
- * @return A constrained size range for layout for the item at this index path.
+ * @param traitCollection The trait collection to be used to construct the returned layout context.
+ *
+ * @return A context for layout for the item at this index path.
  */
-- (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode
+  layoutContextForItemAtIndexPath:(NSIndexPath *)indexPath
+              withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 - (void)collectionNode:(ASCollectionNode *)collectionNode willDisplayItemWithNode:(ASCellNode *)node;
 
@@ -762,7 +766,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A constrained size range for layout the node at this index path.
  */
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's constrainedSizeForItemAtIndexPath: instead. PLEASE NOTE the very subtle method name change.");
+- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's layoutContextForItemAtIndexPath:withTraitCollection: instead.");
+
+/**
+ * Provides the constrained size range for measuring the given item.
+ *
+ * @note Deprecated in 2.5
+ *
+ * @param collectionNode The sender.
+ *
+ * @param indexPath The index path of the item.
+ *
+ * @return A constrained size range for layout for the item at this index path.
+ */
+- (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's layoutContextForItemAtIndexPath:withTraitCollection: instead.");
 
 /**
  * Informs the delegate that the collection view will add the given node
@@ -839,9 +856,9 @@ NS_ASSUME_NONNULL_BEGIN
  *    nil from within a nodeBlock, if you have returned a nodeBlock object.
  * 4. Lastly, you must implement a method to provide the size for the cell. There are two ways this is done:
  * 4a. UICollectionViewFlowLayout (incl. ASPagerNode). Implement
- collectionNode:constrainedSizeForItemAtIndexPath:.
+ collectionNode:layoutContextForItemAtIndexPath:withTraitCollection:.
  * 4b. Custom collection layouts. Set .layoutInspector and have it implement
- collectionView:constrainedSizeForNodeAtIndexPath:.
+ collectionView:layoutContextForItemAtIndexPath:withTraitCollection:.
  *
  * For an example of using this method with all steps above (including a custom layout, 4b.),
  * see the app in examples/CustomCollectionView and enable kShowUICollectionViewCells = YES.

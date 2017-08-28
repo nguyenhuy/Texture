@@ -610,16 +610,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tableNode:(ASTableNode *)tableNode performAction:(SEL)action forRowAtIndexPath:(NSIndexPath *)indexPath withSender:(nullable id)sender;
 
 /**
- * Provides the constrained size range for measuring the row at the index path.
- * Note: the widths in the returned size range are ignored!
+ * Provides the layout context for measuring the row at the index path.
+ *
+ * @note the widths in the returned size range are ignored!
  *
  * @param tableNode The sender.
  *
  * @param indexPath The index path of the node.
  *
- * @return A constrained size range for layout the node at this index path.
+ * @param traitCollection The trait collection to be used in the returned layout context.
+ *
+ * @return A layout context for the node at this index path.
  */
-- (ASSizeRange)tableNode:(ASTableNode *)tableNode constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (ASLayoutContext)tableNode:(ASTableNode *)tableNode layoutContextForRowAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Receive a message that the tableView is near the end of its data set and more data should be fetched if necessary.
@@ -706,7 +709,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Provides the constrained size range for measuring the row at the index path.
- * Note: the widths in the returned size range are ignored!
+ *
+ * @note the widths in the returned size range are ignored!
+ *
+ * @note Deprecated in 2.5
+ *
+ * @param tableNode The sender.
+ *
+ * @param indexPath The index path of the node.
+ *
+ * @return A constrained size range for layout the node at this index path.
+ */
+- (ASSizeRange)tableNode:(ASTableNode *)tableNode constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's -layoutContextForRowAtIndexPath:withTraitCollection: method instead.");
+
+/**
+ * Provides the constrained size range for measuring the row at the index path.
+ *
+ * @note the widths in the returned size range are ignored!
  *
  * @param tableView The sender.
  *
@@ -714,7 +733,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A constrained size range for layout the node at this index path.
  */
-- (ASSizeRange)tableView:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's method instead.");
+- (ASSizeRange)tableView:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT  ASDISPLAYNODE_DEPRECATED_MSG("Use ASTableNode's -layoutContextForRowAtIndexPath:withTraitCollection: method instead.");
 
 /**
  * Informs the delegate that the table view will add the node

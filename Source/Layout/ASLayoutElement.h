@@ -81,21 +81,21 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
 #pragma mark - Calculate layout
 
 /**
- * @abstract Asks the node to return a layout based on given size range.
+ * @abstract Asks the node to return a layout based on given layout context.
  *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ * @param layoutContext The layout context the receiver should fit in.
  *
  * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
  *
  * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
- * constraint and the result.
+ * context and the result.
  *
  * @warning Subclasses must not override this; it caches results from -calculateLayoutThatFits:.  Calling this method may
  * be expensive if result is not cached.
  *
  * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
  */
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize;
+- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext;
 
 /**
  * Call this on children layoutElements to compute their layouts within your implementation of -calculateLayoutThatFits:.
@@ -103,17 +103,18 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * @warning You may not override this method. Override -calculateLayoutThatFits: instead.
  * @warning In almost all cases, prefer the use of ASCalculateLayout in ASLayout
  *
- * @param constrainedSize Specifies a minimum and maximum size. The receiver must choose a size that is in this range.
+ * @param layoutContext Specifies a layout context. The receiver must choose a size that is in the min and max range of
+ *                      the layout context.
  * @param parentSize The parent node's size. If the parent component does not have a final size in a given dimension,
  *                  then it should be passed as ASLayoutElementParentDimensionUndefined (for example, if the parent's width
  *                  depends on the child's size).
  *
  * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
- * constraint and the result.
+ * context and the result.
  *
  * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
  */
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize;
+- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext parentSize:(CGSize)parentSize;
 
 /**
  * Override this method to compute your layoutElement's layout.
@@ -121,16 +122,16 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * @discussion Why do you need to override -calculateLayoutThatFits: instead of -layoutThatFits:parentSize:?
  * The base implementation of -layoutThatFits:parentSize: does the following for you:
  * 1. First, it uses the parentSize parameter to resolve the nodes's size (the one assigned to the size property).
- * 2. Then, it intersects the resolved size with the constrainedSize parameter. If the two don't intersect,
- *    constrainedSize wins. This allows a component to always override its childrens' sizes when computing its layout.
+ * 2. Then, it intersects the resolved size with the size range provided in the layout context. If the two don't intersect,
+ *    the size range wins. This allows a component to always override its childrens' sizes when computing its layout.
  *    (The analogy for UIView: you might return a certain size from -sizeThatFits:, but a parent view can always override
  *    that size and set your frame to any size.)
  * 3. It caches it result for reuse
  *
- * @param constrainedSize A min and max size. This is computed as described in the description. The ASLayout you
- *                        return MUST have a size between these two sizes.
+ * @param layoutContext A layout context. This is computed as described in the description. The ASLayout you
+ *                        return MUST have a size between the two sizes of the layout context.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize;
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext;
 
 /**
  * In certain advanced cases, you may want to override this method. Overriding this method allows you to receive the
@@ -139,7 +140,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  *
  * @warning Overriding this method should be done VERY rarely.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 

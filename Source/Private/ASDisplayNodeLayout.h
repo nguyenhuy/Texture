@@ -27,7 +27,7 @@
  */
 struct ASDisplayNodeLayout {
   ASLayout *layout;
-  ASSizeRange constrainedSize;
+  ASLayoutContext layoutContext;
   CGSize parentSize;
   BOOL requestedLayoutFromAbove;
   NSUInteger version;
@@ -35,21 +35,21 @@ struct ASDisplayNodeLayout {
   /*
    * Create a new display node layout with
    * @param layout The layout to associate, usually returned from a call to -layoutThatFits:parentSize:
-   * @param constrainedSize Constrained size used to create the layout
+   * @param layoutContext Context used to create the layout
    * @param parentSize Parent size used to create the layout
    * @param version The version of the source layout data – see ASDisplayNode's _layoutVersion. 
    */
-  ASDisplayNodeLayout(ASLayout *layout, ASSizeRange constrainedSize, CGSize parentSize, NSUInteger version)
-  : layout(layout), constrainedSize(constrainedSize), parentSize(parentSize), requestedLayoutFromAbove(NO), version(version) {};
+  ASDisplayNodeLayout(ASLayout *layout, ASLayoutContext layoutContext, CGSize parentSize, NSUInteger version)
+  : layout(layout), layoutContext(layoutContext), parentSize(parentSize), requestedLayoutFromAbove(NO), version(version) {};
   
   /*
    * Creates a layout without any layout associated. By default this display node layout is dirty.
    */
   ASDisplayNodeLayout()
-  : layout(nil), constrainedSize({{0, 0}, {0, 0}}), parentSize({0, 0}), requestedLayoutFromAbove(NO), version(0) {};
+  : layout(nil), layoutContext(ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault())), parentSize({0, 0}), requestedLayoutFromAbove(NO), version(0) {};
   
   /**
-   * Returns whether this is valid for a given constrained size, parent size, and version
+   * Returns whether this is valid for a given layout context, parent size, and version
    */
-  BOOL isValid(ASSizeRange constrainedSize, CGSize parentSize, NSUInteger version);
+  BOOL isValid(ASLayoutContext layoutContext, CGSize parentSize, NSUInteger version);
 };

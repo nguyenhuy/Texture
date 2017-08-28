@@ -31,17 +31,17 @@ extern BOOL ASPointIsNull(CGPoint point);
 /**
  * Safely calculates the layout of the given root layoutElement by guarding against nil nodes.
  * @param rootLayoutElement The root node to calculate the layout for.
- * @param sizeRange The size range to calculate the root layout within.
+ * @param layoutContext The context to calculate the root layout within.
  */
-extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange);
+extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASLayoutContext layoutContext);
 
 /**
  * Safely computes the layout of the given node by guarding against nil nodes.
  * @param layoutElement The layout element to calculate the layout for.
- * @param sizeRange The size range to calculate the node layout within.
+ * @param layoutContext The context to calculate the node layout within.
  * @param parentSize The parent size of the node to calculate the layout for.
  */
-extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASSizeRange sizeRange, const CGSize parentSize);
+extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASLayoutContext layoutContext, const CGSize parentSize);
 
 ASDISPLAYNODE_EXTERN_C_END
 

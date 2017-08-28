@@ -42,6 +42,7 @@ typedef struct {
 @protocol ASIGSupplementaryNodeSource <IGListSupplementaryViewSource, ASSupplementaryNodeSource>
 @end
 
+// TODO: Fix deprecations
 @interface ASIGListAdapterBasedDataSource ()
 @property (nonatomic, weak, readonly) IGListAdapter *listAdapter;
 @property (nonatomic, readonly) id<UICollectionViewDelegateFlowLayout> delegate;

@@ -61,7 +61,7 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 /**
  * ASDisplayNode layout spec block. This block can be used instead of implementing layoutSpecThatFits: in subclass
  */
-typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize);
+typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext layoutContext);
 
 /**
  * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
@@ -773,7 +773,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 /**
  * @abstract Asks the node to return a layout based on given size range.
  *
- * @param constrainedSize The minimum and maximum sizes the receiver should fit in.
+ * @param layoutContext The minimum and maximum sizes, as well as trait collection, the receiver should fit in.
  *
  * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
  *
@@ -785,7 +785,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
  */
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize;
+- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext;
 
 @end
 
@@ -817,22 +817,20 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Return the calculated size.
  *
  * @discussion Ideal for use by subclasses in -layout, having already prompted their subnodes to calculate their size by
- * calling -layoutThatFits: on them in -calculateLayoutThatFits.
+ * calling -layoutThatFits: on them in -calculateLayoutThatFits:.
  *
- * @return Size already calculated by -calculateLayoutThatFits:.
+ * @return Size already calculated by -layoutThatFits:.
  *
  * @warning Subclasses must not override this; it returns the last cached measurement and is never expensive.
  */
 @property (nonatomic, readonly, assign) CGSize calculatedSize;
 
 /** 
- * @abstract Return the constrained size range used for calculating layout.
+ * @abstract Return the context used for calculating layout.
  *
- * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
+ * @return The context used by -layoutThatFits:.
  */
-// TODO Deprecate this with contextForCalculatedLayout
-@property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout;
-
+@property (nonatomic, readonly, assign) ASLayoutContext contextForCalculatedLayout;
 
 @end
 
@@ -866,26 +864,28 @@ extern NSInteger const ASDefaultDrawingPriority;
 - (void)didCompleteLayoutTransition:(nonnull id<ASContextTransitioning>)context;
 
 /**
- * @abstract Transitions the current layout with a new constrained size. Must be called on main thread.
+ * @abstract Transitions the current layout with a new layout context. Must be called on main thread.
  *
+ * @param layoutContext The new layout context to measure against.
  * @param animated Animation is optional, but will still proceed through your `animateLayoutTransition` implementation with `isAnimated == NO`.
  * @param shouldMeasureAsync Measure the layout asynchronously.
  * @param completion Optional completion block called only if a new layout is calculated.
  * It is called on main, right after the measurement and before -animateLayoutTransition:.
  *
- * @discussion If the passed constrainedSize is the the same as the node's current constrained size, this method is noop. If passed YES to shouldMeasureAsync it's guaranteed that measurement is happening on a background thread, otherwise measaurement will happen on the thread that the method was called on. The measurementCompletion callback is always called on the main thread right after the measurement and before -animateLayoutTransition:.
+ * @discussion If the passed layout context is the the same as the node's current context, this method is no-op.
+ * If passed YES to shouldMeasureAsync it's guaranteed that measurement is happening on a background thread,
+ * otherwise measaurement will happen on the thread that the method was called on.
+ * The measurementCompletion callback is always called on the main thread right after the measurement and before -animateLayoutTransition:.
  *
  * @see animateLayoutTransition:
- *
  */
-- (void)transitionLayoutWithSizeRange:(ASSizeRange)constrainedSize
-                             animated:(BOOL)animated
-                   shouldMeasureAsync:(BOOL)shouldMeasureAsync
-                measurementCompletion:(nullable void(^)(void))completion;
-
+- (void)transitionLayoutWithLayoutContext:(ASLayoutContext)layoutContext
+                                 animated:(BOOL)animated
+                       shouldMeasureAsync:(BOOL)shouldMeasureAsync
+                    measurementCompletion:(nullable void(^)(void))completion;
 
 /**
- * @abstract Invalidates the layout and begins a relayout of the node with the current `constrainedSize`. Must be called on main thread.
+ * @abstract Invalidates the layout and begins a relayout of the node with the current layout context. Must be called on main thread.
  *
  * @discussion It is called right after the measurement and before -animateLayoutTransition:.
  *
@@ -894,7 +894,6 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @param completion Optional completion block called only if a new layout is calculated.
  *
  * @see animateLayoutTransition:
- *
  */
 - (void)transitionLayoutWithAnimation:(BOOL)animated
                    shouldMeasureAsync:(BOOL)shouldMeasureAsync

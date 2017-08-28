@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
 
 @class ASCollectionView;
@@ -25,14 +26,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *collectionView);
+extern ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection);
 
 @protocol ASCollectionViewLayoutInspecting <NSObject>
-
-/**
- * Asks the inspector to provide a constrained size range for the given collection view node.
- */
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  * Return the directions in which your collection view can scroll
@@ -42,9 +38,15 @@ extern ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *colle
 @optional
 
 /**
- * Asks the inspector to provide a constrained size range for the given supplementary node.
+ * Asks the inspector to provide a layout context for the given collection view node.
  */
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath;
+// TODO: Make this non-optional once -collectionView:constrainedSizeForNodeAtIndexPath: is gone.
+- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+
+/**
+ * Asks the inspector to provide a layout context for the given supplementary node.
+ */
+- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Asks the inspector for the number of supplementary views for the given kind in the specified section.
@@ -65,7 +67,7 @@ extern ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *colle
  */
 - (void)didChangeCollectionViewDataSource:(nullable id<ASCollectionDataSource>)dataSource;
 
-#pragma mark Deprecated Methods
+#pragma mark Deprecated Optional Methods
 
 /**
  * Asks the inspector for the number of supplementary sections in the collection view for the given kind.
@@ -74,6 +76,18 @@ extern ASSizeRange NodeConstrainedSizeForScrollDirection(ASCollectionView *colle
  * Supplementary elements must exist in the same sections as regular collection view items i.e. -numberOfSectionsInCollectionView:
  */
 - (NSUInteger)collectionView:(ASCollectionView *)collectionView numberOfSectionsForSupplementaryNodeOfKind:(NSString *)kind ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's method instead.");
+
+/**
+ * Asks the inspector to provide a constrained size range for the given collection view node.
+ *
+ * Note: Deprecated in 2.5.
+ */
+- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use -collectionView:layoutContextForNodeAtIndexPath:withTraitCollection: method instead.");
+
+/**
+ * Asks the inspector to provide a constrained size range for the given supplementary node.
+ */
+- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use -collectionView:layoutContextForSupplementaryNodeOfKind:atIndexPath:withTraitCollection: method instead.");
 
 @end
 

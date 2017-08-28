@@ -267,7 +267,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextMakeWi
 /**
  * A size range from zero to infinity in both directions.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextWithUnconstrainedSizeRange(ASPrimitiveTraitCollection traitCollection)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextMakeWithUnconstrainedSizeRange(ASPrimitiveTraitCollection traitCollection)
 {
   return ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), traitCollection);
 }

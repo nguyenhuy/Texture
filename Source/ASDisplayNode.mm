@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASDisplayNode+Ancestry.h>
 #import <AsyncDisplayKit/ASDisplayNode+FrameworkSubclasses.h>
 #import <AsyncDisplayKit/ASDisplayNode+Beta.h>
+#import <AsyncDisplayKit/ASDisplayNode+Deprecated.h>
 #import <AsyncDisplayKit/AsyncDisplayKit+Debug.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
@@ -940,7 +941,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark Calculation
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
@@ -956,9 +957,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASSignpostStart(ASSignpostCalculateLayout);
   }
 
-  ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(self.style.size, parentSize);
-  const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
-  ASLayout *result = [self calculateLayoutThatFits:resolvedRange];
+  ASLayoutContext styleAndParentContext = ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection);
+  const ASLayoutContext resolvedContext = ASLayoutContextIntersect(layoutContext, styleAndParentContext);
+  ASLayout *result = [self calculateLayoutThatFits:resolvedContext];
   as_log_verbose(ASLayoutLog(), "Calculated layout %@", result);
 
   if (isRootCall) {
@@ -968,7 +969,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return result;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
@@ -992,8 +993,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
       ASDN::MutexUnlocker ul(__instanceLock__);
       as_activity_create_for_scope("Yoga layout calculation");
       if (self.yogaLayoutInProgress == NO) {
-        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASSizeRange(constrainedSize));
-        [self calculateLayoutFromYogaRoot:constrainedSize];
+        ASYogaLog("Calculating yoga layout from root %@, %@", self, NSStringFromASLayoutContext(layoutContext));
+        [self calculateLayoutFromYogaRoot:layoutContext];
       } else {
         ASYogaLog("Reusing existing yoga layout %@", _yogaCalculatedLayout);
       }
@@ -1008,9 +1009,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   
   // Manual size calculation via calculateSizeThatFits:
   if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0) {
-    CGSize size = [self calculateSizeThatFits:constrainedSize.max];
+    CGSize size = [self calculateSizeThatFits:layoutContext.max];
     ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
-    return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:nil];
+    return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, size) sublayouts:nil];
   }
   
   // Size calcualtion with layout elements
@@ -1020,7 +1021,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
 
   // Get layout element from the node
-  id<ASLayoutElement> layoutElement = [self _locked_layoutElementThatFits:constrainedSize];
+  id<ASLayoutElement> layoutElement = [self _locked_layoutElementThatFits:layoutContext];
 #if ASEnableVerboseLogging
   for (NSString *asciiLine in [[layoutElement asciiArtString] componentsSeparatedByString:@"\n"]) {
     as_log_verbose(ASLayoutLog(), "%@", asciiLine);
@@ -1054,7 +1055,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   // Layout element layout creation
   ASLayout *layout = ({
     ASDN::SumScopeTimer t(_layoutComputationTotalTime, measureLayoutComputation);
-    [layoutElement layoutThatFits:constrainedSize];
+    [layoutElement layoutThatFits:layoutContext];
   });
   ASDisplayNodeAssertNotNil(layout, @"[ASLayoutElement layoutThatFits:] should never return nil! %@, %@", self, layout);
     
@@ -1084,7 +1085,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return ASIsCGSizeValidForSize(constrainedSize) ? constrainedSize : CGSizeZero;
 }
 
-- (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASSizeRange)constrainedSize
+- (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASLayoutContext)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   
@@ -1094,17 +1095,17 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     return ({
       ASDN::MutexLocker l(__instanceLock__);
       ASDN::SumScopeTimer t(_layoutSpecTotalTime, measureLayoutSpec);
-      _layoutSpecBlock(self, constrainedSize);
+      _layoutSpecBlock(self, layoutContext);
     });
   } else {
     return ({
       ASDN::SumScopeTimer t(_layoutSpecTotalTime, measureLayoutSpec);
-      [self layoutSpecThatFits:constrainedSize];
+      [self layoutSpecThatFits:layoutContext];
     });
   }
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASSizeRange)constrainedSize
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   
@@ -3636,6 +3637,17 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
     }
     [self addSublayer:subnode.layer];
   }
+}
+
+@end
+
+#pragma mark - ASDisplayNode (Deprecated)
+
+@implementation ASDisplayNode (Deprecated)
+
+- (ASSizeRange)constrainedSizeForCalculatedLayout
+{
+  return self.contextForCalculatedLayout;
 }
 
 @end
