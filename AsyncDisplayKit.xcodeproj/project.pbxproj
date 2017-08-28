@@ -434,6 +434,8 @@
 		E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E00711F1D3828000B30D7 /* ASPagerNode+Beta.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E54E81FC1EB357BD00FFE8E1 /* ASPageTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */; };
 		E54E81FD1EB357BD00FFE8E1 /* ASPageTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */; };
+		E55A4EA71F54670200B13FAA /* ASDimension+Deprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = E55A4EA61F54670200B13FAA /* ASDimension+Deprecated.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E55A4EA91F54672400B13FAA /* ASDimension+Deprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = E55A4EA81F54672400B13FAA /* ASDimension+Deprecated.m */; };
 		E55D86331CA8A14000A0C26F /* ASLayoutElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */; };
 		E5667E8C1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = E5667E8B1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E5667E8E1F33872700FA6FC0 /* _ASCollectionGalleryLayoutInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = E5667E8D1F33872700FA6FC0 /* _ASCollectionGalleryLayoutInfo.m */; };
@@ -934,6 +936,8 @@
 		E54E00711F1D3828000B30D7 /* ASPagerNode+Beta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ASPagerNode+Beta.h"; sourceTree = "<group>"; };
 		E54E81FA1EB357BD00FFE8E1 /* ASPageTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASPageTable.h; sourceTree = "<group>"; };
 		E54E81FB1EB357BD00FFE8E1 /* ASPageTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASPageTable.m; sourceTree = "<group>"; };
+		E55A4EA61F54670200B13FAA /* ASDimension+Deprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASDimension+Deprecated.h"; sourceTree = "<group>"; };
+		E55A4EA81F54672400B13FAA /* ASDimension+Deprecated.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ASDimension+Deprecated.m"; sourceTree = "<group>"; };
 		E55D86311CA8A14000A0C26F /* ASLayoutElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ASLayoutElement.mm; sourceTree = "<group>"; };
 		E5667E8B1F33871300FA6FC0 /* _ASCollectionGalleryLayoutInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _ASCollectionGalleryLayoutInfo.h; sourceTree = "<group>"; };
 		E5667E8D1F33872700FA6FC0 /* _ASCollectionGalleryLayoutInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _ASCollectionGalleryLayoutInfo.m; sourceTree = "<group>"; };
@@ -1552,6 +1556,8 @@
 				1A6C000C1FAB4E2100D05926 /* ASCornerLayoutSpec.mm */,
 				ACF6ED071B17843500DA7C62 /* ASDimension.h */,
 				ACF6ED081B17843500DA7C62 /* ASDimension.mm */,
+				E55A4EA61F54670200B13FAA /* ASDimension+Deprecated.h */,
+				E55A4EA81F54672400B13FAA /* ASDimension+Deprecated.m */,
 				690C35631E055C7B00069B91 /* ASDimensionInternal.h */,
 				690C35601E055C5D00069B91 /* ASDimensionInternal.mm */,
 				ACF6ED091B17843500DA7C62 /* ASInsetLayoutSpec.h */,
@@ -1745,6 +1751,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A6C000D1FAB4E2100D05926 /* ASCornerLayoutSpec.h in Headers */,
+				E55A4EA71F54670200B13FAA /* ASDimension+Deprecated.h in Headers */,
 				E54E00721F1D3828000B30D7 /* ASPagerNode+Beta.h in Headers */,
 				E5B225281F1790D6001E1431 /* ASHashing.h in Headers */,
 				CC034A131E649F1300626263 /* AsyncDisplayKit+IGListKitMethods.h in Headers */,
@@ -2232,6 +2239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E5B225291F1790EE001E1431 /* ASHashing.m in Sources */,
+				E55A4EA91F54672400B13FAA /* ASDimension+Deprecated.m in Sources */,
 				DEB8ED7C1DD003D300DBDE55 /* ASLayoutTransition.mm in Sources */,
 				CCA5F62E1EECC2A80060C137 /* ASAssert.m in Sources */,
 				9F98C0261DBE29E000476D92 /* ASControlTargetAction.m in Sources */,

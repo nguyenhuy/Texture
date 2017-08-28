@@ -64,11 +64,7 @@ NSString *NSStringFromASDimension(ASDimension dimension)
 
 ASLayoutSize const ASLayoutSizeAuto = {ASDimensionAuto, ASDimensionAuto};
 
-#pragma mark - ASSizeRange
-
-ASSizeRange const ASSizeRangeZero = {};
-
-ASSizeRange const ASSizeRangeUnconstrained = { {0, 0}, { INFINITY, INFINITY }};
+#pragma mark - ASLayoutContext
 
 struct _Range {
   CGFloat min;
@@ -95,26 +91,32 @@ struct _Range {
   }
 };
 
-ASSizeRange ASSizeRangeIntersect(ASSizeRange sizeRange, ASSizeRange otherSizeRange)
+ASLayoutContext ASLayoutContextIntersect(ASLayoutContext layoutContext, ASLayoutContext otherLayoutContext)
 {
-  auto w = _Range({sizeRange.min.width, sizeRange.max.width}).intersect({otherSizeRange.min.width, otherSizeRange.max.width});
-  auto h = _Range({sizeRange.min.height, sizeRange.max.height}).intersect({otherSizeRange.min.height, otherSizeRange.max.height});
-  return {{w.min, h.min}, {w.max, h.max}};
+  ASPrimitiveTraitCollection traitCollection = layoutContext.traitCollection;
+  // Make sure contexts have the same trait collection, otherwise we need to ask for one to use in the result.
+  ASDisplayNodeCAssertTrue(ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(traitCollection,
+                                                                                         otherLayoutContext.traitCollection));
+  auto w = _Range({layoutContext.min.width, layoutContext.max.width}).intersect({otherLayoutContext.min.width, otherLayoutContext.max.width});
+  auto h = _Range({layoutContext.min.height, layoutContext.max.height}).intersect({otherLayoutContext.min.height, otherLayoutContext.max.height});
+  return {{w.min, h.min}, {w.max, h.max}, traitCollection};
 }
 
-NSString *NSStringFromASSizeRange(ASSizeRange sizeRange)
+NSString *NSStringFromASLayoutContext(ASLayoutContext layoutContext)
 {
   // 17 field length copied from iOS 10.3 impl of NSStringFromCGSize.
-  if (CGSizeEqualToSize(sizeRange.min, sizeRange.max)) {
-    return [NSString stringWithFormat:@"{{%.*g, %.*g}}",
-            17, sizeRange.min.width,
-            17, sizeRange.min.height];
+  if (CGSizeEqualToSize(layoutContext.min, layoutContext.max)) {
+    return [NSString stringWithFormat:@"{{%.*g, %.*g}, %@}",
+            17, layoutContext.min.width,
+            17, layoutContext.min.height,
+            NSStringFromASPrimitiveTraitCollection(layoutContext.traitCollection)];
   }
-  return [NSString stringWithFormat:@"{{%.*g, %.*g}, {%.*g, %.*g}}",
-          17, sizeRange.min.width,
-          17, sizeRange.min.height,
-          17, sizeRange.max.width,
-          17, sizeRange.max.height];
+  return [NSString stringWithFormat:@"{{%.*g, %.*g}, {%.*g, %.*g}, %@}",
+          17, layoutContext.min.width,
+          17, layoutContext.min.height,
+          17, layoutContext.max.width,
+          17, layoutContext.max.height,
+          NSStringFromASPrimitiveTraitCollection(layoutContext.traitCollection)];
 }
 
 #if YOGA

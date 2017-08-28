@@ -96,15 +96,15 @@ extern AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutElementSize(ASLayoutE
  * dimension with unit ASDimensionUnitAuto the given autoASSizeRange value will be used.
  * Based on the calculated exact, min and max size constraints the final size range will be calculated.
  */
-extern AS_WARN_UNUSED_RESULT ASSizeRange ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASSizeRange autoASSizeRange);
+extern AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection, ASLayoutContext autoLayoutContext);
 
 /**
  * Resolve the given size to a parent size. Uses internally ASLayoutElementSizeResolveAutoSize with {INFINITY, INFINITY} as
  * as autoASSizeRange. For more information look at ASLayoutElementSizeResolveAutoSize.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASLayoutElementSizeResolve(ASLayoutElementSize size, const CGSize parentSize)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutElementSizeResolve(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection)
 {
-  return ASLayoutElementSizeResolveAutoSize(size, parentSize, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  return ASLayoutElementSizeResolveAutoSize(size, parentSize, traitCollection, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), traitCollection));
 }
 
 

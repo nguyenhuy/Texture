@@ -213,7 +213,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutSize(AS
           NSStringFromASDimension(size.height)];
 }
 
-#pragma mark - ASSizeRange
+#pragma mark - ASLayoutContext
 
 /**
  * Expresses an inclusive range of sizes. Used to provide a simple constraint to layout.
@@ -221,31 +221,19 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutSize(AS
 typedef struct {
   CGSize min;
   CGSize max;
-} ASSizeRange;
+  ASPrimitiveTraitCollection traitCollection;
+} ASLayoutContext;
 
 /**
- * A size range with all dimensions zero.
+ * Returns whether a layout context has > 0.1 max width and max height.
  */
-extern ASSizeRange const ASSizeRangeZero;
-
-/**
- * A size range from zero to infinity in both directions.
- */
-extern ASSizeRange const ASSizeRangeUnconstrained;
-
-/**
- * Returns whether a size range has > 0.1 max width and max height.
- */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeHasSignificantArea(ASSizeRange sizeRange)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutContextHasSignificantArea(ASLayoutContext layoutContext)
 {
   static CGFloat const limit = 0.1f;
-  return (sizeRange.max.width > limit && sizeRange.max.height > limit);
+  return (layoutContext.max.width > limit && layoutContext.max.height > limit);
 }
 
-/**
- * Creates an ASSizeRange with provided min and max size.
- */
-ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize min, CGSize max)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextMake(CGSize min, CGSize max, ASPrimitiveTraitCollection traitCollection)
 {
   ASDisplayNodeCAssertPositiveReal(@"Range min width", min.width);
   ASDisplayNodeCAssertPositiveReal(@"Range min height", min.height);
@@ -255,47 +243,64 @@ ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRang
                        @"Range min width (%f) must not be larger than max width (%f).", min.width, max.width);
   ASDisplayNodeCAssert(min.height <= max.height,
                        @"Range min height (%f) must not be larger than max height (%f).", min.height, max.height);
-  ASSizeRange sizeRange;
-  sizeRange.min = min;
-  sizeRange.max = max;
-  return sizeRange;
+  ASLayoutContext layoutContext;
+  layoutContext.min = min;
+  layoutContext.max = max;
+  layoutContext.traitCollection = traitCollection;
+  return layoutContext;
 }
 
-/**
- * Creates an ASSizeRange with provided size as both min and max.
- */
-ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize exactSize)
+ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextMake(CGSize exactSize, ASPrimitiveTraitCollection traitCollection)
 {
-  return ASSizeRangeMake(exactSize, exactSize);
+  return ASLayoutContextMake(exactSize, exactSize, traitCollection);
 }
 
 /**
- * Clamps the provided CGSize between the [min, max] bounds of this ASSizeRange.
+ * A layout context with all dimensions zero.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT CGSize ASSizeRangeClamp(ASSizeRange sizeRange, CGSize size)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollection traitCollection)
 {
-  return CGSizeMake(MAX(sizeRange.min.width, MIN(sizeRange.max.width, size.width)),
-                    MAX(sizeRange.min.height, MIN(sizeRange.max.height, size.height)));
+  return ASLayoutContextMake(CGSizeZero, traitCollection);
 }
 
 /**
- * Intersects another size range. If the other size range does not overlap in either dimension, this size range
+ * A size range from zero to infinity in both directions.
+ */
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextWithUnconstrainedSizeRange(ASPrimitiveTraitCollection traitCollection)
+{
+  return ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), traitCollection);
+}
+
+/**
+ * Clamps the provided CGSize between the [min, max] bounds of this ASLayoutContext.
+ */
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT CGSize ASLayoutContextClamp(ASLayoutContext layoutContext, CGSize size)
+{
+  return CGSizeMake(MAX(layoutContext.min.width, MIN(layoutContext.max.width, size.width)),
+                    MAX(layoutContext.min.height, MIN(layoutContext.max.height, size.height)));
+}
+
+/**
+ * Intersects the size range of this layout context with the one of another layout context.
+ * If the size range of the other layout context does not overlap in either dimension, the size range of this layout context
  * "wins" by returning a single point within its own range that is closest to the non-overlapping range.
  */
-extern AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeIntersect(ASSizeRange sizeRange, ASSizeRange otherSizeRange);
+extern AS_WARN_UNUSED_RESULT ASLayoutContext ASLayoutContextIntersect(ASLayoutContext layoutContext, ASLayoutContext otherLayoutContext);
 
 /**
- * Returns whether two size ranges are equal in min and max size.
+ * Returns whether two layout contexts are equal in min, max sizes and trait collection.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeEqualToSizeRange(ASSizeRange lhs, ASSizeRange rhs)
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutContextEqualToLayoutContext(ASLayoutContext lhs, ASLayoutContext rhs)
 {
-  return CGSizeEqualToSize(lhs.min, rhs.min) && CGSizeEqualToSize(lhs.max, rhs.max);
+  return CGSizeEqualToSize(lhs.min, rhs.min)
+    && CGSizeEqualToSize(lhs.max, rhs.max)
+    && ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(lhs.traitCollection, rhs.traitCollection);
 }
 
 /**
- * Returns a string representation of a size range
+ * Returns a string representation of a layout context
  */
-extern AS_WARN_UNUSED_RESULT NSString *NSStringFromASSizeRange(ASSizeRange sizeRange);
+extern AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutContext(ASLayoutContext layoutContext);
 
 #if YOGA
 
