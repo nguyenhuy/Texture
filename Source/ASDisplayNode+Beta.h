@@ -185,7 +185,7 @@ extern void ASDisplayNodePerformBlockOnEveryYogaChild(ASDisplayNode * _Nullable 
 // These methods are intended to be used internally to Texture, and should not be called directly.
 - (BOOL)shouldHaveYogaMeasureFunc;
 - (void)invalidateCalculatedYogaLayout;
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize;
+- (void)calculateLayoutFromYogaRoot:(ASLayoutContext)rootLayoutContext;
 
 @end
 

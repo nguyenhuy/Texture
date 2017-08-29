@@ -34,7 +34,7 @@
 
 @interface ASDisplayNode (YogaInternal)
 @property (nonatomic, weak) ASDisplayNode *yogaParent;
-- (ASSizeRange)_locked_constrainedSizeForLayoutPass;
+- (ASLayoutContext)_locked_contextForLayoutPass;
 @end
 
 @implementation ASDisplayNode (Yoga)
@@ -244,14 +244,14 @@
   self.yogaCalculatedLayout = nil;
 }
 
-- (void)calculateLayoutFromYogaRoot:(ASSizeRange)rootConstrainedSize
+- (void)calculateLayoutFromYogaRoot:(ASLayoutContext)rootLayoutContext
 {
   ASDisplayNode *yogaParent = self.yogaParent;
 
   if (yogaParent) {
     ASYogaLog("ESCALATING to Yoga root: %@", self);
     // TODO(appleguy): Consider how to get the constrainedSize for the yogaRoot when escalating manually.
-    [yogaParent calculateLayoutFromYogaRoot:ASSizeRangeUnconstrained];
+    [yogaParent calculateLayoutFromYogaRoot:ASLayoutContextMakeWithUnconstrainedSizeRange(rootLayoutContext.traitCollection)];
     return;
   }
 
@@ -262,27 +262,27 @@
     node.yogaLayoutInProgress = YES;
   });
 
-  if (ASSizeRangeEqualToSizeRange(rootConstrainedSize, ASSizeRangeUnconstrained)) {
-    rootConstrainedSize = [self _locked_constrainedSizeForLayoutPass];
+  if (ASLayoutContextEqualToLayoutContext(rootLayoutContext, ASLayoutContextMakeWithUnconstrainedSizeRange(rootLayoutContext.traitCollection))) {
+    rootLayoutContext = [self _locked_contextForLayoutPass];
   }
 
-  ASYogaLog("CALCULATING at Yoga root with constraint = {%@, %@}: %@",
-            NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max), self);
+  ASYogaLog(@"CALCULATING at Yoga root with constraint = {%@, %@}: %@",
+            NSStringFromCGSize(rootLayoutContext.min), NSStringFromCGSize(rootLayoutContext.max), self);
 
   YGNodeRef rootYogaNode = self.style.yogaNode;
 
-  // Apply the constrainedSize as a base, known frame of reference.
+  // Apply the rootLayoutContext as a base, known frame of reference.
   // If the root node also has style.*Size set, these will be overridden below.
   // YGNodeCalculateLayout currently doesn't offer the ability to pass a minimum size (max is passed there).
 
   // TODO(appleguy): Reconcile the self.style.*Size properties with rootConstrainedSize
-  YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.width));
-  YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
+  YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootLayoutContext.min.width));
+  YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootLayoutContext.min.height));
 
   // It is crucial to use yogaFloat... to convert CGFLOAT_MAX into YGUndefined here.
   YGNodeCalculateLayout(rootYogaNode,
-                        yogaFloatForCGFloat(rootConstrainedSize.max.width),
-                        yogaFloatForCGFloat(rootConstrainedSize.max.height),
+                        yogaFloatForCGFloat(rootLayoutContext.max.width),
+                        yogaFloatForCGFloat(rootLayoutContext.max.height),
                         YGDirectionInherit);
 
   // Reset accessible elements, since layout may have changed.
