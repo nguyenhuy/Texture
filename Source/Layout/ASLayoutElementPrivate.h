@@ -46,22 +46,22 @@ NS_ASSUME_NONNULL_END
 #pragma mark - ASLayoutElementLayoutDefaults
 
 #define ASLayoutElementLayoutCalculationDefaults \
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize\
+- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext\
 {\
-  return [self layoutThatFits:constrainedSize parentSize:constrainedSize.max];\
+  return [self layoutThatFits:layoutContext parentSize:layoutContext.max];\
 }\
 \
-- (ASLayout *)layoutThatFits:(ASSizeRange)constrainedSize parentSize:(CGSize)parentSize\
+- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext parentSize:(CGSize)parentSize\
 {\
-  return [self calculateLayoutThatFits:constrainedSize restrictedToSize:self.style.size relativeToParentSize:parentSize];\
+  return [self calculateLayoutThatFits:layoutContext restrictedToSize:self.style.size relativeToParentSize:parentSize];\
 }\
 \
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize\
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext\
                      restrictedToSize:(ASLayoutElementSize)size\
                  relativeToParentSize:(CGSize)parentSize\
 {\
-  const ASSizeRange resolvedRange = ASSizeRangeIntersect(constrainedSize, ASLayoutElementSizeResolve(self.style.size, parentSize));\
-  return [self calculateLayoutThatFits:resolvedRange];\
+  const ASLayoutContext resolvedContext = ASLayoutContextIntersect(layoutContext, ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection));\
+  return [self calculateLayoutThatFits:resolvedContext];\
 }\
 
 

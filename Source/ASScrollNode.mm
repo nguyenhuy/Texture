@@ -77,21 +77,21 @@
   return self;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
   ASDN::MutexLocker l(__instanceLock__);  // Lock for using our instance variables.
 
-  ASSizeRange contentConstrainedSize = constrainedSize;
+  ASLayoutContext contentLayoutContext = layoutContext;
   if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections)) {
-    contentConstrainedSize.max.height = CGFLOAT_MAX;
+    contentLayoutContext.max.height = CGFLOAT_MAX;
   }
   if (ASScrollDirectionContainsHorizontalDirection(_scrollableDirections)) {
-    contentConstrainedSize.max.width = CGFLOAT_MAX;
+    contentLayoutContext.max.width = CGFLOAT_MAX;
   }
   
-  ASLayout *layout = [super calculateLayoutThatFits:contentConstrainedSize
+  ASLayout *layout = [super calculateLayoutThatFits:contentLayoutContext
                                    restrictedToSize:size
                                relativeToParentSize:parentSize];
 
