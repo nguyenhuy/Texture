@@ -801,7 +801,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Provides a way to declare a block to provide an ASLayoutSpec without having to subclass ASDisplayNode and
  * implement layoutSpecThatFits:
  *
- * @return A block that takes a constrainedSize ASSizeRange argument, and must return an ASLayoutSpec that includes all
+ * @return A block that takes a layoutContext ASLayoutContext argument, and must return an ASLayoutSpec that includes all
  * of the subnodes to position in the layout. This input-output relationship is identical to the subclass override
  * method -layoutSpecThatFits:
  *
@@ -809,7 +809,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * an exception. A future version of the framework may support using both, calling them serially, with the
  * .layoutSpecBlock superseding any values set by the method override.
  *
- * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
+ * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext layoutContext) {};
  */
 @property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
 
