@@ -720,7 +720,7 @@ static ASDN::StaticMutex& cacheLock = *new ASDN::StaticMutex;
   
   if (_debugLabelNode) {
     CGSize boundsSize        = self.bounds.size;
-    CGSize debugLabelSize    = [_debugLabelNode layoutThatFits:ASSizeRangeMake(CGSizeZero, boundsSize)].size;
+    CGSize debugLabelSize    = [_debugLabelNode layoutThatFits:ASLayoutContextMake(CGSizeZero, boundsSize, self.contextForCalculatedLayout.traitCollection)].size;
     CGPoint debugLabelOrigin = CGPointMake(boundsSize.width - debugLabelSize.width,
                                            boundsSize.height - debugLabelSize.height);
     _debugLabelNode.frame    = (CGRect) {debugLabelOrigin, debugLabelSize};
