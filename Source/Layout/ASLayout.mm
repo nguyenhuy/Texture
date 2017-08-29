@@ -376,16 +376,16 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 @end
 
-ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, const ASSizeRange sizeRange, const CGSize parentSize)
+ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, const ASLayoutContext layoutContext, const CGSize parentSize)
 {
   ASDisplayNodeCAssertNotNil(layoutElement, @"Not valid layoutElement passed in.");
   
-  return [layoutElement layoutThatFits:sizeRange parentSize:parentSize];
+  return [layoutElement layoutThatFits:layoutContext parentSize:parentSize];
 }
 
-ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASSizeRange sizeRange)
+ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASLayoutContext layoutContext)
 {
-  ASLayout *layout = ASCalculateLayout(rootLayoutElement, sizeRange, sizeRange.max);
+  ASLayout *layout = ASCalculateLayout(rootLayoutElement, layoutContext, layoutContext.max);
   // Here could specific verfication happen
   return layout;
 }
