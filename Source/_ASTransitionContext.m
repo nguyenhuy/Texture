@@ -52,9 +52,9 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
   return [_layoutDelegate transitionContext:self layoutForKey:key];
 }
 
-- (ASSizeRange)constrainedSizeForKey:(NSString *)key
+- (ASLayoutContext)layoutContextForKey:(NSString *)key
 {
-  return [_layoutDelegate transitionContext:self constrainedSizeForKey:key];
+  return [_layoutDelegate transitionContext:self layoutContextForKey:key];
 }
 
 - (CGRect)initialFrameForNode:(ASDisplayNode *)node
@@ -89,6 +89,13 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
 - (void)completeTransition:(BOOL)didComplete
 {
   [_completionDelegate transitionContext:self didComplete:didComplete];
+}
+
+#pragma mark - ASContextTransitioning Protocol Deprecated Implementation
+
+- (ASSizeRange)constrainedSizeForKey:(NSString *)key
+{
+  return [self layoutContextForKey:key];
 }
 
 @end

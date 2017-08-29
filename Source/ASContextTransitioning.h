@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 @class ASDisplayNode;
 @class ASLayout;
@@ -38,9 +39,15 @@ extern NSString * const ASTransitionContextToLayoutKey;
 - (nullable ASLayout *)layoutForKey:(NSString *)key;
 
 /**
- * @abstract Retrieve either the "from" or "to" constrainedSize
+ * @abstract Retrieve either the "from" or "to" layout context
  */
-- (ASSizeRange)constrainedSizeForKey:(NSString *)key;
+- (ASLayoutContext)layoutContextForKey:(NSString *)key;
+
+/**
+ * @abstract Retrieve either the "from" or "to" constrainedSize
+ * @note Deprecated in 2.5
+ */
+- (ASSizeRange)constrainedSizeForKey:(NSString *)key ASDISPLAYNODE_DEPRECATED_MSG("Use -layoutContextForKey: method instead.");
 
 /**
  * @abstract Retrieve the subnodes from either the "from" or "to" layout

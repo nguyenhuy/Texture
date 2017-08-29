@@ -23,6 +23,7 @@
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayoutRangeType.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 @class ASCellNode;
 @class ASCollectionNode;

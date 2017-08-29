@@ -209,15 +209,15 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   }
 }
 
-- (ASSizeRange)transitionContext:(_ASTransitionContext *)context constrainedSizeForKey:(NSString *)key
+- (ASLayoutContext)transitionContext:(_ASTransitionContext *)context layoutContextForKey:(NSString *)key
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
-    return _previousLayout->constrainedSize;
+    return _previousLayout->layoutContext;
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
-    return _pendingLayout->constrainedSize;
+    return _pendingLayout->layoutContext;
   } else {
-    return ASSizeRangeMake(CGSizeZero, CGSizeZero);
+    return ASLayoutContextMake(CGSizeZero, ASPrimitiveTraitCollectionMakeDefault());
   }
 }
 

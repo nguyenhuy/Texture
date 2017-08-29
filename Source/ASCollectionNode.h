@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASCollectionView.h>
 #import <AsyncDisplayKit/ASBlockTypes.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 @protocol ASCollectionViewLayoutFacilitatorProtocol;
 @protocol ASCollectionDelegate;

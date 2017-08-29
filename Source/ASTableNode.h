@@ -20,6 +20,7 @@
 #import <AsyncDisplayKit/ASRangeControllerUpdateRangeProtocol+Beta.h>
 #import <AsyncDisplayKit/ASTableView.h>
 #import <AsyncDisplayKit/ASRangeManagingNode.h>
+#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
