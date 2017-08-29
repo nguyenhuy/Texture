@@ -525,25 +525,6 @@ ASLayoutElementStyleExtensibilityForwarding
   
 }
 
-- (void)transitionLayoutWithSizeRange:(ASSizeRange)constrainedSize
-                             animated:(BOOL)animated
-                   shouldMeasureAsync:(BOOL)shouldMeasureAsync
-                measurementCompletion:(void(^)())completion
-{
-  ASDisplayNodeAssertMainThread();
-
-  ASLayoutContext layoutContext = constrainedSize;
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-    layoutContext.traitCollection = [self _locked_traitCollectionForLayoutPass];
-  }
-
-  [self transitionLayoutWithLayoutContext:layoutContext
-                                 animated:animated
-                       shouldMeasureAsync:shouldMeasureAsync
-                    measurementCompletion:completion];
-}
-
 - (void)transitionLayoutWithLayoutContext:(ASLayoutContext)layoutContext
                                  animated:(BOOL)animated
                        shouldMeasureAsync:(BOOL)shouldMeasureAsync
@@ -998,6 +979,36 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 
   _calculatedDisplayNodeLayout = displayNodeLayout;
+}
+
+@end
+
+#pragma mark - ASDisplayNode (Deprecated)
+
+@implementation ASDisplayNode (Deprecated)
+
+- (ASSizeRange)constrainedSizeForCalculatedLayout
+{
+  return self.contextForCalculatedLayout;
+}
+
+- (void)transitionLayoutWithSizeRange:(ASSizeRange)constrainedSize
+                             animated:(BOOL)animated
+                   shouldMeasureAsync:(BOOL)shouldMeasureAsync
+                measurementCompletion:(void(^)())completion
+{
+  ASDisplayNodeAssertMainThread();
+
+  ASLayoutContext layoutContext = constrainedSize;
+  {
+    ASDN::MutexLocker l(__instanceLock__);
+    layoutContext.traitCollection = [self _locked_traitCollectionForLayoutPass];
+  }
+
+  [self transitionLayoutWithLayoutContext:layoutContext
+                                 animated:animated
+                       shouldMeasureAsync:shouldMeasureAsync
+                    measurementCompletion:completion];
 }
 
 @end

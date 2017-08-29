@@ -3543,7 +3543,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
     [props addObject:@{ @"calculatedLayout": c.layout }];
     [props addObject:@{ @"calculatedVersion": @(c.version) }];
-    [props addObject:@{ @"calculatedConstrainedSize" : NSStringFromASSizeRange(c.constrainedSize) }];
+    [props addObject:@{ @"calculatedLayoutContext" : NSStringFromASLayoutContext(c.layoutContext) }];
     if (c.requestedLayoutFromAbove) {
       [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
     }
@@ -3552,7 +3552,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
     [props addObject:@{ @"pendingLayout": p.layout }];
     [props addObject:@{ @"pendingVersion": @(p.version) }];
-    [props addObject:@{ @"pendingConstrainedSize" : NSStringFromASSizeRange(p.constrainedSize) }];
+    [props addObject:@{ @"pendingLayoutContext" : NSStringFromASLayoutContext(p.layoutContext) }];
     if (p.requestedLayoutFromAbove) {
       [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
     }
@@ -3637,17 +3637,6 @@ static const char *ASDisplayNodeAssociatedNodeKey = "ASAssociatedNode";
     }
     [self addSublayer:subnode.layer];
   }
-}
-
-@end
-
-#pragma mark - ASDisplayNode (Deprecated)
-
-@implementation ASDisplayNode (Deprecated)
-
-- (ASSizeRange)constrainedSizeForCalculatedLayout
-{
-  return self.contextForCalculatedLayout;
 }
 
 @end
