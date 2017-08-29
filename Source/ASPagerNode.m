@@ -176,9 +176,11 @@
 
 #pragma mark - ASCollectionDelegate
 
-- (ASSizeRange)collectionNode:(ASCollectionNode *)collectionNode constrainedSizeForItemAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode
+  layoutContextForItemAtIndexPath:(NSIndexPath *)indexPath
+              withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 {
-  return ASSizeRangeMake([self pageSize]);
+  return ASLayoutContextMake([self pageSize], traitCollection);
 }
 
 #pragma mark - Data Source Proxy
