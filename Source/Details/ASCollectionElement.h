@@ -17,8 +17,6 @@
 
 #import <AsyncDisplayKit/ASDataController.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
-// TODO Remove this
-#import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
 @class ASDisplayNode;
 @protocol ASRangeManagingNode;
@@ -29,15 +27,14 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionElement : NSObject
 
 @property (nonatomic, readonly, copy, nullable) NSString *supplementaryElementKind;
-// TODO Rename to layoutContext
-@property (nonatomic, assign) ASSizeRange constrainedSize;
+@property (nonatomic, assign) ASLayoutContext layoutContext;
 @property (nonatomic, readonly, weak) id<ASRangeManagingNode> owningNode;
 @property (nonatomic, readonly, nullable) id nodeModel;
 
 - (instancetype)initWithNodeModel:(nullable id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(nullable NSString *)supplementaryElementKind
-                  constrainedSize:(ASSizeRange)constrainedSize
+                    layoutContext:(ASLayoutContext)layoutContext
                        owningNode:(id<ASRangeManagingNode>)owningNode;
 
 /**

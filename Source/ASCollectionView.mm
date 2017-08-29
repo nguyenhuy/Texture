@@ -663,7 +663,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
                         @"Placeholder cells for UIKit passthrough should be generic ASCellNodes: %@", node);
     return node.style.preferredSize;
   } else {
-    return [node layoutThatFits:element.constrainedSize].size;
+    return [node layoutThatFits:element.layoutContext].size;
   }
 }
 

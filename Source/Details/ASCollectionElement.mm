@@ -34,7 +34,7 @@
 - (instancetype)initWithNodeModel:(id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(NSString *)supplementaryElementKind
-                  constrainedSize:(ASSizeRange)constrainedSize
+                    layoutContext:(ASLayoutContext)layoutContext
                        owningNode:(id<ASRangeManagingNode>)owningNode
 {
   NSAssert(nodeBlock != nil, @"Node block must not be nil");
@@ -43,8 +43,7 @@
     _nodeModel = nodeModel;
     _nodeBlock = nodeBlock;
     _supplementaryElementKind = [supplementaryElementKind copy];
-    // TODO Assert that the trait collection is there
-    _constrainedSize = constrainedSize;
+    _layoutContext = layoutContext;
     _owningNode = owningNode;
   }
   return self;
