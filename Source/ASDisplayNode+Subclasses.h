@@ -214,6 +214,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This method should not be called directly outside of ASDisplayNode; use -layoutThatFits: or layoutThatFits:parentSize: instead.
  */
+// TODO: Consider deprecating this in favor of -calculateLayoutThatFits:. Because any other information besides the max size, such as trait collection, is dropped immediately.
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize;
 
 /**

@@ -191,9 +191,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearPreloadedData)), @"Subclass %@ must not override recursivelyClearFetchedData method.", classString);
   } else {
     // Check if subnodes where modified during the creation of the layout
-	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASSizeRange sizeRange) {
+	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASLayoutContext layoutContext) {
 		  NSArray *oldSubnodes = _self.subnodes;
-		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASSizeRange))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), sizeRange);
+		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASLayoutContext))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), layoutContext);
 		  NSArray *subnodes = _self.subnodes;
 		  ASDisplayNodeAssert(oldSubnodes.count == subnodes.count, @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
 		  for (NSInteger i = 0; i < oldSubnodes.count; i++) {
@@ -951,7 +951,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   auto key = ASPthreadStaticKey(NULL);
   BOOL isRootCall = (pthread_getspecific(key) == NULL);
   as_activity_scope_verbose(as_activity_create("Calculate node layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
-  as_log_verbose(ASLayoutLog(), "Calculating layout for %@ sizeRange %@", self, NSStringFromASSizeRange(constrainedSize));
+  as_log_verbose(ASLayoutLog(), "Calculating layout for %@ layout context %@", self, NSStringForASLayoutContext(layoutContext));
   if (isRootCall) {
     pthread_setspecific(key, kCFBooleanTrue);
     ASSignpostStart(ASSignpostCalculateLayout);

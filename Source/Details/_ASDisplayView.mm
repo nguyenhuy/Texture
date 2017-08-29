@@ -214,7 +214,8 @@
 - (CGSize)sizeThatFits:(CGSize)size
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
-  return node ? [node layoutThatFits:ASSizeRangeMake(size)].size : [super sizeThatFits:size];
+  ASPrimitiveTraitCollection traitCollection = node.contextForCalculatedLayout.traitCollection;
+  return node ? [node layoutThatFits:ASLayoutContextMake(size, traitCollection)].size : [super sizeThatFits:size];
 }
 
 - (void)setNeedsDisplay
