@@ -169,10 +169,10 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       }
 
       // Layout the node if the size range is valid.
-      ASSizeRange sizeRange = context.constrainedSize;
+      ASLayoutContext layoutContext = context.layoutContext;
       // Also check trait collection. If it's undefined, log and skip
-      if (ASSizeRangeHasSignificantArea(sizeRange)) {
-        [self _layoutNode:node withConstrainedSize:sizeRange];
+      if (ASLayoutContextHasSignificantArea(layoutContext)) {
+        [self _layoutNode:node withLayoutContext:layoutContext];
       }
     });
   }
@@ -184,13 +184,11 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 /**
  * Measure and layout the given node with the constrained size range.
  */
-- (void)_layoutNode:(ASCellNode *)node withConstrainedSize:(ASSizeRange)constrainedSize
+- (void)_layoutNode:(ASCellNode *)node withLayoutContext:(ASLayoutContext)layoutContext
 {
-  ASDisplayNodeAssert(ASSizeRangeHasSignificantArea(constrainedSize), @"Attempt to layout cell node with invalid size range %@", NSStringFromASSizeRange(constrainedSize));
-  // TODO Assert that trait collection is there
-
+  ASDisplayNodeAssert(ASLayoutContextHasSignificantArea(layoutContext), @"Attempt to layout cell node with invalid size range %@", NSStringFromASLayoutContext(layoutContext));
   CGRect frame = CGRectZero;
-  frame.size = [node layoutThatFits:constrainedSize].size;
+  frame.size = [node layoutThatFits:layoutContext].size;
   node.frame = frame;
 }
 
@@ -237,13 +235,13 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
  * @param indexPaths The index paths belongs to sections whose supplementary nodes need to be repopulated.
  * @param changeSet The changeset that triggered this repopulation.
  * @param indexPathsAreNew YES if index paths are "after the update," NO otherwise.
- * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
+ * @param shouldFetchLayoutContexts Whether layout contexts should be fetched from data source
  */
 - (void)_repopulateSupplementaryNodesIntoMap:(ASMutableElementMap *)map
              forSectionsContainingIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
                                    changeSet:(_ASHierarchyChangeSet *)changeSet
                             indexPathsAreNew:(BOOL)indexPathsAreNew
-                       shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                   shouldFetchLayoutContexts:(BOOL)shouldFetchLayoutContexts
                                  previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
@@ -266,7 +264,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
 
   for (NSString *kind in [self supplementaryKindsInSections:newSections]) {
-    [self _insertElementsIntoMap:map kind:kind forSections:newSections shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+    [self _insertElementsIntoMap:map kind:kind forSections:newSections shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
   }
 }
 
@@ -275,12 +273,12 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
  *
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
  * @param sections The sections that should be populated by new elements
- * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
+ * @param shouldFetchLayoutContexts Whether layout contexts should be fetched from data source
  */
 - (void)_insertElementsIntoMap:(ASMutableElementMap *)map
                           kind:(NSString *)kind
                    forSections:(NSIndexSet *)sections
-         shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+     shouldFetchLayoutContexts:(BOOL)shouldFetchLayoutContexts
                      changeSet:(_ASHierarchyChangeSet *)changeSet
                    previousMap:(ASElementMap *)previousMap
 {
@@ -291,7 +289,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
   
   NSArray<NSIndexPath *> *indexPaths = [self _allIndexPathsForItemsOfKind:kind inSections:sections];
-  [self _insertElementsIntoMap:map kind:kind atIndexPaths:indexPaths shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+  [self _insertElementsIntoMap:map kind:kind atIndexPaths:indexPaths shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
 }
 
 /**
@@ -300,12 +298,12 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
  * @param map The map to insert the elements into.
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
  * @param indexPaths The index paths at which new elements should be populated
- * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
+ * @param shouldFetchLayoutContexts Whether layout contexts should be fetched from data source
  */
 - (void)_insertElementsIntoMap:(ASMutableElementMap *)map
                           kind:(NSString *)kind
                   atIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
-         shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+     shouldFetchLayoutContexts:(BOOL)shouldFetchLayoutContexts
                      changeSet:(_ASHierarchyChangeSet *)changeSet
                    previousMap:(ASElementMap *)previousMap
 {
@@ -351,16 +349,15 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       nodeBlock = [dataSource dataController:self supplementaryNodeBlockOfKind:kind atIndexPath:indexPath];
     }
     
-    ASSizeRange constrainedSize = ASSizeRangeUnconstrained;
-    if (shouldFetchSizeRanges) {
-      // TODO: Assert and/or bail if no trait collection exists
-      constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPath];
+    ASLayoutContext layoutContext = ASLayoutContextMakeWithUnconstrainedSizeRange(ASPrimitiveTraitCollectionMakeDefault());
+    if (shouldFetchLayoutContexts) {
+      layoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPath];
     }
     
     ASCollectionElement *element = [[ASCollectionElement alloc] initWithNodeModel:nodeModel
                                                                         nodeBlock:nodeBlock
                                                          supplementaryElementKind:isRowKind ? nil : kind
-                                                                  constrainedSize:constrainedSize
+                                                                    layoutContext:layoutContext
                                                                        owningNode:node];
     [map insertElement:element atIndexPath:indexPath];
   }
@@ -406,13 +403,15 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 {
   ASDisplayNodeAssertMainThread();
 
+  ASPrimitiveTraitCollection traitCollection = _node ? _node.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
   id<ASDataControllerSource> dataSource = _dataSource;
+
   if (dataSource == nil || indexPath == nil) {
-    return ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault());
+    return ASLayoutContextMakeWithZeroSize(traitCollection);
   }
   
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
-    ASDisplayNodeAssert(_dataSourceFlags.layoutContextForNodeAtIndexPath, @"-dataController:constrainedSizeForNodeAtIndexPath: must also be implemented");
+    ASDisplayNodeAssert(_dataSourceFlags.layoutContextForNodeAtIndexPath, @"-dataController:layoutContextForNodeAtIndexPath: must also be implemented");
     return [dataSource dataController:self layoutContextForNodeAtIndexPath:indexPath];
   }
   
@@ -421,7 +420,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
   
   ASDisplayNodeAssert(NO, @"Unknown constrained size for node of kind %@ by data source %@", kind, dataSource);
-  return ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault());
+  return ASLayoutContextMakeWithZeroSize(traitCollection);
 }
 
 #pragma mark - Batching (External API)
@@ -538,7 +537,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       // Step 1.1: Update the mutable copies to match the data source's state
       [self _updateSectionsInMap:mutableMap changeSet:changeSet];
       // TODO: Assert and/or bail if no trait collection exists
-      [self _updateElementsInMap:mutableMap changeSet:changeSet shouldFetchSizeRanges:(! canDelegate) previousMap:previousMap];
+      [self _updateElementsInMap:mutableMap changeSet:changeSet shouldFetchLayoutContexts:(! canDelegate) previousMap:previousMap];
 
       // Step 1.2: Clone the new data
       newMap = [mutableMap copy];
@@ -638,7 +637,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
  */
 - (void)_updateElementsInMap:(ASMutableElementMap *)map
                    changeSet:(_ASHierarchyChangeSet *)changeSet
-       shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+   shouldFetchLayoutContexts:(BOOL)shouldFetchLayoutContexts
                  previousMap:(ASElementMap *)previousMap
 {
   ASDisplayNodeAssertMainThread();
@@ -649,7 +648,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     NSUInteger sectionCount = [self itemCountsFromDataSource].size();
     if (sectionCount > 0) {
       NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
-      [self _insertElementsIntoMap:map sections:sectionIndexes shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+      [self _insertElementsIntoMap:map sections:sectionIndexes shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
     }
     // Return immediately because reloadData can't be used in conjuntion with other updates.
     return;
@@ -664,7 +663,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     [self _repopulateSupplementaryNodesIntoMap:map forSectionsContainingIndexPaths:change.indexPaths
                                      changeSet:changeSet
                               indexPathsAreNew:NO
-                         shouldFetchSizeRanges:shouldFetchSizeRanges
+                         shouldFetchLayoutContexts:shouldFetchLayoutContexts
                                    previousMap:previousMap];
   }
 
@@ -674,23 +673,23 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
   
   for (_ASHierarchySectionChange *change in [changeSet sectionChangesOfType:_ASHierarchyChangeTypeInsert]) {
-    [self _insertElementsIntoMap:map sections:change.indexSet shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+    [self _insertElementsIntoMap:map sections:change.indexSet shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
   }
   
   for (_ASHierarchyItemChange *change in [changeSet itemChangesOfType:_ASHierarchyChangeTypeInsert]) {
-    [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind atIndexPaths:change.indexPaths shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+    [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind atIndexPaths:change.indexPaths shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
     // Aggressively reload supplementary nodes (#1773 & #1629)
     [self _repopulateSupplementaryNodesIntoMap:map forSectionsContainingIndexPaths:change.indexPaths
                                      changeSet:changeSet
                               indexPathsAreNew:YES
-                         shouldFetchSizeRanges:shouldFetchSizeRanges
+                         shouldFetchLayoutContexts:shouldFetchLayoutContexts
                                    previousMap:previousMap];
   }
 }
 
 - (void)_insertElementsIntoMap:(ASMutableElementMap *)map
                       sections:(NSIndexSet *)sectionIndexes
-         shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+     shouldFetchLayoutContexts:(BOOL)shouldFetchLayoutContexts
                      changeSet:(_ASHierarchyChangeSet *)changeSet
                    previousMap:(ASElementMap *)previousMap
 {
@@ -702,12 +701,12 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 
   // Items
   [map insertEmptySectionsOfItemsAtIndexes:sectionIndexes];
-  [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind forSections:sectionIndexes shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+  [self _insertElementsIntoMap:map kind:ASDataControllerRowNodeKind forSections:sectionIndexes shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
 
   // Supplementaries
   for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
     // Step 2: Populate new elements for all sections
-    [self _insertElementsIntoMap:map kind:kind forSections:sectionIndexes shouldFetchSizeRanges:shouldFetchSizeRanges changeSet:changeSet previousMap:previousMap];
+    [self _insertElementsIntoMap:map kind:kind forSections:sectionIndexes shouldFetchLayoutContexts:shouldFetchLayoutContexts changeSet:changeSet previousMap:previousMap];
   }
 }
 
@@ -736,9 +735,8 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     }
 
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-    ASSizeRange constrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
-    // Check constrained size has significant area and trait collection is defined before proceeding.
-    [self _layoutNode:node withConstrainedSize:constrainedSize];
+    ASLayoutContext layoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+    [self _layoutNode:node withLayoutContext:layoutContext];
 
     BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:element matchesSize:node.frame.size];
     if (! matchesSize) {
@@ -780,17 +778,16 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     }
 
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-    ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+    ASLayoutContext newLayoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
 
-    // TODO Also check trait collection. If it's undefined, skip (all nodes?)
-    if (ASSizeRangeHasSignificantArea(newConstrainedSize)) {
-      element.constrainedSize = newConstrainedSize;
+    if (ASLayoutContextHasSignificantArea(newLayoutContext)) {
+      element.layoutContext = newLayoutContext;
 
       // Node may not be allocated yet (e.g node virtualization or same size optimization)
       // Call context.nodeIfAllocated here to avoid premature node allocation and layout
       ASCellNode *node = element.nodeIfAllocated;
       if (node) {
-        [self _layoutNode:node withConstrainedSize:newConstrainedSize];
+        [self _layoutNode:node withLayoutContext:newLayoutContext];
       }
     }
   }
