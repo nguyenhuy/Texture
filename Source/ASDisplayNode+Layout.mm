@@ -532,10 +532,10 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
   as_activity_create_for_scope("Transition node layout");
-  as_log_debug(ASLayoutLog(), "Transition layout for %@ sizeRange %@ anim %d asyncMeasure %d", self, NSStringFromASLayoutContext(layoutContext), animated, shouldMeasureAsync);
+  as_log_debug(ASLayoutLog(), "Transition layout for %@ layoutContext %@ anim %d asyncMeasure %d", self, NSStringFromASLayoutContext(layoutContext), animated, shouldMeasureAsync);
   
   if (layoutContext.max.width <= 0.0 || layoutContext.max.height <= 0.0) {
-    // Using CGSizeZero for the sizeRange can cause negative values in client layout code.
+    // Using CGSizeZero for the size range can cause negative values in client layout code.
     // Most likely called transitionLayout: without providing a size, before first layout pass.
     as_log_verbose(ASLayoutLog(), "Ignoring transition due to bad size range.");
     return;
