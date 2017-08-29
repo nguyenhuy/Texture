@@ -21,6 +21,7 @@
 #import <AsyncDisplayKit/ASEqualityHelpers.h>
 #import <AsyncDisplayKit/ASInternalHelpers.h>
 #import <AsyncDisplayKit/ASDisplayNodeExtras.h>
+#import <AsyncDisplayKit/ASLayout.h>
 
 static BOOL ASAssetIsEqual(AVAsset *asset1, AVAsset *asset2) {
   return ASObjectIsEqual(asset1, asset2)
@@ -248,33 +249,30 @@ static NSString * const kRate = @"rate";
   }
 }
 
-- (void)layout
-{
-  [super layout];
-  // The _playerNode wraps AVPlayerLayer, and therefore should extend across the entire bounds.
-  _playerNode.frame = self.bounds;
-}
-
-- (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   __instanceLock__.lock();
   ASDisplayNode *playerNode = _playerNode;
   __instanceLock__.unlock();
 
-  CGSize calculatedSize = constrainedSize;
+  CGSize calculatedSize = layoutContext.max;
   
   // Prevent crashes through if infinite width or height
   if (isinf(calculatedSize.width) || isinf(calculatedSize.height)) {
     ASDisplayNodeAssert(NO, @"Infinite width or height in ASVideoNode");
     calculatedSize = CGSizeZero;
   }
-  
+
+  NSArray *sublayouts = nil;
   if (playerNode != nil) {
-    playerNode.style.preferredSize = calculatedSize;
-    [playerNode layoutThatFits:ASSizeRangeMake(CGSizeZero, calculatedSize)];
+    // The _playerNode wraps AVPlayerLayer, and therefore should extend across the entire video node.
+    ASLayoutContext playerNodeLayoutContext = ASLayoutContextMake(calculatedSize, layoutContext.traitCollection);
+    CGSize playerNodeSize = [playerNode layoutThatFits:playerNodeLayoutContext].size;
+    ASLayout *playerNodeSublayout = [ASLayout layoutWithLayoutElement:playerNode size:playerNodeSize position:CGPointZero sublayouts:nil];
+    sublayouts = @[playerNodeSublayout];
   }
-  
-  return calculatedSize;
+
+  return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, calculatedSize) sublayouts:sublayouts];
 }
 
 - (void)generatePlaceholderImage
