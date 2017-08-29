@@ -90,7 +90,7 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASLayoutElementSizeEqualToLayout
 extern AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutElementSize(ASLayoutElementSize size);
 
 /**
- * Resolve the given size relative to a parent size and an auto size.
+ * Resolve the given size relative to a parent size and an auto context.
  * From the given size uses width, height to resolve the exact size constraint, uses the minHeight and minWidth to
  * resolve the min size constraint and the maxHeight and maxWidth to resolve the max size constraint. For every
  * dimension with unit ASDimensionUnitAuto the given autoASSizeRange value will be used.

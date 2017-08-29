@@ -60,14 +60,14 @@ ASDISPLAYNODE_INLINE void ASLayoutElementSizeConstrain(CGFloat minVal, CGFloat e
     }
 }
 
-ASSizeRange ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASSizeRange autoASSizeRange)
+ASLayoutContext ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection, ASLayoutContext autoLayoutContext)
 {
   CGSize resolvedExact = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.width, size.height), parentSize, {NAN, NAN});
-  CGSize resolvedMin = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.minWidth, size.minHeight), parentSize, autoASSizeRange.min);
-  CGSize resolvedMax = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.maxWidth, size.maxHeight), parentSize, autoASSizeRange.max);
+  CGSize resolvedMin = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.minWidth, size.minHeight), parentSize, autoLayoutContext.min);
+  CGSize resolvedMax = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.maxWidth, size.maxHeight), parentSize, autoLayoutContext.max);
   
   CGSize rangeMin, rangeMax;
   ASLayoutElementSizeConstrain(resolvedMin.width, resolvedExact.width, resolvedMax.width, &rangeMin.width, &rangeMax.width);
   ASLayoutElementSizeConstrain(resolvedMin.height, resolvedExact.height, resolvedMax.height, &rangeMin.height, &rangeMax.height);
-  return {rangeMin, rangeMax};
+  return ASLayoutContextMake(rangeMin, rangeMax, traitCollection);
 }
