@@ -129,7 +129,8 @@
     finalSpec = [ASInsetLayoutSpec insetLayoutSpecWithInsets:sectionInset child:stackSpec];
   }
 
-  ASLayout *layout = [finalSpec layoutThatFits:ASSizeRangeForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections)];
+  ASLayoutContext finalSpecLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections, context.traitCollection);
+  ASLayout *layout = [finalSpec layoutThatFits:finalSpecLayoutContext];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {
     _ASGalleryLayoutItem *item = ASDynamicCast(sublayout.layoutElement, _ASGalleryLayoutItem);

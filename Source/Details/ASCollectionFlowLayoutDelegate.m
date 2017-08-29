@@ -73,8 +73,10 @@
                                                                         children:children];
   stackSpec.concurrent = YES;
 
-  ASSizeRange sizeRange = ASSizeRangeForCollectionLayoutThatFitsViewportSize(context.viewportSize, context.scrollableDirections);
-  ASLayout *layout = [stackSpec layoutThatFits:sizeRange];
+  ASLayoutContext stackLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(context.viewportSize,
+                                                                                              context.scrollableDirections,
+                                                                                              context.traitCollection);
+  ASLayout *layout = [stackSpec layoutThatFits:stackLayoutContext];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {
     ASCellNode *node = ASDynamicCast(sublayout.layoutElement, ASCellNode);

@@ -12,16 +12,16 @@
 
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
 
-extern ASSizeRange ASSizeRangeForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections)
+extern ASLayoutContext ASLayoutContextForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections, ASPrimitiveTraitCollection traitCollection)
 {
-  ASSizeRange sizeRange = ASSizeRangeUnconstrained;
+  ASLayoutContext layoutContext = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
   if (ASScrollDirectionContainsVerticalDirection(scrollableDirections) == NO) {
-    sizeRange.min.height = viewportSize.height;
-    sizeRange.max.height = viewportSize.height;
+    layoutContext.min.height = viewportSize.height;
+    layoutContext.max.height = viewportSize.height;
   }
   if (ASScrollDirectionContainsHorizontalDirection(scrollableDirections) == NO) {
-    sizeRange.min.width = viewportSize.width;
-    sizeRange.max.width = viewportSize.width;
+    layoutContext.min.width = viewportSize.width;
+    layoutContext.max.width = viewportSize.width;
   }
-  return sizeRange;
+  return layoutContext;
 }

@@ -73,10 +73,12 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   Class<ASCollectionLayoutDelegate> layoutDelegateClass = [_layoutDelegate class];
   ASCollectionLayoutCache *layoutCache = _layoutCache;
   ASCollectionNode *collectionNode = _collectionNode;
+  ASPrimitiveTraitCollection traitCollection = collectionNode.layoutContext.traitCollection;
   if (collectionNode == nil) {
     return [[ASCollectionLayoutContext alloc] initWithViewportSize:CGSizeZero
                                               initialContentOffset:CGPointZero
                                               scrollableDirections:ASScrollDirectionNone
+                                                   traitCollection:traitCollection
                                                           elements:[[ASElementMap alloc] init]
                                                layoutDelegateClass:layoutDelegateClass
                                                        layoutCache:layoutCache
@@ -95,6 +97,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   return [[ASCollectionLayoutContext alloc] initWithViewportSize:viewportSize
                                             initialContentOffset:contentOffset
                                             scrollableDirections:scrollableDirections
+                                                 traitCollection:traitCollection
                                                         elements:elements
                                              layoutDelegateClass:layoutDelegateClass
                                                      layoutCache:layoutCache

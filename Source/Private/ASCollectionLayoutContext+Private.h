@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithViewportSize:(CGSize)viewportSize
                 initialContentOffset:(CGPoint)initialContentOffset
                 scrollableDirections:(ASScrollDirection)scrollableDirections
+                     traitCollection:(ASPrimitiveTraitCollection)traitCollection
                             elements:(ASElementMap *)elements
                  layoutDelegateClass:(Class<ASCollectionLayoutDelegate>)layoutDelegateClass
                          layoutCache:(ASCollectionLayoutCache *)layoutCache

@@ -18,6 +18,7 @@
 #import <UIKit/UIKit.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
+#import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASElementMap;
 
@@ -29,6 +30,7 @@ AS_SUBCLASSING_RESTRICTED
 @property (nonatomic, assign, readonly) CGSize viewportSize;
 @property (nonatomic, assign, readonly) CGPoint initialContentOffset;
 @property (nonatomic, assign, readonly) ASScrollDirection scrollableDirections;
+@property (nonatomic, assign, readonly) ASPrimitiveTraitCollection traitCollection;
 @property (nonatomic, weak, readonly) ASElementMap *elements;
 @property (nonatomic, strong, readonly, nullable) id additionalInfo;
 

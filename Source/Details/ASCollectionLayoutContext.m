@@ -28,6 +28,7 @@
 - (instancetype)initWithViewportSize:(CGSize)viewportSize
                 initialContentOffset:(CGPoint)initialContentOffset
                 scrollableDirections:(ASScrollDirection)scrollableDirections
+                     traitCollection:(ASPrimitiveTraitCollection)traitCollection
                             elements:(ASElementMap *)elements
                  layoutDelegateClass:(Class<ASCollectionLayoutDelegate>)layoutDelegateClass
                          layoutCache:(ASCollectionLayoutCache *)layoutCache
@@ -38,6 +39,7 @@
     _viewportSize = viewportSize;
     _initialContentOffset = initialContentOffset;
     _scrollableDirections = scrollableDirections;
+    _traitCollection = traitCollection;
     _elements = elements;
     _layoutDelegateClass = layoutDelegateClass;
     _layoutCache = layoutCache;
@@ -70,6 +72,7 @@
   // should never be considered the same even if they are nil now.
   return CGSizeEqualToSize(_viewportSize, context.viewportSize)
   && _scrollableDirections == context.scrollableDirections
+  && ASPrimitiveTraitCollectionIsEqualToASPrimitiveTraitCollection(_traitCollection, context.traitCollection)
   && [_elements isEqual:context.elements]
   && _layoutDelegateClass == context.layoutDelegateClass
   && ASObjectIsEqual(_additionalInfo, context.additionalInfo);
@@ -91,12 +94,14 @@
   struct {
     CGSize viewportSize;
     ASScrollDirection scrollableDirections;
+    ASPrimitiveTraitCollection traitCollection;
     NSUInteger elementsHash;
     NSUInteger layoutDelegateClassHash;
     NSUInteger additionalInfoHash;
   } data = {
     _viewportSize,
     _scrollableDirections,
+    _traitCollection,
     _elements.hash,
     _layoutDelegateClass.hash,
     [_additionalInfo hash]
