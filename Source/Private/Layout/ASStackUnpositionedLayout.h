@@ -65,7 +65,7 @@ struct ASStackUnpositionedLayout {
   /** Given a set of children, computes the unpositioned layouts for those children. */
   static ASStackUnpositionedLayout compute(const std::vector<ASStackLayoutSpecChild> &children,
                                            const ASStackLayoutSpecStyle &style,
-                                           const ASSizeRange &sizeRange,
+                                           const ASLayoutContext &layoutContext,
                                            const BOOL concurrent);
   
   static CGFloat baselineForItem(const ASStackLayoutSpecStyle &style,
@@ -73,9 +73,9 @@ struct ASStackUnpositionedLayout {
   
   static CGFloat computeStackViolation(const CGFloat stackDimensionSum,
                                        const ASStackLayoutSpecStyle &style,
-                                       const ASSizeRange &sizeRange);
+                                       const ASLayoutContext &layoutContext);
 
   static CGFloat computeCrossViolation(const CGFloat crossDimensionSum,
                                        const ASStackLayoutSpecStyle &style,
-                                       const ASSizeRange &sizeRange);
+                                       const ASLayoutContext &layoutContext);
 };

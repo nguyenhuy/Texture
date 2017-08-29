@@ -28,5 +28,5 @@ struct ASStackPositionedLayout {
   /** Given an unpositioned layout, computes the positions each child should be placed at. */
   static ASStackPositionedLayout compute(const ASStackUnpositionedLayout &unpositionedLayout,
                                          const ASStackLayoutSpecStyle &style,
-                                         const ASSizeRange &constrainedSize);
+                                         const ASLayoutContext &layoutContext);
 };

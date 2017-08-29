@@ -74,7 +74,7 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
  Inset will compute a new constrained size for it's child after applying insets and re-positioning
  the child to respect the inset.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
@@ -87,19 +87,20 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
   const CGFloat insetsY = (finiteOrZero(_insets.top) + finiteOrZero(_insets.bottom));
 
   // if either x-axis inset is infinite, let child be intrinsic width
-  const CGFloat minWidth = (isinf(_insets.left) || isinf(_insets.right)) ? 0 : constrainedSize.min.width;
+  const CGFloat minWidth = (isinf(_insets.left) || isinf(_insets.right)) ? 0 : layoutContext.min.width;
   // if either y-axis inset is infinite, let child be intrinsic height
-  const CGFloat minHeight = (isinf(_insets.top) || isinf(_insets.bottom)) ? 0 : constrainedSize.min.height;
+  const CGFloat minHeight = (isinf(_insets.top) || isinf(_insets.bottom)) ? 0 : layoutContext.min.height;
 
-  const ASSizeRange insetConstrainedSize = {
+  const ASLayoutContext insetLayoutContext = {
     {
       MAX(0, minWidth - insetsX),
       MAX(0, minHeight - insetsY),
     },
     {
-      MAX(0, constrainedSize.max.width - insetsX),
-      MAX(0, constrainedSize.max.height - insetsY),
-    }
+      MAX(0, layoutContext.max.width - insetsX),
+      MAX(0, layoutContext.max.height - insetsY),
+    },
+    layoutContext.traitCollection
   };
   
   const CGSize insetParentSize = {
@@ -107,21 +108,21 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
     MAX(0, parentSize.height - insetsY)
   };
   
-  ASLayout *sublayout = [self.child layoutThatFits:insetConstrainedSize parentSize:insetParentSize];
+  ASLayout *sublayout = [self.child layoutThatFits:insetLayoutContext parentSize:insetParentSize];
 
-  const CGSize computedSize = ASSizeRangeClamp(constrainedSize, {
-    finite(sublayout.size.width + _insets.left + _insets.right, constrainedSize.max.width),
-    finite(sublayout.size.height + _insets.top + _insets.bottom, constrainedSize.max.height),
+  const CGSize computedSize = ASLayoutContextClamp(layoutContext, {
+    finite(sublayout.size.width + _insets.left + _insets.right, layoutContext.max.width),
+    finite(sublayout.size.height + _insets.top + _insets.bottom, layoutContext.max.height),
   });
 
-  const CGFloat x = finite(_insets.left, constrainedSize.max.width -
+  const CGFloat x = finite(_insets.left, layoutContext.max.width -
                            (finite(_insets.right,
-                                   centerInset(constrainedSize.max.width, sublayout.size.width)) + sublayout.size.width));
+                                   centerInset(layoutContext.max.width, sublayout.size.width)) + sublayout.size.width));
 
   const CGFloat y = finite(_insets.top,
-                           constrainedSize.max.height -
+                           layoutContext.max.height -
                            (finite(_insets.bottom,
-                                   centerInset(constrainedSize.max.height, sublayout.size.height)) + sublayout.size.height));
+                                   centerInset(layoutContext.max.height, sublayout.size.height)) + sublayout.size.height));
   
   sublayout.position = CGPointMake(x, y);
   

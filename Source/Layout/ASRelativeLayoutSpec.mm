@@ -58,30 +58,30 @@
   _sizingOption = sizingOption;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   // If we have a finite size in any direction, pass this so that the child can resolve percentages against it.
   // Otherwise pass ASLayoutElementParentDimensionUndefined as the size will depend on the content
   CGSize size = {
-    ASPointsValidForSize(constrainedSize.max.width) == NO ? ASLayoutElementParentDimensionUndefined : constrainedSize.max.width,
-    ASPointsValidForSize(constrainedSize.max.height) == NO ? ASLayoutElementParentDimensionUndefined : constrainedSize.max.height
+    ASPointsValidForSize(layoutContext.max.width) == NO ? ASLayoutElementParentDimensionUndefined : layoutContext.max.width,
+    ASPointsValidForSize(layoutContext.max.height) == NO ? ASLayoutElementParentDimensionUndefined : layoutContext.max.height
   };
   
   // Layout the child
   const CGSize minChildSize = {
-    (_horizontalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : constrainedSize.min.width,
-    (_verticalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : constrainedSize.min.height,
+    (_horizontalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : layoutContext.min.width,
+    (_verticalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : layoutContext.min.height,
   };
-  ASLayout *sublayout = [self.child layoutThatFits:ASSizeRangeMake(minChildSize, constrainedSize.max) parentSize:size];
+  ASLayout *sublayout = [self.child layoutThatFits:ASLayoutContextMake(minChildSize, layoutContext.max, layoutContext.traitCollection) parentSize:size];
   
   // If we have an undetermined height or width, use the child size to define the layout size
-  size = ASSizeRangeClamp(constrainedSize, {
+  size = ASLayoutContextClamp(layoutContext, {
     isfinite(size.width) == NO ? sublayout.size.width : size.width,
     isfinite(size.height) == NO ? sublayout.size.height : size.height
   });
   
   // If minimum size options are set, attempt to shrink the size to the size of the child
-  size = ASSizeRangeClamp(constrainedSize, {
+  size = ASLayoutContextClamp(layoutContext, {
     MIN(size.width, (_sizingOption & ASRelativeLayoutSpecSizingOptionMinimumWidth) != 0 ? sublayout.size.width : size.width),
     MIN(size.height, (_sizingOption & ASRelativeLayoutSpecSizingOptionMinimumHeight) != 0 ? sublayout.size.height : size.height)
   });

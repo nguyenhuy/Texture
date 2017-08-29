@@ -64,11 +64,12 @@
 
 #pragma mark - ASLayoutSpec
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
+  ASPrimitiveTraitCollection traitCollection = layoutContext.traitCollection;
   CGSize size = {
-    ASPointsValidForSize(constrainedSize.max.width) == NO ? ASLayoutElementParentDimensionUndefined : constrainedSize.max.width,
-    ASPointsValidForSize(constrainedSize.max.height) == NO ? ASLayoutElementParentDimensionUndefined : constrainedSize.max.height
+    ASPointsValidForSize(layoutContext.max.width) == NO ? ASLayoutElementParentDimensionUndefined : layoutContext.max.width,
+    ASPointsValidForSize(layoutContext.max.height) == NO ? ASLayoutElementParentDimensionUndefined : layoutContext.max.height
   };
   
   NSArray *children = self.children;
@@ -77,32 +78,35 @@
   for (id<ASLayoutElement> child in children) {
     CGPoint layoutPosition = child.style.layoutPosition;
     CGSize autoMaxSize = {
-      constrainedSize.max.width  - layoutPosition.x,
-      constrainedSize.max.height - layoutPosition.y
+      layoutContext.max.width  - layoutPosition.x,
+      layoutContext.max.height - layoutPosition.y
     };
 
-    const ASSizeRange childConstraint = ASLayoutElementSizeResolveAutoSize(child.style.size, size, {{0,0}, autoMaxSize});
+    const ASLayoutContext childContext = ASLayoutElementSizeResolveAutoSize(child.style.size,
+                                                                            size,
+                                                                            traitCollection,
+                                                                            ASLayoutContextMake(CGSizeZero, autoMaxSize, traitCollection));
     
-    ASLayout *sublayout = [child layoutThatFits:childConstraint parentSize:size];
+    ASLayout *sublayout = [child layoutThatFits:childContext parentSize:size];
     sublayout.position = layoutPosition;
     [sublayouts addObject:sublayout];
   }
   
   if (_sizing == ASAbsoluteLayoutSpecSizingSizeToFit || isnan(size.width)) {
-    size.width = constrainedSize.min.width;
+    size.width = layoutContext.min.width;
     for (ASLayout *sublayout in sublayouts) {
       size.width  = MAX(size.width,  sublayout.position.x + sublayout.size.width);
     }
   }
   
   if (_sizing == ASAbsoluteLayoutSpecSizingSizeToFit || isnan(size.height)) {
-    size.height = constrainedSize.min.height;
+    size.height = layoutContext.min.height;
     for (ASLayout *sublayout in sublayouts) {
       size.height = MAX(size.height, sublayout.position.y + sublayout.size.height);
     }
   }
   
-  return [ASLayout layoutWithLayoutElement:self size:ASSizeRangeClamp(constrainedSize, size) sublayouts:sublayouts];
+  return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, size) sublayouts:sublayouts];
 }
 
 @end

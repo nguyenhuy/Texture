@@ -150,7 +150,7 @@ static void positionItemsInLine(const ASStackUnpositionedLine &line,
 
 ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnpositionedLayout &layout,
                                                          const ASStackLayoutSpecStyle &style,
-                                                         const ASSizeRange &sizeRange)
+                                                         const ASLayoutContext &layoutContext)
 {
   const auto &lines = layout.lines;
   if (lines.empty()) {
@@ -162,7 +162,7 @@ ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnposition
   const auto alignContent = style.alignContent;
   const auto lineSpacing = style.lineSpacing;
   const auto justifyContent = style.justifyContent;
-  const auto crossViolation = ASStackUnpositionedLayout::computeCrossViolation(layout.crossDimensionSum, style, sizeRange);
+  const auto crossViolation = ASStackUnpositionedLayout::computeCrossViolation(layout.crossDimensionSum, style, layoutContext);
   CGFloat crossOffset;
   CGFloat crossSpacing;
   crossOffsetAndSpacingForEachLine(numOfLines, crossViolation, alignContent, crossOffset, crossSpacing);
@@ -177,7 +177,7 @@ ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnposition
     first = NO;
     
     const auto &items = line.items;
-    const auto stackViolation = ASStackUnpositionedLayout::computeStackViolation(line.stackDimensionSum, style, sizeRange);
+    const auto stackViolation = ASStackUnpositionedLayout::computeStackViolation(line.stackDimensionSum, style, layoutContext);
     CGFloat stackOffset;
     CGFloat stackSpacing;
     stackOffsetAndSpacingForEachItem(items.size(), stackViolation, justifyContent, stackOffset, stackSpacing);
@@ -190,5 +190,5 @@ ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnposition
   }
 
   const CGSize finalSize = directionSize(direction, layout.stackDimensionSum, layout.crossDimensionSum);
-  return {std::move(positionedItems), ASSizeRangeClamp(sizeRange, finalSize)};
+  return {std::move(positionedItems), ASLayoutContextClamp(layoutContext, finalSize)};
 }

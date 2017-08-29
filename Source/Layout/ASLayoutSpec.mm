@@ -86,9 +86,9 @@
 
 ASLayoutElementLayoutCalculationDefaults
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
-  return [ASLayout layoutWithLayoutElement:self size:constrainedSize.min];
+  return [ASLayout layoutWithLayoutElement:self size:layoutContext.min];
 }
 
 #pragma mark - Child
@@ -283,14 +283,14 @@ ASLayoutElementStyleExtensibilityForwarding
   return self;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   NSArray *children = self.children;
   NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];
   
-  CGSize size = constrainedSize.min;
+  CGSize size = layoutContext.min;
   for (id<ASLayoutElement> child in children) {
-    ASLayout *sublayout = [child layoutThatFits:constrainedSize parentSize:constrainedSize.max];
+    ASLayout *sublayout = [child layoutThatFits:layoutContext parentSize:layoutContext.max];
     sublayout.position = CGPointZero;
     
     size.width = MAX(size.width,  sublayout.size.width);

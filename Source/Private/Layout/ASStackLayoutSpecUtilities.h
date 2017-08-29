@@ -56,13 +56,14 @@ inline void setStackValueToPoint(const ASStackLayoutDirection direction, const C
   (direction == ASStackLayoutDirectionVertical) ? (point.y = stack) : (point.x = stack);
 }
 
-inline ASSizeRange directionSizeRange(const ASStackLayoutDirection direction,
-                                      const CGFloat stackMin,
-                                      const CGFloat stackMax,
-                                      const CGFloat crossMin,
-                                      const CGFloat crossMax)
+inline ASLayoutContext directionLayoutContext(const ASLayoutContext &layoutContext,
+                                              const ASStackLayoutDirection direction,
+                                              const CGFloat stackMin,
+                                              const CGFloat stackMax,
+                                              const CGFloat crossMin,
+                                              const CGFloat crossMax)
 {
-  return {directionSize(direction, stackMin, crossMin), directionSize(direction, stackMax, crossMax)};
+  return {directionSize(direction, stackMin, crossMin), directionSize(direction, stackMax, crossMax), layoutContext.traitCollection};
 }
 
 inline ASStackLayoutAlignItems alignment(ASStackLayoutAlignSelf childAlignment, ASStackLayoutAlignItems stackAlignment)

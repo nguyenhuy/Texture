@@ -64,21 +64,21 @@
 
 #pragma mark - ASLayoutElement
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   std::vector<CGSize> sizeOptions;
   
-  if (ASPointsValidForSize(constrainedSize.max.width)) {
-    sizeOptions.push_back(ASSizeRangeClamp(constrainedSize, {
-      constrainedSize.max.width,
-      ASFloorPixelValue(_ratio * constrainedSize.max.width)
+  if (ASPointsValidForSize(layoutContext.max.width)) {
+    sizeOptions.push_back(ASLayoutContextClamp(layoutContext, {
+      layoutContext.max.width,
+      ASFloorPixelValue(_ratio * layoutContext.max.width)
     }));
   }
   
-  if (ASPointsValidForSize(constrainedSize.max.height)) {
-    sizeOptions.push_back(ASSizeRangeClamp(constrainedSize, {
-      ASFloorPixelValue(constrainedSize.max.height / _ratio),
-      constrainedSize.max.height
+  if (ASPointsValidForSize(layoutContext.max.height)) {
+    sizeOptions.push_back(ASLayoutContextClamp(layoutContext, {
+      ASFloorPixelValue(layoutContext.max.height / _ratio),
+      layoutContext.max.height
     }));
   }
 
@@ -88,9 +88,9 @@
   });
 
   // If there is no max size in *either* dimension, we can't apply the ratio, so just pass our size range through.
-  const ASSizeRange childRange = (bestSize == sizeOptions.end()) ? constrainedSize : ASSizeRangeIntersect(constrainedSize, ASSizeRangeMake(*bestSize, *bestSize));
+  const ASLayoutContext childContext = (bestSize == sizeOptions.end()) ? layoutContext : ASLayoutContextIntersect(layoutContext, ASLayoutContextMake(*bestSize, *bestSize, layoutContext.traitCollection));
   const CGSize parentSize = (bestSize == sizeOptions.end()) ? ASLayoutElementParentSizeUndefined : *bestSize;
-  ASLayout *sublayout = [self.child layoutThatFits:childRange parentSize:parentSize];
+  ASLayout *sublayout = [self.child layoutThatFits:childContext parentSize:parentSize];
   sublayout.position = CGPointZero;
   return [ASLayout layoutWithLayoutElement:self size:sublayout.size sublayouts:@[sublayout]];
 }

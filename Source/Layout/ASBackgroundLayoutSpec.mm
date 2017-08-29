@@ -50,16 +50,16 @@ static NSUInteger const kBackgroundChildIndex = 1;
 /**
  * First layout the contents, then fit the background image.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASLayout *contentsLayout = [self.child layoutThatFits:constrainedSize parentSize:parentSize];
+  ASLayout *contentsLayout = [self.child layoutThatFits:layoutContext parentSize:parentSize];
 
   NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:2];
   if (self.background) {
     // Size background to exactly the same size.
-    ASLayout *backgroundLayout = [self.background layoutThatFits:ASSizeRangeMake(contentsLayout.size)
+    ASLayout *backgroundLayout = [self.background layoutThatFits:ASLayoutContextMake(contentsLayout.size, layoutContext.traitCollection)
                                                       parentSize:parentSize];
     backgroundLayout.position = CGPointZero;
     [sublayouts addObject:backgroundLayout];

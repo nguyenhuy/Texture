@@ -134,11 +134,11 @@
   _spacing = spacing;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
 {
   NSArray *children = self.children;
   if (children.count == 0) {
-    return [ASLayout layoutWithLayoutElement:self size:constrainedSize.min];
+    return [ASLayout layoutWithLayoutElement:self size:layoutContext.min];
   }
  
   as_activity_scope_verbose(as_activity_create("Calculate stack layout", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
@@ -152,8 +152,8 @@
   
   const ASStackLayoutSpecStyle style = {.direction = _direction, .spacing = _spacing, .justifyContent = _justifyContent, .alignItems = _alignItems, .flexWrap = _flexWrap, .alignContent = _alignContent, .lineSpacing = _lineSpacing};
   
-  const auto unpositionedLayout = ASStackUnpositionedLayout::compute(stackChildren, style, constrainedSize, _concurrent);
-  const auto positionedLayout = ASStackPositionedLayout::compute(unpositionedLayout, style, constrainedSize);
+  const auto unpositionedLayout = ASStackUnpositionedLayout::compute(stackChildren, style, layoutContext, _concurrent);
+  const auto positionedLayout = ASStackPositionedLayout::compute(unpositionedLayout, style, layoutContext);
   
   if (style.direction == ASStackLayoutDirectionVertical) {
     self.style.ascender = stackChildren.front().style.ascender;

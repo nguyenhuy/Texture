@@ -95,7 +95,7 @@
     YGNodeStyleSetAspectRatio(yogaNode, aspectRatio);
   }
 
-  // For the root node, we use rootConstrainedSize above. For children, consult the style for their size.
+  // For the root node, we use rootContext above. For children, consult the style for their size.
   if (parentYogaNode != NULL) {
     YGNodeInsertChild(parentYogaNode, yogaNode, YGNodeGetChildCount(parentYogaNode));
 
@@ -114,19 +114,19 @@
   // TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT: YGNodeStyleSetOverflow, YGNodeStyleSetFlex
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASSizeRange)constrainedSize
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
                      restrictedToSize:(ASLayoutElementSize)layoutElementSize
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASSizeRange styleAndParentSize = ASLayoutElementSizeResolve(layoutElementSize, parentSize);
-  const ASSizeRange rootConstrainedSize = ASSizeRangeIntersect(constrainedSize, styleAndParentSize);
+  ASLayoutContext styleAndParentContext = ASLayoutElementSizeResolve(layoutElementSize, parentSize, layoutContext.traitCollection);
+  const ASLayoutContext rootContext = ASLayoutContextIntersect(layoutContext, styleAndParentSize);
 
   YGNodeRef rootYogaNode = YGNodeNew();
 
   // YGNodeCalculateLayout currently doesn't offer the ability to pass a minimum size (max is passed there).
-  // Apply the constrainedSize.min directly to the root node so that layout accounts for it.
-  YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.width));
-  YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootConstrainedSize.min.height));
+  // Apply the rootContext.min directly to the root node so that layout accounts for it.
+  YGNodeStyleSetMinWidth (rootYogaNode, yogaFloatForCGFloat(rootContext.min.width));
+  YGNodeStyleSetMinHeight(rootYogaNode, yogaFloatForCGFloat(rootContext.min.height));
 
   // It's crucial to set these values. YGNodeCalculateLayout has unusual behavior for its width and height parameters:
   // 1. If no maximum size set, infer this means YGMeasureModeExactly. Even if a small minWidth & minHeight are set,
@@ -143,8 +143,8 @@
 
   // It is crucial to use yogaFloat... to convert CGFLOAT_MAX into YGUndefined here.
   YGNodeCalculateLayout(rootYogaNode,
-                        yogaFloatForCGFloat(rootConstrainedSize.max.width),
-                        yogaFloatForCGFloat(rootConstrainedSize.max.height),
+                        yogaFloatForCGFloat(rootContext.max.width),
+                        yogaFloatForCGFloat(rootContext.max.height),
                         YGDirectionInherit);
 
   ASLayout *layout = [self layoutForYogaNode:rootYogaNode];
@@ -160,7 +160,7 @@
       NSLog(@"style = %@", self.rootNode.style);
       YGNodePrint(rootYogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
   }
-  NSLog(@"rootConstraint = (%@, %@), layout = %@, sublayouts = %@", NSStringFromCGSize(rootConstrainedSize.min), NSStringFromCGSize(rootConstrainedSize.max), layout, layout.sublayouts);
+  NSLog(@"rootContext = %@, layout = %@, sublayouts = %@", NSStringFromASLayoutContext(rootContext), layout, layout.sublayouts);
 #endif
 
   while(YGNodeGetChildCount(rootYogaNode) > 0) {
