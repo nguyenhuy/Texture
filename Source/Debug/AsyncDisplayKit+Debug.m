@@ -621,7 +621,7 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   [self setBarSubviewOrder];
 
   CGRect rect       = CGRectIntegral(CGRectMake(0, 0, boundsSize.width, floorf(boundsSize.height / 2.0)));
-  rect.size         = [_debugText layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX))].size;
+  rect.size         = [_debugText layoutThatFits:ASLayoutContextMakeWithUnconstrainedSizeRange(ASPrimitiveTraitCollectionMakeDefault())].size;
   rect.origin.x     = (boundsSize.width - rect.size.width) / 2.0;
   _debugText.frame  = rect;
   rect.origin.y    += rect.size.height;
