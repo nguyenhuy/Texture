@@ -257,27 +257,38 @@ ASVisibilityDepthImplementation;
   
   ASDisplayNodeAssertMainThread();
   ASPrimitiveTraitCollection asyncTraitCollection = ASPrimitiveTraitCollectionFromUITraitCollection(traitCollection);
-  asyncTraitCollection.containerSize = self.view.frame.size;
+  asyncTraitCollection.containerSize = self.view.bounds.size;
   return asyncTraitCollection;
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
   [super traitCollectionDidChange:previousTraitCollection];
-  
+
+  // TODO: Check if -viewWillLayoutSubviews called again. If yes, don't need to do this
+  // TODO: Test this
   ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-  traitCollection.containerSize = self.view.bounds.size;
-  // TODO: Run another layout pass with this new trait collection
+  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+
+  // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
+  // If the node's layout context didn't change between the last layout pass it's a no-op
+  [_node layoutThatFits:layoutContext];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
 
-  // TODO: Get the trait collection from node's layout context for calculated layout
-//  ASPrimitiveTraitCollection traitCollection = _node.primitiveTraitCollection;
-//  traitCollection.containerSize = self.view.bounds.size;
-  // TODO: Run another layout pass with this new trait collection
+  // TODO: Check if -viewWillLayoutSubviews called again. If yes, don't need to do this
+  // TODO: Test this
+  ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
+  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+
+  // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
+  // If the node's layout context didn't change between the last layout pass it's a no-op
+  [_node layoutThatFits:layoutContext];
 }
 
 @end
