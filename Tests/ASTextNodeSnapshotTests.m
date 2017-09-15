@@ -39,7 +39,7 @@
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"judar"
                                                             attributes:@{NSFontAttributeName : [UIFont italicSystemFontOfSize:24]}];
   textNode.textContainerInset = UIEdgeInsetsMake(0, 2, 0, 2);
-  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)));
+  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
   
   ASSnapshotVerifyNode(textNode, nil);
 }
@@ -55,7 +55,7 @@
   
   textNode.textContainerInset = UIEdgeInsetsMake(10, 10, 10, 10);
   
-  ASLayout *layout = [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 80))];
+  ASLayout *layout = [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 80), ASPrimitiveTraitCollectionMakeDefault())];
   textNode.frame = CGRectMake(50, 50, layout.size.width, layout.size.height);
 
   [backgroundView addSubview:textNode.view];
@@ -77,7 +77,7 @@
                                                             attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:30] }];
 
   textNode.textContainerInset = UIEdgeInsetsMake(5, 10, 10, 5);
-  ASLayout *layout = [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY))];
+  ASLayout *layout = [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault())];
   textNode.frame = CGRectMake(50, 50, layout.size.width, layout.size.height);
 
   [backgroundView addSubview:textNode.view];
@@ -94,7 +94,7 @@
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
-  [textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 50))];
+  [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 50), ASPrimitiveTraitCollectionMakeDefault())];
   ASSnapshotVerifyNode(textNode, nil);
 }
 
@@ -104,7 +104,7 @@
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
   // Set exclusion paths to trigger slow path
   textNode.exclusionPaths = @[ [UIBezierPath bezierPath] ];
-  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 50)));
+  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 50), ASPrimitiveTraitCollectionMakeDefault()));
   ASSnapshotVerifyNode(textNode, nil);
 }
 
@@ -116,7 +116,7 @@
   textNode.shadowOpacity = 0.3;
   textNode.shadowRadius = 3;
   textNode.shadowOffset = CGSizeMake(0, 1);
-  ASDisplayNodeSizeToFitSizeRange(textNode, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
   ASSnapshotVerifyNode(textNode, nil);
 }
 

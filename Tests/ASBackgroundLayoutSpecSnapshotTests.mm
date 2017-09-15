@@ -20,7 +20,7 @@
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 
-static const ASSizeRange kSize = {{320, 320}, {320, 320}};
+static const ASLayoutContext kLayoutContext = ASLayoutContextMake({320, 320}, {320, 320}, ASPrimitiveTraitCollectionMakeDefault());
 
 @interface ASBackgroundLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 
@@ -42,7 +42,7 @@ static const ASSizeRange kSize = {{320, 320}, {320, 320}};
     child:foregroundNode]
    background:backgroundNode];
   
-  [self testLayoutSpec:layoutSpec sizeRange:kSize subnodes:@[backgroundNode, foregroundNode] identifier: nil];
+  [self testLayoutSpec:layoutSpec layoutContext:kLayoutContext subnodes:@[backgroundNode, foregroundNode] identifier: nil];
 }
 
 @end

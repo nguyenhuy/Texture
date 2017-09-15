@@ -21,7 +21,7 @@
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
 
-static const ASSizeRange kSize = {{100, 120}, {320, 160}};
+static const ASLayoutContext kLayoutContext = ASLayoutContextMake({100, 120}, {320, 160}, ASPrimitiveTraitCollectionMakeDefault());
 
 @interface ASCenterLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 @end
@@ -64,7 +64,7 @@ static const ASSizeRange kSize = {{100, 120}, {320, 160}};
    background:backgroundNode];
 
   [self testLayoutSpec:layoutSpec
-             sizeRange:kSize
+         layoutContext:kLayoutContext
               subnodes:@[backgroundNode, foregroundNode]
             identifier:suffixForCenteringOptions(options, sizingOptions)];
 }
@@ -114,7 +114,7 @@ static NSString *suffixForCenteringOptions(ASCenterLayoutSpecCenteringOptions ce
      children:@[foregroundNode]]
     background:backgroundNode]];
 
-  [self testLayoutSpec:layoutSpec sizeRange:kSize subnodes:@[backgroundNode, foregroundNode] identifier:nil];
+  [self testLayoutSpec:layoutSpec layoutContext:kLayoutContext subnodes:@[backgroundNode, foregroundNode] identifier:nil];
 }
 
 @end

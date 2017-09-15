@@ -119,7 +119,7 @@
 {
   for (NSInteger i = 10; i < 500; i += 50) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+    CGSize calculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
     XCTAssertTrue(calculatedSize.width <= constrainedSize.width, @"Calculated width (%f) should be less than or equal to constrained width (%f)", calculatedSize.width, constrainedSize.width);
     XCTAssertTrue(calculatedSize.height <= constrainedSize.height, @"Calculated height (%f) should be less than or equal to constrained height (%f)", calculatedSize.height, constrainedSize.height);
   }
@@ -129,8 +129,8 @@
 {
   for (NSInteger i = 10; i < 500; i += 50) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
-    CGSize recalculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+    CGSize calculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
+    CGSize recalculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
     
     XCTAssertTrue(CGSizeEqualToSizeWithIn(calculatedSize, recalculatedSize, 4.0), @"Recalculated size %@ should be same as original size %@", NSStringFromCGSize(recalculatedSize), NSStringFromCGSize(calculatedSize));
   }
@@ -140,8 +140,8 @@
 {
   for (CGFloat i = 10; i < 500; i *= 1.3) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
-    CGSize recalculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+    CGSize calculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
+    CGSize recalculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
 
     XCTAssertTrue(CGSizeEqualToSizeWithIn(calculatedSize, recalculatedSize, 11.0), @"Recalculated size %@ should be same as original size %@", NSStringFromCGSize(recalculatedSize), NSStringFromCGSize(calculatedSize));
   }
@@ -151,9 +151,9 @@
 {
   _textNode.placeholderEnabled = YES;
   
-  XCTAssertNoThrow([_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeZero)], @"Measure with zero size and placeholder enabled should not throw an exception");
-  XCTAssertNoThrow([_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(0, 100))], @"Measure with zero width and placeholder enabled should not throw an exception");
-  XCTAssertNoThrow([_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 0))], @"Measure with zero height and placeholder enabled should not throw an exception");
+  XCTAssertNoThrow([_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeZero, ASPrimitiveTraitCollectionMakeDefault())], @"Measure with zero size and placeholder enabled should not throw an exception");
+  XCTAssertNoThrow([_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(0, 100), ASPrimitiveTraitCollectionMakeDefault())], @"Measure with zero width and placeholder enabled should not throw an exception");
+  XCTAssertNoThrow([_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 0), ASPrimitiveTraitCollectionMakeDefault())], @"Measure with zero height and placeholder enabled should not throw an exception");
 }
 
 - (void)testAccessibility
@@ -178,7 +178,7 @@
   ASTextNodeTestDelegate *delegate = [ASTextNodeTestDelegate new];
   _textNode.delegate = delegate;
 
-  ASLayout *layout = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 100))];
+  ASLayout *layout = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())];
   _textNode.frame = CGRectMake(0, 0, layout.size.width, layout.size.height);
   
   NSRange returnedLinkRange;
@@ -202,7 +202,7 @@
   ASTextNodeTestDelegate *delegate = [ASTextNodeTestDelegate new];
   _textNode.delegate = delegate;
 
-  CGSize calculatedSize = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 100))].size;
+  CGSize calculatedSize = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())].size;
   NSRange returnedLinkRange = NSMakeRange(NSNotFound, 0);
   NSRange expectedRange = NSMakeRange(NSNotFound, 0);
   NSString *returnedAttributeName;
@@ -228,9 +228,9 @@
 - (void)testAddingExclusionPathsShouldInvalidateAndIncreaseTheSize
 {
   CGSize constrainedSize = CGSizeMake(100, CGFLOAT_MAX);
-  CGSize sizeWithoutExclusionPaths = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  CGSize sizeWithoutExclusionPaths = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
   _textNode.exclusionPaths = @[[UIBezierPath bezierPathWithRect:CGRectMake(50, 20, 30, 40)]];
-  CGSize sizeWithExclusionPaths = [_textNode layoutThatFits:ASSizeRangeMake(CGSizeZero, constrainedSize)].size;
+  CGSize sizeWithExclusionPaths = [_textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
 
   XCTAssertGreaterThan(sizeWithExclusionPaths.height, sizeWithoutExclusionPaths.height, @"Setting exclusions paths should invalidate the calculated size and return a greater size");
 }

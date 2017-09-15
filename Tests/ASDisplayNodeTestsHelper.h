@@ -27,6 +27,6 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
 BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block);
 
 void ASDisplayNodeSizeToFitSize(ASDisplayNode *node, CGSize size);
-void ASDisplayNodeSizeToFitSizeRange(ASDisplayNode *node, ASSizeRange sizeRange);
+void ASDisplayNodeSizeToFitLayoutContext(ASDisplayNode *node, ASLayoutContext layoutContext);
 
 ASDISPLAYNODE_EXTERN_C_END

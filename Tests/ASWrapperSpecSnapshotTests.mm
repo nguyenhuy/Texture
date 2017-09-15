@@ -28,8 +28,8 @@
 {
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
-  ASSizeRange sizeRange = ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY));
-  [self testWithChildren:@[child] sizeRange:sizeRange identifier:nil];
+  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault());
+  [self testWithChildren:@[child] layoutContext:layoutContext identifier:nil];
 }
 
 - (void)testWrapperSpecWithMultipleElementsShouldSizeToLargestElement
@@ -37,11 +37,11 @@
   ASDisplayNode *firstChild = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   ASDisplayNode *secondChild = ASDisplayNodeWithBackgroundColor([UIColor greenColor], {100, 100});
   
-  ASSizeRange sizeRange = ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY));
-  [self testWithChildren:@[secondChild, firstChild] sizeRange:sizeRange identifier:nil];
+  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault());
+  [self testWithChildren:@[secondChild, firstChild] layoutContext:layoutContext identifier:nil];
 }
 
-- (void)testWithChildren:(NSArray *)children sizeRange:(ASSizeRange)sizeRange identifier:(NSString *)identifier
+- (void)testWithChildren:(NSArray *)children layoutContext:(ASLayoutContext)layoutContext identifier:(NSString *)identifier
 {
   ASDisplayNode *backgroundNode = ASDisplayNodeWithBackgroundColor([UIColor whiteColor]);
 
@@ -54,7 +54,7 @@
     wrapperWithLayoutElements:children]
    background:backgroundNode];
   
-  [self testLayoutSpec:layoutSpec sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+  [self testLayoutSpec:layoutSpec layoutContext:layoutContext subnodes:subnodes identifier:identifier];
 }
 
 @end

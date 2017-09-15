@@ -75,7 +75,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
 - (void)testStackLayoutSpecWithJustify:(ASStackLayoutJustifyContent)justify
                             flexFactor:(CGFloat)flex
-                             sizeRange:(ASSizeRange)sizeRange
+                         layoutContext:(ASLayoutContext)layoutContext
                             identifier:(NSString *)identifier
 {
   ASStackLayoutSpecStyle style = {
@@ -85,20 +85,20 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   NSArray<ASDisplayNode *> *subnodes = defaultSubnodesWithSameSize({50, 50}, flex);
   
-  [self testStackLayoutSpecWithStyle:style sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+  [self testStackLayoutSpecWithStyle:style layoutContext:layoutContext subnodes:subnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithStyle:(ASStackLayoutSpecStyle)style
-                           sizeRange:(ASSizeRange)sizeRange
+                       layoutContext:(ASLayoutContext)layoutContext
                             subnodes:(NSArray *)subnodes
                           identifier:(NSString *)identifier
 {
-  [self testStackLayoutSpecWithStyle:style children:subnodes sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+  [self testStackLayoutSpecWithStyle:style children:subnodes layoutContext:layoutContext subnodes:subnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithStyle:(ASStackLayoutSpecStyle)style
                             children:(NSArray *)children
-                           sizeRange:(ASSizeRange)sizeRange
+                       layoutContext:(ASLayoutContext)layoutContext
                             subnodes:(NSArray *)subnodes
                           identifier:(NSString *)identifier
 {
@@ -113,7 +113,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
    lineSpacing:style.lineSpacing
    children:children];
 
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:layoutContext subnodes:subnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithDirection:(ASStackLayoutDirection)direction
@@ -130,8 +130,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.verticalAlignment = verticalAlignment;
   
   CGSize exactSize = CGSizeMake(200, 200);
-  static ASSizeRange kSize = ASSizeRangeMake(exactSize, exactSize);
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:subnodes identifier:identifier];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake(exactSize, exactSize, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:subnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithBaselineAlignment:(ASStackLayoutAlignItems)baselineAlignment
@@ -145,12 +145,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.children = textNodes;
   stackLayoutSpec.alignItems = baselineAlignment;
   
-  static ASSizeRange kSize = ASSizeRangeMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX));
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:textNodes identifier:identifier];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:textNodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpec:(ASStackLayoutSpec *)stackLayoutSpec
-                  sizeRange:(ASSizeRange)sizeRange
+              layoutContext:(ASLayoutContext)layoutContext
                    subnodes:(NSArray *)subnodes
                  identifier:(NSString *)identifier
 {
@@ -160,12 +160,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   NSMutableArray *newSubnodes = [NSMutableArray arrayWithObject:backgroundNode];
   [newSubnodes addObjectsFromArray:subnodes];
   
-  [self testLayoutSpec:layoutSpec sizeRange:sizeRange subnodes:newSubnodes identifier:identifier];
+  [self testLayoutSpec:layoutSpec layoutContext:layoutContext subnodes:newSubnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
                                 lineSpacing:(CGFloat)lineSpacing
-                                  sizeRange:(ASSizeRange)sizeRange
+                              layoutContext:(ASLayoutContext)layoutContext
                                  identifier:(NSString *)identifier
 {
   ASStackLayoutSpecStyle style = {
@@ -185,14 +185,14 @@ static NSArray<ASTextNode*> *defaultTextNodes()
                                          ASDisplayNodeWithBackgroundColor([UIColor cyanColor], subnodeSize),
                                          ];
 
-  [self testStackLayoutSpecWithStyle:style sizeRange:sizeRange subnodes:subnodes identifier:identifier];
+  [self testStackLayoutSpecWithStyle:style layoutContext:layoutContext subnodes:subnodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
-                                  sizeRange:(ASSizeRange)sizeRange
+                              layoutContext:(ASLayoutContext)layoutContext
                                  identifier:(NSString *)identifier
 {
-  [self testStackLayoutSpecWithAlignContent:alignContent lineSpacing:0.0 sizeRange:sizeRange identifier:identifier];
+  [self testStackLayoutSpecWithAlignContent:alignContent lineSpacing:0.0 layoutContext:layoutContext identifier:identifier];
 }
 
 #pragma mark -
@@ -213,27 +213,27 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testUnderflowBehaviors
 {
   // width 300px; height 0-300px
-  static ASSizeRange kSize = {{300, 0}, {300, 300}};
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 sizeRange:kSize identifier:@"justifyStart"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 sizeRange:kSize identifier:@"justifyCenter"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 sizeRange:kSize identifier:@"justifyEnd"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:1 sizeRange:kSize identifier:@"flex"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 sizeRange:kSize identifier:@"justifySpaceBetween"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 sizeRange:kSize identifier:@"justifySpaceAround"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyStart"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyCenter"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyEnd"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:1 layoutContext:kLayoutContext identifier:@"flex"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 layoutContext:kLayoutContext identifier:@"justifySpaceBetween"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 layoutContext:kLayoutContext identifier:@"justifySpaceAround"];
 }
 
 - (void)testOverflowBehaviors
 {
   // width 110px; height 0-300px
-  static ASSizeRange kSize = {{110, 0}, {110, 300}};
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 sizeRange:kSize identifier:@"justifyStart"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 sizeRange:kSize identifier:@"justifyCenter"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 sizeRange:kSize identifier:@"justifyEnd"];
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:1 sizeRange:kSize identifier:@"flex"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 0}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyStart"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyCenter"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyEnd"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:1 layoutContext:kLayoutContext identifier:@"flex"];
   // On overflow, "space between" is identical to "content start"
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 sizeRange:kSize identifier:@"justifyStart"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyStart"];
   // On overflow, "space around" is identical to "content center"
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 sizeRange:kSize identifier:@"justifyCenter"];
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyCenter"];
 }
 
 - (void)testOverflowBehaviorsWhenAllFlexShrinkChildrenHaveBeenClampedToZeroButViolationStillExists
@@ -244,8 +244,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.flexShrink = 1;
   
   // Width is 75px--that's less than the sum of the widths of the children, which is 100px.
-  static ASSizeRange kSize = {{75, 0}, {75, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({75, 0}, {75, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testFlexWithUnequalIntrinsicSizes
@@ -256,12 +256,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 150}, subnodes[1]);
 
   // width 300px; height 0-150px.
-  static ASSizeRange kUnderflowSize = {{300, 0}, {300, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
+  static ASLayoutContext kUnderflowSize = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
   
   // width 200px; height 0-150px.
-  static ASSizeRange kOverflowSize = {{200, 0}, {200, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kOverflowSize subnodes:subnodes identifier:@"overflow"];
+  static ASLayoutContext kOverflowSize = ASLayoutContextMake({200, 0}, {200, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kOverflowSize subnodes:subnodes identifier:@"overflow"];
 }
 
 - (void)testCrossAxisSizeBehaviors
@@ -274,12 +274,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 50}, subnodes[2]);
   
   // width 0-300px; height 300px
-  static ASSizeRange kVariableHeight = {{0, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
   
   // width 300px; height 300px
-  static ASSizeRange kFixedHeight = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kFixedHeight subnodes:subnodes identifier:@"fixedHeight"];
+  static ASLayoutContext kFixedHeight = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kFixedHeight subnodes:subnodes identifier:@"fixedHeight"];
 }
 
 - (void)testStackSpacing
@@ -295,8 +295,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 50}, subnodes[2]);
 
   // width 0-300px; height 300px
-  static ASSizeRange kVariableHeight = {{0, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
 }
 
 - (void)testStackSpacingWithChildrenHavingNilObjects
@@ -320,14 +320,14 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     background:backgroundNode]];
   
   // width 300px; height 0-300px
-  static ASSizeRange kVariableHeight = {{300, 0}, {300, 300}};
-  [self testLayoutSpec:layoutSpec sizeRange:kVariableHeight subnodes:@[backgroundNode] identifier:@"variableHeight"];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testLayoutSpec:layoutSpec layoutContext:kVariableHeight subnodes:@[backgroundNode] identifier:@"variableHeight"];
 }
 
 - (void)testChildSpacing
 {
   // width 0-INF; height 0-INF
-  static ASSizeRange kAnySize = {{0, 0}, {INFINITY, INFINITY}};
+  static ASLayoutContext kAnySize = ASLayoutContextMake({0, 0}, {INFINITY, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
   ASStackLayoutSpecStyle style = {.direction = ASStackLayoutDirectionVertical};
 
   NSArray<ASDisplayNode *> *subnodes = defaultSubnodes();
@@ -337,14 +337,14 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   subnodes[1].style.spacingBefore = 10;
   subnodes[2].style.spacingBefore = 20;
-  [self testStackLayoutSpecWithStyle:style sizeRange:kAnySize subnodes:subnodes identifier:@"spacingBefore"];
+  [self testStackLayoutSpecWithStyle:style layoutContext:kAnySize subnodes:subnodes identifier:@"spacingBefore"];
   // Reset above spacing values
   subnodes[1].style.spacingBefore = 0;
   subnodes[2].style.spacingBefore = 0;
 
   subnodes[1].style.spacingAfter = 10;
   subnodes[2].style.spacingAfter = 20;
-  [self testStackLayoutSpecWithStyle:style sizeRange:kAnySize subnodes:subnodes identifier:@"spacingAfter"];
+  [self testStackLayoutSpecWithStyle:style layoutContext:kAnySize subnodes:subnodes identifier:@"spacingAfter"];
   // Reset above spacing values
   subnodes[1].style.spacingAfter = 0;
   subnodes[2].style.spacingAfter = 0;
@@ -352,7 +352,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   style.spacing = 10;
   subnodes[1].style.spacingBefore = -10;
   subnodes[1].style.spacingAfter = -10;
-  [self testStackLayoutSpecWithStyle:style sizeRange:kAnySize subnodes:subnodes identifier:@"spacingBalancedOut"];
+  [self testStackLayoutSpecWithStyle:style layoutContext:kAnySize subnodes:subnodes identifier:@"spacingBalancedOut"];
 }
 
 - (void)testJustifiedCenterWithChildSpacing
@@ -372,8 +372,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[2].style.spacingBefore = 30;
 
   // width 0-300px; height 300px
-  static ASSizeRange kVariableHeight = {{0, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
 }
 
 - (void)testJustifiedSpaceBetweenWithOneChild
@@ -386,8 +386,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
   // width 300px; height 0-INF
-  static ASSizeRange kVariableHeight = {{300, 0}, {300, INFINITY}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableHeight subnodes:@[child] identifier:nil];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:@[child] identifier:nil];
 }
 
 - (void)testJustifiedSpaceAroundWithOneChild
@@ -400,22 +400,22 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
   // width 300px; height 0-INF
-  static ASSizeRange kVariableHeight = {{300, 0}, {300, INFINITY}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableHeight subnodes:@[child] identifier:nil];
+  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:@[child] identifier:nil];
 }
 
 - (void)testJustifiedSpaceBetweenWithRemainingSpace
 {
   // width 301px; height 0-300px;
-  static ASSizeRange kSize = {{301, 0}, {301, 300}};
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 sizeRange:kSize identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({301, 0}, {301, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 layoutContext:kLayoutContext identifier:nil];
 }
 
 - (void)testJustifiedSpaceAroundWithRemainingSpace
 {
   // width 305px; height 0-300px;
-  static ASSizeRange kSize = {{305, 0}, {305, 300}};
-  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 sizeRange:kSize identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({305, 0}, {305, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 layoutContext:kLayoutContext identifier:nil];
 }
 
 - (void)testChildThatChangesCrossSizeWhenMainSizeIsFlexed
@@ -430,8 +430,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   child1.style.flexGrow = 1;
   child1.style.flexShrink = 1;
   
-  static ASSizeRange kFixedWidth = {{150, 0}, {150, INFINITY}};
-  [self testStackLayoutSpecWithStyle:style children:@[child1, subnode2] sizeRange:kFixedWidth subnodes:@[subnode1, subnode2] identifier:nil];
+  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style children:@[child1, subnode2] layoutContext:kFixedWidth subnodes:@[subnode1, subnode2] identifier:nil];
 }
 
 - (void)testAlignCenterWithFlexedMainDimension
@@ -448,8 +448,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[0].style.flexShrink = 1;
   subnodes[1].style.flexShrink = 1;
 
-  static ASSizeRange kFixedWidth = {{150, 0}, {150, 100}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kFixedWidth subnodes:subnodes identifier:nil];
+  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, 100}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kFixedWidth subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignCenterWithIndefiniteCrossDimension
@@ -462,8 +462,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnode2.style.alignSelf = ASStackLayoutAlignSelfCenter;
 
   NSArray<ASDisplayNode *> *subnodes = @[subnode1, subnode2];
-  static ASSizeRange kFixedWidth = {{150, 0}, {150, INFINITY}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kFixedWidth subnodes:subnodes identifier:nil];
+  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kFixedWidth subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignedStart
@@ -483,8 +483,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASSizeRange kExactSize = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kExactSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignedEnd
@@ -504,8 +504,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASSizeRange kExactSize = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kExactSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignedCenter
@@ -525,8 +525,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASSizeRange kExactSize = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kExactSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignedStretchNoChildExceedsMin
@@ -546,9 +546,9 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASSizeRange kVariableSize = {{200, 200}, {300, 300}};
+  static ASLayoutContext kVariableSize = ASLayoutContextMake({200, 200}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
   // all children should be 200px wide
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableSize subnodes:subnodes identifier:nil];
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testAlignedStretchOneChildExceedsMin
@@ -568,15 +568,15 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASSizeRange kVariableSize = {{50, 50}, {300, 300}};
+  static ASLayoutContext kVariableSize = ASLayoutContextMake({50, 50}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
   // all children should be 150px wide
-  [self testStackLayoutSpecWithStyle:style sizeRange:kVariableSize subnodes:subnodes identifier:nil];
+  [self testStackLayoutSpecWithStyle:style layoutContext:kVariableSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testEmptyStack
 {
-  static ASSizeRange kVariableSize = {{50, 50}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:{} sizeRange:kVariableSize subnodes:@[] identifier:nil];
+  static ASLayoutContext kVariableSize = ASLayoutContextMake({50, 50}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:{} layoutContext:kVariableSize subnodes:@[] identifier:nil];
 }
 
 - (void)testFixedFlexBasisAppliedWhenFlexingItems
@@ -592,12 +592,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   }
 
   // width 300px; height 0-150px.
-  static ASSizeRange kUnderflowSize = {{300, 0}, {300, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
+  static ASLayoutContext kUnderflowSize = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
 
   // width 200px; height 0-150px.
-  static ASSizeRange kOverflowSize = {{200, 0}, {200, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kOverflowSize subnodes:subnodes identifier:@"overflow"];
+  static ASLayoutContext kOverflowSize = ASLayoutContextMake({200, 0}, {200, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kOverflowSize subnodes:subnodes identifier:@"overflow"];
 }
 
 - (void)testFractionalFlexBasisResolvesAgainstParentSize
@@ -613,8 +613,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The result should be that the red box is twice as wide as the blue and gree boxes after flexing.
   subnodes[0].style.flexBasis = ASDimensionMakeWithFraction(0.5);
 
-  static ASSizeRange kSize = {{200, 0}, {200, INFINITY}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({200, 0}, {200, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testFixedFlexBasisOverridesIntrinsicSizeForNonFlexingChildren
@@ -630,8 +630,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     subnode.style.flexBasis = ASDimensionMakeWithPoints(20);
   }
   
-  static ASSizeRange kSize = {{300, 0}, {300, 150}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testCrossAxisStretchingOccursAfterStackAxisFlexing
@@ -668,8 +668,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     ]
    background:subnodes[0]];
 
-  static ASSizeRange kSize = {{300, 0}, {300, INFINITY}};
-  [self testLayoutSpec:layoutSpec sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testLayoutSpec:layoutSpec layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedEqually
@@ -682,8 +682,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 350 results in a positive violation of 200.
   // Due to each flexible subnode specifying a flex grow factor of 1 the violation will be distributed evenly.
-  static ASSizeRange kSize = {{350, 350}, {350, 350}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedEquallyWithArbitraryFloats
@@ -696,8 +696,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 350 results in a positive violation of 200.
   // Due to each flexible child component specifying a flex grow factor of 0.5 the violation will be distributed evenly.
-  static ASSizeRange kSize = {{350, 350}, {350, 350}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedProportionally
@@ -712,8 +712,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 350 results in a positive violation of 200.
   // The first and third subnodes specify a flex grow factor of 1 and will flex by 50.
   // The second subnode specifies a flex grow factor of 2 and will flex by 100.
-  static ASSizeRange kSize = {{350, 350}, {350, 350}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedProportionallyWithArbitraryFloats
@@ -728,8 +728,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 350 results in a positive violation of 200.
   // The first and third child components specify a flex grow factor of 0.25 and will flex by 50.
   // The second child component specifies a flex grow factor of 0.25 and will flex by 100.
-  static ASSizeRange kSize = {{350, 350}, {350, 350}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedEquallyAmongMixedChildren
@@ -748,8 +748,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a positive violation of 200.
   // The first and third subnode specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second and fourth subnode specify a flex grow factor of 1 and will flex by 100.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedEquallyAmongMixedChildrenWithArbitraryFloats
@@ -768,8 +768,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a positive violation of 200.
   // The first and third child components specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second and fourth child components specify a flex grow factor of 0.5 and will flex by 100.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedProportionallyAmongMixedChildren
@@ -789,8 +789,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third subnodes specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second child subnode specifies a flex grow factor of 3 and will flex by 150.
   // The fourth child subnode specifies a flex grow factor of 1 and will flex by 50.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testPositiveViolationIsDistributedProportionallyAmongMixedChildrenWithArbitraryFloats
@@ -810,8 +810,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third child components specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second child component specifies a flex grow factor of 0.75 and will flex by 150.
   // The fourth child component specifies a flex grow factor of 0.25 and will flex by 50.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testRemainingViolationIsAppliedProperlyToFirstFlexibleChild
@@ -830,8 +830,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 300 results in a positive violation of 175.
   // The second and third subnodes specify a flex grow factor of 1 and will flex by 88 and 87, respectively.
-  static ASSizeRange kSize = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testRemainingViolationIsAppliedProperlyToFirstFlexibleChildWithArbitraryFloats
@@ -850,8 +850,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 300 results in a positive violation of 175.
   // The second and third child components specify a flex grow factor of 0.5 and will flex by 88 and 87, respectively.
-  static ASSizeRange kSize = {{300, 300}, {300, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSize
@@ -870,8 +870,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 1 and will flex by -120 and -80, respectively.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeWithArbitraryFloats
@@ -890,8 +890,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.5 and will flex by -120 and -80, respectively.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactor
@@ -911,8 +911,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 2 and will flex by -109 and -72, respectively.
   // The second subnode specifies a flex shrink factor of 1 and will flex by -18.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactorWithArbitraryFloats
@@ -932,8 +932,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.4 and will flex by -109 and -72, respectively.
   // The second child component specifies a flex shrink factor of 0.2 and will flex by -18.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAmongMixedChildrenChildren
@@ -952,8 +952,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second and fourth subnodes specify a flex grow factor of 1 and will flex by -100.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAmongMixedChildrenWithArbitraryFloats
@@ -972,8 +972,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second and fourth child components specify a flex shrink factor of 0.5 and will flex by -100.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactorAmongMixedChildren
@@ -996,8 +996,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third subnodes specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second subnode specifies a flex grow factor of 1 and will flex by -28.
   // The fourth subnode specifies a flex grow factor of 3 and will flex by -171.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactorAmongMixedChildrenArbitraryFloats
@@ -1020,8 +1020,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third child components specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second child component specifies a flex shrink factor of 0.25 and will flex by -28.
   // The fourth child component specifies a flex shrink factor of 0.75 and will flex by -171.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactorDoesNotShrinkToZero
@@ -1041,8 +1041,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 1 and will flex by 50.
   // The second subnode specifies a flex shrink factor of 2 and will flex by -57. It will have a width of 43.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNegativeViolationIsDistributedBasedOnSizeAndFlexFactorDoesNotShrinkToZeroWithArbitraryFloats
@@ -1062,8 +1062,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.25 and will flex by 50.
   // The second child specifies a flex shrink factor of 0.50 and will flex by -57. It will have a width of 43.
-  static ASSizeRange kSize = {{400, 400}, {400, 400}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 
@@ -1082,8 +1082,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 40 results in a negative violation of 10.
   // The first child will not flex.
   // The second child specifies a flex shrink factor of 1 but it has a zero size, so the factor won't be respected and it will not shrink.
-  static ASSizeRange kSize = {{40, 50}, {40, 50}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 50}, {40, 50}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testNestedStackLayoutStretchDoesNotViolateWidth
@@ -1097,8 +1097,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   stackLayoutSpec.children = @[child];
   
-  static ASSizeRange kSize = {{0, 0}, {300, INFINITY}};
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:@[child] identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:@[child] identifier:nil];
 }
 
 - (void)testHorizontalAndVerticalAlignments
@@ -1179,8 +1179,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   NSArray<ASDisplayNode *> *subnodes = @[textNodes[0], textNodes[1], stretchedNode];
   
-  static ASSizeRange kSize = ASSizeRangeMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX));
-  [self testStackLayoutSpec:horizontalStack sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:horizontalStack layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testBaselineAlignmentWithSpaceBetween
@@ -1192,8 +1192,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.alignItems = ASStackLayoutAlignItemsBaselineFirst;
   stackLayoutSpec.justifyContent = ASStackLayoutJustifyContentSpaceBetween;
   
-  static ASSizeRange kSize = ASSizeRangeMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX));
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:textNodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:textNodes identifier:nil];
 }
 
 - (void)testBaselineAlignmentWithStretchedItem
@@ -1215,8 +1215,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.alignItems = ASStackLayoutAlignItemsBaselineLast;
   stackLayoutSpec.justifyContent = ASStackLayoutJustifyContentSpaceBetween;
   
-  static ASSizeRange kSize = ASSizeRangeMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX));
-  [self testStackLayoutSpec:stackLayoutSpec sizeRange:kSize subnodes:children identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:children identifier:nil];
 }
 
 #pragma mark - Flex wrap and item spacings test
@@ -1247,8 +1247,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // width is 230px, enough to fit all items without taking all spacings into account
   // Test that all spacings are included and therefore the last item is pushed to a second line.
   // See: https://github.com/TextureGroup/Texture/pull/472
-  static ASSizeRange kSize = {{230, 300}, {230, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({230, 300}, {230, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 - (void)testFlexWrapWithItemSpacingsBeingResetOnNewLines
@@ -1286,8 +1286,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // width is 190px, enough to fit 3 items into a line
   // Test that interitem spacing is reset on new lines. Otherwise, lines after the 1st line would have only 2 items.
   // See: https://github.com/TextureGroup/Texture/pull/472
-  static ASSizeRange kSize = {{190, 300}, {190, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({190, 300}, {190, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 #pragma mark - Content alignment tests
@@ -1296,25 +1296,25 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 {
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASSizeRange kSize = {{110, 300}, {110, 300}};
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart sizeRange:kSize identifier:@"alignContentStart"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter sizeRange:kSize identifier:@"alignContentCenter"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd sizeRange:kSize identifier:@"alignContentEnd"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween sizeRange:kSize identifier:@"alignContentSpaceBetween"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround sizeRange:kSize identifier:@"alignContentSpaceAround"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch sizeRange:kSize identifier:@"alignContentStretch"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 300}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween layoutContext:kLayoutContext identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround layoutContext:kLayoutContext identifier:@"alignContentSpaceAround"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch layoutContext:kLayoutContext identifier:@"alignContentStretch"];
 }
 
 - (void)testAlignContentOverflow
 {
   // 6 lines, each line has 1 item, each item has a size of {50, 50}
   // width is 40px. It's 10px smaller than the width of each item (40px vs 50px) to test that items are still correctly collected into lines
-  static ASSizeRange kSize = {{40, 260}, {40, 260}};
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart sizeRange:kSize identifier:@"alignContentStart"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter sizeRange:kSize identifier:@"alignContentCenter"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd sizeRange:kSize identifier:@"alignContentEnd"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween sizeRange:kSize identifier:@"alignContentSpaceBetween"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround sizeRange:kSize identifier:@"alignContentSpaceAround"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 260}, {40, 260}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween layoutContext:kLayoutContext identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround layoutContext:kLayoutContext identifier:@"alignContentSpaceAround"];
 }
 
 - (void)testAlignContentWithUnconstrainedCrossSize
@@ -1322,13 +1322,13 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
   // height is unconstrained. It causes no cross size violation and the end results are all similar to ASStackLayoutAlignContentStart.
-  static ASSizeRange kSize = {{110, 0}, {110, CGFLOAT_MAX}};
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart sizeRange:kSize identifier:nil];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter sizeRange:kSize identifier:nil];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd sizeRange:kSize identifier:nil];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween sizeRange:kSize identifier:nil];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround sizeRange:kSize identifier:nil];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch sizeRange:kSize identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 0}, {110, CGFLOAT_MAX}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:nil];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:nil];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:nil];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween layoutContext:kLayoutContext identifier:nil];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround layoutContext:kLayoutContext identifier:nil];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch layoutContext:kLayoutContext identifier:nil];
 }
 
 - (void)testAlignContentStretchAndOtherAlignments
@@ -1359,8 +1359,8 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASSizeRange kSize = {{110, 300}, {110, 300}};
-  [self testStackLayoutSpecWithStyle:style sizeRange:kSize subnodes:subnodes identifier:nil];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 300}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
 #pragma mark - Line spacing tests
@@ -1370,13 +1370,13 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // 10px between lines
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASSizeRange kSize = {{110, 320}, {110, 320}};
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 sizeRange:kSize identifier:@"alignContentStart"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 sizeRange:kSize identifier:@"alignContentCenter"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 sizeRange:kSize identifier:@"alignContentEnd"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceBetween"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceAround"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch lineSpacing:10 sizeRange:kSize identifier:@"alignContentStretch"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 320}, {110, 320}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentSpaceAround"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStretch lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentStretch"];
 }
 
 - (void)testAlignContentAndLineSpacingOverflow
@@ -1384,12 +1384,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 6 lines, each line has 1 item, each item has a size of {50, 50}
   // 10px between lines
   // width is 40px. It's 10px smaller than the width of each item (40px vs 50px) to test that items are still correctly collected into lines
-  static ASSizeRange kSize = {{40, 310}, {40, 310}};
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 sizeRange:kSize identifier:@"alignContentStart"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 sizeRange:kSize identifier:@"alignContentCenter"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 sizeRange:kSize identifier:@"alignContentEnd"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceBetween"];
-  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 sizeRange:kSize identifier:@"alignContentSpaceAround"];
+  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 310}, {40, 310}, ASPrimitiveTraitCollectionMakeDefault());
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentStart"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentCenter"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentEnd"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceBetween lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentSpaceBetween"];
+  [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentSpaceAround lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentSpaceAround"];
 }
 
 @end

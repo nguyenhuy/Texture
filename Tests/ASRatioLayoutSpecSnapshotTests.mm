@@ -19,7 +19,7 @@
 
 #import <AsyncDisplayKit/ASRatioLayoutSpec.h>
 
-static const ASSizeRange kFixedSize = {{0, 0}, {100, 100}};
+static const ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {100, 100}, ASPrimitiveTraitCollectionMakeDefault());
 
 @interface ASRatioLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 @end
@@ -32,7 +32,7 @@ static const ASSizeRange kFixedSize = {{0, 0}, {100, 100}};
   
   ASLayoutSpec *layoutSpec = [ASRatioLayoutSpec ratioLayoutSpecWithRatio:ratio child:subnode];
   
-  [self testLayoutSpec:layoutSpec sizeRange:kFixedSize subnodes:@[subnode] identifier:identifier];
+  [self testLayoutSpec:layoutSpec layoutContext:kLayoutContext subnodes:@[subnode] identifier:identifier];
 }
 
 - (void)testRatioLayout

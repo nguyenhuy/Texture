@@ -66,10 +66,10 @@
 
 @end
 
-@interface InspectorTestDataSourceDelegateWithoutNodeConstrainedSize : NSObject <InspectorTestDataSourceDelegateProtocol>
+@interface InspectorTestDataSourceDelegateWithoutNodelayoutContext : NSObject <InspectorTestDataSourceDelegateProtocol>
 @end
 
-@implementation InspectorTestDataSourceDelegateWithoutNodeConstrainedSize
+@implementation InspectorTestDataSourceDelegateWithoutNodelayoutContext
 
 - (ASCellNodeBlock)collectionView:(ASCollectionView *)collectionView nodeBlockForItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -131,13 +131,13 @@
     [super tearDown];
 }
 
-#pragma mark - #collectionView:constrainedSizeForSupplementaryNodeOfKind:atIndexPath:
+#pragma mark - #collectionView:layoutContextForSupplementaryNodeOfKind:atIndexPath:
 
 // Vertical
 
 // Delegate implementation
 
-- (void)testThatItReturnsAVerticalConstrainedSizeFromTheHeaderDelegateImplementation
+- (void)testThatItReturnsAVerticallayoutContextFromTheHeaderDelegateImplementation
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   HeaderReferenceSizeTestDelegate *delegate = [[HeaderReferenceSizeTestDelegate alloc] init];
@@ -151,16 +151,17 @@
   collectionView.asyncDelegate = delegate;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
 
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
 }
 
-- (void)testThatItReturnsAVerticalConstrainedSizeFromTheFooterDelegateImplementation
+- (void)testThatItReturnsAVerticallayoutContextFromTheFooterDelegateImplementation
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   FooterReferenceSizeTestDelegate *delegate = [[FooterReferenceSizeTestDelegate alloc] init];
@@ -174,9 +175,10 @@
   collectionView.asyncDelegate = delegate;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -184,7 +186,7 @@
 
 // Size implementation
 
-- (void)testThatItReturnsAVerticalConstrainedSizeFromTheHeaderProperty
+- (void)testThatItReturnsAVerticallayoutContextFromTheHeaderProperty
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   
@@ -197,15 +199,16 @@
   collectionView.asyncDataSource = dataSource;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
 }
 
-- (void)testThatItReturnsAVerticalConstrainedSizeFromTheFooterProperty
+- (void)testThatItReturnsAVerticallayoutContextFromTheFooterProperty
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   
@@ -218,9 +221,10 @@
   collectionView.asyncDataSource = dataSource;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(collectionView.bounds.size.width, 125.0));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -228,7 +232,7 @@
 
 // Horizontal
 
-- (void)testThatItReturnsAHorizontalConstrainedSizeFromTheHeaderDelegateImplementation
+- (void)testThatItReturnsAHorizontallayoutContextFromTheHeaderDelegateImplementation
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   HeaderReferenceSizeTestDelegate *delegate = [[HeaderReferenceSizeTestDelegate alloc] init];
@@ -242,15 +246,16 @@
   collectionView.asyncDelegate = delegate;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
 }
 
-- (void)testThatItReturnsAHorizontalConstrainedSizeFromTheFooterDelegateImplementation
+- (void)testThatItReturnsAHorizontallayoutContextFromTheFooterDelegateImplementation
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   FooterReferenceSizeTestDelegate *delegate = [[FooterReferenceSizeTestDelegate alloc] init];
@@ -264,9 +269,10 @@
   collectionView.asyncDelegate = delegate;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -274,7 +280,7 @@
 
 // Size implementation
 
-- (void)testThatItReturnsAHorizontalConstrainedSizeFromTheHeaderProperty
+- (void)testThatItReturnsAHorizontallayoutContextFromTheHeaderProperty
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   
@@ -287,15 +293,16 @@
   collectionView.asyncDataSource = dataSource;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.width));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.width), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
 }
 
-- (void)testThatItReturnsAHorizontalConstrainedSizeFromTheFooterProperty
+- (void)testThatItReturnsAHorizontallayoutContextFromTheFooterProperty
 {
   InspectorTestDataSource *dataSource = [[InspectorTestDataSource alloc] init];
   
@@ -308,9 +315,10 @@
   collectionView.asyncDataSource = dataSource;
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeMake(125.0, collectionView.bounds.size.height));
-  ASXCTAssertEqualSizeRanges(size, sizeCompare, @"should have a size constrained by the size set on the layout");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
+  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -325,9 +333,10 @@
   collectionView.asyncDataSource = dataSource;
   collectionView.asyncDelegate = delegate;
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
-  ASSizeRange size = [inspector collectionView:collectionView constrainedSizeForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-  ASSizeRange sizeCompare = ASSizeRangeMake(CGSizeZero, CGSizeZero);
-  XCTAssert(CGSizeEqualToSize(size.min, sizeCompare.min) && CGSizeEqualToSize(size.max, sizeCompare.max), @"should have a zero size");
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
+  XCTAssert(CGSizeEqualToSize(context.min, contextCompare.min) && CGSizeEqualToSize(context.max, contextCompare.max), @"should have a zero size");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -384,53 +393,55 @@
   collectionView.asyncDelegate = nil;
 }
 
-- (void)testThatItThrowsIfNodeConstrainedSizeIsImplementedOnDataSourceButNotOnDelegateLayoutInspector
+- (void)testThatItThrowsIfNodelayoutContextIsImplementedOnDataSourceButNotOnDelegateLayoutInspector
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   ASCollectionNode *node = [[ASCollectionNode alloc] initWithCollectionViewLayout:layout];
   ASCollectionView *collectionView = node.view;
   
   id dataSourceAndDelegate = [OCMockObject mockForProtocol:@protocol(InspectorTestDataSourceDelegateProtocol)];
-  ASSizeRange constrainedSize = ASSizeRangeMake(CGSizeZero, CGSizeZero);
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-  NSValue *value = [NSValue value:&constrainedSize withObjCType:@encode(ASSizeRange)];
-  [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node constrainedSizeForItemAtIndexPath:indexPath];
+  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext)];
+  [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
   node.dataSource = dataSourceAndDelegate;
   
-  id delegate = [InspectorTestDataSourceDelegateWithoutNodeConstrainedSize new];
+  id delegate = [InspectorTestDataSourceDelegateWithoutNodelayoutContext new];
   node.delegate = delegate;
   
   ASCollectionViewLayoutInspector *inspector = [[ASCollectionViewLayoutInspector alloc] init];
   
   collectionView.layoutInspector = inspector;
-  XCTAssertThrows([inspector collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath]);
+  XCTAssertThrows([inspector collectionView:collectionView layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection]);
   
   node.delegate = dataSourceAndDelegate;
-  XCTAssertNoThrow([inspector collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath]);
+  XCTAssertNoThrow([inspector collectionView:collectionView layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection]);
 }
 
-- (void)testThatItThrowsIfNodeConstrainedSizeIsImplementedOnDataSourceButNotOnDelegateFlowLayoutInspector
+- (void)testThatItThrowsIfNodelayoutContextIsImplementedOnDataSourceButNotOnDelegateFlowLayoutInspector
 {
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   
   ASCollectionNode *node = [[ASCollectionNode alloc] initWithCollectionViewLayout:layout];
   ASCollectionView *collectionView = node.view;
   id dataSourceAndDelegate = [OCMockObject mockForProtocol:@protocol(InspectorTestDataSourceDelegateProtocol)];
-  ASSizeRange constrainedSize = ASSizeRangeMake(CGSizeZero, CGSizeZero);
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-  NSValue *value = [NSValue value:&constrainedSize withObjCType:@encode(ASSizeRange)];
+  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext)];
   
-  [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node constrainedSizeForItemAtIndexPath:indexPath];
+  [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
   node.dataSource = dataSourceAndDelegate;
-  id delegate = [InspectorTestDataSourceDelegateWithoutNodeConstrainedSize new];
+  id delegate = [InspectorTestDataSourceDelegateWithoutNodelayoutContext new];
   
   node.delegate = delegate;
   ASCollectionViewFlowLayoutInspector *inspector = collectionView.layoutInspector;
 
-  XCTAssertThrows([inspector collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath]);
+  XCTAssertThrows([inspector collectionView:collectionView layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection]);
   
   node.delegate = dataSourceAndDelegate;
-  XCTAssertNoThrow([inspector collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath]);
+  XCTAssertNoThrow([inspector collectionView:collectionView layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection]);
 }
 
 @end

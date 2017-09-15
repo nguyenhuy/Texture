@@ -90,7 +90,7 @@
     return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[stack1, stack2, node5]];
   };
   
-  ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)));
+  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
   [node.view layoutIfNeeded];
 
   XCTAssertEqual(node.subnodes[0], node1);
@@ -167,7 +167,7 @@
     }
   };
   
-  ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)));
+  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
   [node.view layoutIfNeeded];
   XCTAssertEqual(node.subnodes[0], node1);
   XCTAssertEqual(node.subnodes[1], node2);
@@ -181,22 +181,6 @@
   XCTAssertEqual(node.subnodes[2], node2);
 }
 
-// Disable test for now as we disabled the assertion
-//- (void)testLayoutTransitionWillThrowForManualSubnodeManagement
-//{
-//  ASDisplayNode *node1 = [[ASDisplayNode alloc] init];
-//  node1.name = @"node1";
-//  
-//  ASSpecTestDisplayNode *node = [[ASSpecTestDisplayNode alloc] init];
-//  node.automaticallyManagesSubnodes = YES;
-//  node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode *weakNode, ASSizeRange constrainedSize){
-//    return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[node1]];
-//  };
-//  
-//  XCTAssertNoThrow([node layoutThatFits:ASSizeRangeMake(CGSizeZero)]);
-//  XCTAssertThrows([node1 removeFromSupernode]);
-//}
-
 - (void)testLayoutTransitionMeasurementCompletionBlockIsCalledOnMainThread
 {
   const CGSize kSize = CGSizeMake(100, 100);
@@ -209,10 +193,13 @@
   
   XCTestExpectation *expectation = [self expectationWithDescription:@"Call measurement completion block on main"];
   
-  [displayNode transitionLayoutWithSizeRange:ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)) animated:YES shouldMeasureAsync:YES measurementCompletion:^{
-    XCTAssertTrue(ASDisplayNodeThreadIsMain(), @"Measurement completion block should be called on main thread");
-    [expectation fulfill];
-  }];
+  [displayNode transitionLayoutWithLayoutContext:ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault())
+                                        animated:YES
+                              shouldMeasureAsync:YES
+                           measurementCompletion:^{
+                             XCTAssertTrue(ASDisplayNodeThreadIsMain(), @"Measurement completion block should be called on main thread");
+                             [expectation fulfill];
+                           }];
   
   [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
@@ -244,7 +231,7 @@
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
     // Measurement happens in the background
-    ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+    ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
     
     // Dispatch back to the main thread to let the insertion / deletion of subnodes happening
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -260,7 +247,7 @@
         node.layoutState = @2;
         [node setNeedsLayout];
     
-        ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+        ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
         
         // Dispatch back to the main thread to let the insertion / deletion of subnodes happening
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -306,7 +293,7 @@
   
   XCTestExpectation *expectation = [self expectationWithDescription:@"Fix IHM layout transition also if one node is already loaded"];
   
-  ASDisplayNodeSizeToFitSizeRange(node, ASSizeRangeMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY)));
+  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
   [node.view layoutIfNeeded];
   XCTAssertEqual(node.subnodes[0], node1);
   

@@ -2183,7 +2183,7 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatItsSafeToAutomeasureANodeMidTransition
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  [supernode layoutThatFits:ASSizeRangeMake(CGSizeZero, CGSizeMake(100, 100))];
+  [supernode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())];
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.bounds = CGRectMake(0, 0, 50, 50);
   [supernode addSubnode:node];
@@ -2266,7 +2266,9 @@ static bool stringContainsPointer(NSString *description, id p) {
   node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode *node, ASSizeRange constrainedSize) {
     return [ASOverlayLayoutSpec overlayLayoutSpecWithChild:[ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:subnode] overlay:subnode];
   };
-  XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASSizeRangeMake(CGSizeMake(100, 100))], NSException, NSInternalInconsistencyException);
+  XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASLayoutContextMake(CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())],
+                               NSException,
+                               NSInternalInconsistencyException);
 }
 
 - (void)testThatOverlaySpecOrdersSubnodesCorrectly

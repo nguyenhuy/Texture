@@ -24,7 +24,7 @@
 /**
  Test the layout spec or records a snapshot if recordMode is YES.
  @param layoutSpec The layout spec under test or to snapshot
- @param sizeRange The size range used to calculate layout of the given layout spec.
+ @param layoutContext The layout context used to calculate layout of the given layout spec.
  @param subnodes An array of ASDisplayNodes used within the layout spec.
  @param identifier An optional identifier, used to identify this snapshot test.
  
@@ -33,7 +33,7 @@
  They will be added to the host in the same order as the array.
  */
 - (void)testLayoutSpec:(ASLayoutSpec *)layoutSpec
-             sizeRange:(ASSizeRange)sizeRange
+         layoutContext:(ASLayoutContext)layoutContext
               subnodes:(NSArray *)subnodes
             identifier:(NSString *)identifier;
 @end

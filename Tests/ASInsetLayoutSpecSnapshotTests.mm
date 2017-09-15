@@ -67,9 +67,9 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
     
-    static ASSizeRange kVariableSize = {{0, 0}, {300, 300}};
+    static ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
     [self testLayoutSpec:layoutSpec
-               sizeRange:kVariableSize
+           layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]
               identifier:nameForInsets(insets)];
   }
@@ -90,9 +90,9 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
 
-    static ASSizeRange kFixedSize = {{300, 300}, {300, 300}};
+    static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
     [self testLayoutSpec:layoutSpec
-               sizeRange:kFixedSize
+           layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]
               identifier:nameForInsets(insets)];
   }
@@ -114,9 +114,9 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
 
-    static ASSizeRange kFixedSize = {{300, 300}, {300, 300}};
+    static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
     [self testLayoutSpec:layoutSpec
-               sizeRange:kFixedSize
+           layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]
               identifier:nameForInsets(insets)];
   }

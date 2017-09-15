@@ -51,11 +51,12 @@
   //  other:      |----------|
   // result:      |----|
 
-  ASSizeRange range = {{0,0}, {10,10}};
-  ASSizeRange other = {{7,7}, {15,15}};
-  ASSizeRange result = ASSizeRangeIntersect(range, other);
-  ASSizeRange expected = {{7,7}, {10,10}};
-  XCTAssertTrue(ASSizeRangeEqualToSizeRange(result, expected), @"Expected %@ but got %@", NSStringFromASSizeRange(expected), NSStringFromASSizeRange(result));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext range = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
+  ASLayoutContext other = ASLayoutContextMake({7,7}, {15,15}, traitCollection);
+  ASLayoutContext result = ASLayoutContextIntersect(range, other);
+  ASLayoutContext expected = ASLayoutContextMake({7,7}, {10,10}, traitCollection);
+  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
 }
 
 - (void)testIntersectingSizeRangeWithRangeThatContainsItReturnsSameRange
@@ -64,11 +65,12 @@
   //  other:  |---------|
   // result:    |-----|
 
-  ASSizeRange range = {{2,2}, {8,8}};
-  ASSizeRange other = {{0,0}, {10,10}};
-  ASSizeRange result = ASSizeRangeIntersect(range, other);
-  ASSizeRange expected = {{2,2}, {8,8}};
-  XCTAssertTrue(ASSizeRangeEqualToSizeRange(result, expected), @"Expected %@ but got %@", NSStringFromASSizeRange(expected), NSStringFromASSizeRange(result));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext range = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
+  ASLayoutContext other = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
+  ASLayoutContext result = ASLayoutContextIntersect(range, other);
+  ASLayoutContext expected = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
+  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
 }
 
 - (void)testIntersectingSizeRangeWithRangeContainedWithinItReturnsContainedRange
@@ -77,11 +79,12 @@
   //  other:    |-----|
   // result:    |-----|
 
-  ASSizeRange range = {{0,0}, {10,10}};
-  ASSizeRange other = {{2,2}, {8,8}};
-  ASSizeRange result = ASSizeRangeIntersect(range, other);
-  ASSizeRange expected = {{2,2}, {8,8}};
-  XCTAssertTrue(ASSizeRangeEqualToSizeRange(result, expected), @"Expected %@ but got %@", NSStringFromASSizeRange(expected), NSStringFromASSizeRange(result));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext range = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
+  ASLayoutContext other = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
+  ASLayoutContext result = ASLayoutContextIntersect(range, other);
+  ASLayoutContext expected = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
+  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
 }
 
 - (void)testIntersectingSizeRangeWithNonOverlappingRangeToRightReturnsSinglePointNearestOtherRange
@@ -90,11 +93,12 @@
   //  other:          |---|
   // result:       *
 
-  ASSizeRange range = {{0,0}, {5,5}};
-  ASSizeRange other = {{10,10}, {15,15}};
-  ASSizeRange result = ASSizeRangeIntersect(range, other);
-  ASSizeRange expected = {{5,5}, {5,5}};
-  XCTAssertTrue(ASSizeRangeEqualToSizeRange(result, expected), @"Expected %@ but got %@", NSStringFromASSizeRange(expected), NSStringFromASSizeRange(result));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext range = ASLayoutContextMake({0,0}, {5,5}, traitCollection);
+  ASLayoutContext other = ASLayoutContextMake({10,10}, {15,15}, traitCollection);
+  ASLayoutContext result = ASLayoutContextIntersect(range, other);
+  ASLayoutContext expected = ASLayoutContextMake({5,5}, {5,5}, traitCollection);
+  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
 }
 
 - (void)testIntersectingSizeRangeWithNonOverlappingRangeToLeftReturnsSinglePointNearestOtherRange
@@ -103,11 +107,12 @@
   //  other: |-----|
   // result:          *
 
-  ASSizeRange range = {{10,10}, {15,15}};
-  ASSizeRange other = {{0,0}, {5,5}};
-  ASSizeRange result = ASSizeRangeIntersect(range, other);
-  ASSizeRange expected = {{10,10}, {10,10}};
-  XCTAssertTrue(ASSizeRangeEqualToSizeRange(result, expected), @"Expected %@ but got %@", NSStringFromASSizeRange(expected), NSStringFromASSizeRange(result));
+  ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
+  ASLayoutContext range = ASLayoutContextMake({10,10}, {15,15}, traitCollection);
+  ASLayoutContext other = ASLayoutContextMake({0,0}, {5,5}, traitCollection);
+  ASLayoutContext result = ASLayoutContextIntersect(range, other);
+  ASLayoutContext expected = ASLayoutContextMake({10,10}, {10,10}, traitCollection);
+  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
 }
 
 @end

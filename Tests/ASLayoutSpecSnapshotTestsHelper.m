@@ -35,7 +35,7 @@
 }
 
 - (void)testLayoutSpec:(ASLayoutSpec *)layoutSpec
-             sizeRange:(ASSizeRange)sizeRange
+         layoutContext:(ASLayoutContext)layoutContext
               subnodes:(NSArray *)subnodes
             identifier:(NSString *)identifier
 {
@@ -47,7 +47,7 @@
   
   node.layoutSpecUnderTest = layoutSpec;
   
-  ASDisplayNodeSizeToFitSizeRange(node, sizeRange);
+  ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
   ASSnapshotVerifyNode(node, identifier);
 }
 

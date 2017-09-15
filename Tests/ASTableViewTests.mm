@@ -214,7 +214,7 @@
 
 - (ASSizeRange)tableView:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  return ASSizeRangeMake(CGSizeMake(10, 42));
+  return ASLayoutContextMake(CGSizeMake(10, 42), ASPrimitiveTraitCollectionMakeDefault());
 }
 
 @end
@@ -439,10 +439,10 @@
         ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:indexPath];
         if ([visibleNodes containsObject:node]) {
           XCTAssertEqual(node.numberOfLayoutsOnMainThread, 1);
-          XCTAssertLessThan(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
+          XCTAssertLessThan(node.contextForCalculatedLayout.max.width, tableViewSize.width);
         } else {
           XCTAssertEqual(node.numberOfLayoutsOnMainThread, 0);
-          XCTAssertEqual(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
+          XCTAssertEqual(node.contextForCalculatedLayout.max.width, tableViewSize.width);
         }
       }
     }
@@ -467,7 +467,7 @@
         ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:indexPath];
         BOOL visible = [visibleNodes containsObject:node];
         XCTAssertEqual(node.numberOfLayoutsOnMainThread, visible ? 2: 0);
-        XCTAssertEqual(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
+        XCTAssertEqual(node.contextForCalculatedLayout.max.width, tableViewSize.width);
       }
     }
     [relayoutAfterDisablingEditingExpectation fulfill];
@@ -501,7 +501,7 @@
   [tableView endUpdatesAnimated:YES completion:^(BOOL completed) {
     ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:lastRowIndexPath];
     XCTAssertEqual(node.numberOfLayoutsOnMainThread, 1);
-    XCTAssertLessThan(node.constrainedSizeForCalculatedLayout.max.width, tableViewSize.width);
+    XCTAssertLessThan(node.contextForCalculatedLayout.max.width, tableViewSize.width);
     [relayoutExpectation fulfill];
   }];
   [self waitForExpectationsWithTimeout:5 handler:^(NSError *error) {
@@ -542,7 +542,7 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
         ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:indexPath];
         XCTAssertEqual(node.numberOfLayoutsOnMainThread, 0);
-        XCTAssertEqual(node.constrainedSizeForCalculatedLayout.max.width, tableView.frame.size.width);
+        XCTAssertEqual(node.contextForCalculatedLayout.max.width, tableView.frame.size.width);
       }
     }
     [reloadDataExpectation fulfill];
@@ -576,7 +576,7 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:section];
         ASTestTextCellNode *node = (ASTestTextCellNode *)[tableView nodeForRowAtIndexPath:indexPath];
         XCTAssertLessThanOrEqual(node.numberOfLayoutsOnMainThread, 1);
-        XCTAssertEqual(node.constrainedSizeForCalculatedLayout.max.width, newSize.width);
+        XCTAssertEqual(node.contextForCalculatedLayout.max.width, newSize.width);
       }
     }
     [nodesMeasuredUsingNewConstrainedSizeExpectation fulfill];
@@ -671,14 +671,14 @@
   XCTAssertGreaterThan(node.numberOfSections, 0);
   [node waitUntilAllUpdatesAreProcessed];
 
-  ASSizeRange expectedSizeRange = ASSizeRangeMake(CGSizeMake(cellWidth, 0));
-  expectedSizeRange.max.height = CGFLOAT_MAX;
+  ASLayoutContext expectedContext = ASLayoutContextMake(CGSizeMake(cellWidth, 0), ASPrimitiveTraitCollectionMakeDefault());
+  expectedContext.max.height = CGFLOAT_MAX;
 
   for (NSInteger i = 0; i < node.numberOfSections; i++) {
     for (NSInteger j = 0; j < [node numberOfRowsInSection:i]; j++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:j inSection:i];
       ASTestTextCellNode *cellNode = (id)[node nodeForRowAtIndexPath:indexPath];
-      ASXCTAssertEqualSizeRanges(cellNode.constrainedSizeForCalculatedLayout, expectedSizeRange);
+      ASXCTAssertEqualLayoutContexts(cellNode.contextForCalculatedLayout, expectedContext);
       XCTAssertEqual(cellNode.numberOfLayoutsOnMainThread, 0);
     }
   }
@@ -712,14 +712,14 @@
   CGFloat cellWidth = cell.contentView.frame.size.width;
   XCTAssert(cellWidth > 0 && cellWidth < 320, @"Expected cell width to be about 305. Width: %@", @(cellWidth));
 
-  ASSizeRange expectedSizeRange = ASSizeRangeMake(CGSizeMake(cellWidth, 0));
+  ASLayoutContext expectedSizeRange = ASLayoutContextMake(CGSizeMake(cellWidth, 0), ASPrimitiveTraitCollectionMakeDefault());
   expectedSizeRange.max.height = CGFLOAT_MAX;
   
   for (NSInteger i = 0; i < node.numberOfSections; i++) {
     for (NSInteger j = 0; j < [node numberOfRowsInSection:i]; j++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:j inSection:i];
       ASTestTextCellNode *cellNode = (id)[node nodeForRowAtIndexPath:indexPath];
-      ASXCTAssertEqualSizeRanges(cellNode.constrainedSizeForCalculatedLayout, expectedSizeRange);
+      ASXCTAssertEqualLayoutContexts(cellNode.contextForCalculatedLayout, expectedSizeRange);
       // We will have to accept a relayout on main thread, since the index bar won't show
       // up until some of the cells are inserted.
       XCTAssertLessThanOrEqual(cellNode.numberOfLayoutsOnMainThread, 1);
