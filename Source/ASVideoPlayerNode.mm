@@ -743,7 +743,7 @@ static void *ASVideoPlayerNodeContext = &ASVideoPlayerNodeContext;
 
 #pragma mark - Layout
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext
 {
   CGSize maxSize = layoutContext.max;
 

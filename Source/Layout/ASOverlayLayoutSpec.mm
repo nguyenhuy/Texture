@@ -72,7 +72,7 @@ static NSUInteger const kOverlayChildIndex = 1;
 /**
  First layout the contents, then fit the overlay on top of it.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
@@ -80,7 +80,9 @@ static NSUInteger const kOverlayChildIndex = 1;
   contentsLayout.position = CGPointZero;
   NSMutableArray *sublayouts = [NSMutableArray arrayWithObject:contentsLayout];
   if (self.overlay) {
-    ASLayout *overlayLayout = [self.overlay layoutThatFits:ASLayoutContextMake(contentsLayout.size, layoutContext.traitCollection)
+    ASLayoutContext *overlayLayoutContext = [ASLayoutContext layoutContextWithExactSize:contentsLayout.size
+                                                                        traitCollection:layoutContext.traitCollection];
+    ASLayout *overlayLayout = [self.overlay layoutThatFits:overlayLayoutContext
                                                 parentSize:contentsLayout.size];
     overlayLayout.position = CGPointZero;
     [sublayouts addObject:overlayLayout];

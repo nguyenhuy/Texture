@@ -131,8 +131,8 @@
   as_activity_scope_verbose(as_activity_create("-[ASViewController viewWillLayoutSubViews]", AS_ACTIVITY_CURRENT, OS_ACTIVITY_FLAG_DEFAULT));
 
   ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
-  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:self.view.bounds.size traitCollection:traitCollection];
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, layoutContext);
 
   // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
   // If the node's layout context didn't change between the last layout pass it's a no-op
@@ -268,8 +268,8 @@ ASVisibilityDepthImplementation;
   // TODO: Check if -viewWillLayoutSubviews called again. If yes, don't need to do this
   // TODO: Test this
   ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
-  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:self.view.bounds.size traitCollection:traitCollection];
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, layoutContext);
 
   // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
   // If the node's layout context didn't change between the last layout pass it's a no-op
@@ -283,8 +283,8 @@ ASVisibilityDepthImplementation;
   // TODO: Check if -viewWillLayoutSubviews called again. If yes, don't need to do this
   // TODO: Test this
   ASPrimitiveTraitCollection traitCollection = [self primitiveTraitCollectionForUITraitCollection:self.traitCollection];
-  ASLayoutContext layoutContext = ASLayoutContextMake(self.view.bounds.size, traitCollection);
-  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, NSStringFromASLayoutContext(layoutContext));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:self.view.bounds.size traitCollection:traitCollection];
+  as_log_debug(ASNodeLog(), "Will layout with layoutContext %@: %@", self, layoutContext);
 
   // Call -layoutThatFits: to let the node prepare for a layout that will happen shortly in the layout pass of the view.
   // If the node's layout context didn't change between the last layout pass it's a no-op

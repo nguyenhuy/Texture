@@ -114,12 +114,12 @@
   // TODO(appleguy): STYLE SETTER METHODS LEFT TO IMPLEMENT: YGNodeStyleSetOverflow, YGNodeStyleSetFlex
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)layoutElementSize
                  relativeToParentSize:(CGSize)parentSize
 {
-  ASLayoutContext styleAndParentContext = ASLayoutElementSizeResolve(layoutElementSize, parentSize, layoutContext.traitCollection);
-  const ASLayoutContext rootContext = ASLayoutContextIntersect(layoutContext, styleAndParentSize);
+  ASLayoutContext *styleAndParentContext = ASLayoutElementSizeResolve(layoutElementSize, parentSize, layoutContext.traitCollection);
+  ASLayoutContext *rootContext = [layoutContext intersectWithLayoutContext:styleAndParentSize];
 
   YGNodeRef rootYogaNode = YGNodeNew();
 
@@ -160,7 +160,7 @@
       NSLog(@"style = %@", self.rootNode.style);
       YGNodePrint(rootYogaNode, (YGPrintOptions)(YGPrintOptionsStyle | YGPrintOptionsLayout));
   }
-  NSLog(@"rootContext = %@, layout = %@, sublayouts = %@", NSStringFromASLayoutContext(rootContext), layout, layout.sublayouts);
+  NSLog(@"rootContext = %@, layout = %@, sublayouts = %@", rootContext, layout, layout.sublayouts);
 #endif
 
   while(YGNodeGetChildCount(rootYogaNode) > 0) {

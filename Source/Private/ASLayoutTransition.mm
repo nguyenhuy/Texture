@@ -209,7 +209,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   }
 }
 
-- (ASLayoutContext)transitionContext:(_ASTransitionContext *)context layoutContextForKey:(NSString *)key
+- (ASLayoutContext *)transitionContext:(_ASTransitionContext *)context layoutContextForKey:(NSString *)key
 {
   ASDN::MutexSharedLocker l(__instanceLock__);
   if ([key isEqualToString:ASTransitionContextFromLayoutKey]) {
@@ -217,7 +217,7 @@ static inline BOOL ASLayoutCanTransitionAsynchronous(ASLayout *layout) {
   } else if ([key isEqualToString:ASTransitionContextToLayoutKey]) {
     return _pendingLayout->layoutContext;
   } else {
-    return ASLayoutContextMake(CGSizeZero, ASPrimitiveTraitCollectionMakeDefault());
+    return [ASLayoutContext layoutContextWithExactSize:CGSizeZero traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   }
 }
 

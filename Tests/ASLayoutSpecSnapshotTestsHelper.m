@@ -35,7 +35,7 @@
 }
 
 - (void)testLayoutSpec:(ASLayoutSpec *)layoutSpec
-         layoutContext:(ASLayoutContext)layoutContext
+         layoutContext:(ASLayoutContext *)layoutContext
               subnodes:(NSArray *)subnodes
             identifier:(NSString *)identifier
 {
@@ -62,7 +62,7 @@
   return self;
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext
 {
   return _layoutSpecUnderTest;
 }

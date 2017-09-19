@@ -1927,42 +1927,44 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   }
 }
 
-- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext *)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
   ASCollectionNode *collectionNode = self.collectionNode;
   ASPrimitiveTraitCollection traitCollection = collectionNode ? collectionNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext result;
+  ASLayoutContext *result;
   if (_layoutInspectorFlags.layoutContextForNodeAtIndexPathWithTraitCollection) {
     result = [self.layoutInspector collectionView:self layoutContextForNodeAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   } else if (_layoutInspectorFlags.constrainedSizeForNodeAtIndexPath) {
-    result = [self.layoutInspector collectionView:self constrainedSizeForNodeAtIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[self.layoutInspector collectionView:self constrainedSizeForNodeAtIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
 #pragma clang diagnostic pop
   } else {
     ASDisplayNodeAssert(NO, @"-collectionView:layoutContextForNodeAtIndexPath: must be implemented.");
-    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+    result = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:traitCollection];
   }
   return result;
 }
 
-- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext *)dataController:(ASDataController *)dataController layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   ASCollectionNode *collectionNode = self.collectionNode;
   ASPrimitiveTraitCollection traitCollection = collectionNode ? collectionNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext result;
+  ASLayoutContext *result;
   if (_layoutInspectorFlags.layoutContextForSupplementaryNodeOfKindAtIndexPathWithTraitCollection) {
     result = [self.layoutInspector collectionView:self layoutContextForSupplementaryNodeOfKind:kind atIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   } else if (_layoutInspectorFlags.constrainedSizeForSupplementaryNodeOfKindAtIndexPath) {
-    result = [self.layoutInspector collectionView:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[self.layoutInspector collectionView:self constrainedSizeForSupplementaryNodeOfKind:kind atIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
 #pragma clang diagnostic pop
   } else {
     ASDisplayNodeAssert(NO, @"To support supplementary nodes in ASCollectionView, it must have a layoutInspector for layout inspection. (See ASCollectionViewFlowLayoutInspector for an example.)");
-    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+    result = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:traitCollection];
   }
   return result;
 }

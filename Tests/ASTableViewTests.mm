@@ -127,7 +127,7 @@
 
 @implementation ASTestTextCellNode
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext
 {
   if ([NSThread isMainThread]) {
     _numberOfLayoutsOnMainThread++;
@@ -214,7 +214,7 @@
 
 - (ASSizeRange)tableView:(ASTableView *)tableView constrainedSizeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  return ASLayoutContextMake(CGSizeMake(10, 42), ASPrimitiveTraitCollectionMakeDefault());
+  return [ASLayoutContext layoutContextWithExactSize:CGSizeMake(10, 42) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
 }
 
 @end
@@ -671,14 +671,15 @@
   XCTAssertGreaterThan(node.numberOfSections, 0);
   [node waitUntilAllUpdatesAreProcessed];
 
-  ASLayoutContext expectedContext = ASLayoutContextMake(CGSizeMake(cellWidth, 0), ASPrimitiveTraitCollectionMakeDefault());
-  expectedContext.max.height = CGFLOAT_MAX;
+  ASMutableLayoutContext *expectedContext = [ASMutableLayoutContext layoutContextWithMinSize:CGSizeMake(cellWidth, 0)
+                                                                                     maxSize:CGSizeMake(cellWidth, CGFLOAT_MAX)
+                                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
 
   for (NSInteger i = 0; i < node.numberOfSections; i++) {
     for (NSInteger j = 0; j < [node numberOfRowsInSection:i]; j++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:j inSection:i];
       ASTestTextCellNode *cellNode = (id)[node nodeForRowAtIndexPath:indexPath];
-      ASXCTAssertEqualLayoutContexts(cellNode.contextForCalculatedLayout, expectedContext);
+      XCTAssertEqualObjects(cellNode.contextForCalculatedLayout, expectedContext);
       XCTAssertEqual(cellNode.numberOfLayoutsOnMainThread, 0);
     }
   }
@@ -712,14 +713,15 @@
   CGFloat cellWidth = cell.contentView.frame.size.width;
   XCTAssert(cellWidth > 0 && cellWidth < 320, @"Expected cell width to be about 305. Width: %@", @(cellWidth));
 
-  ASLayoutContext expectedSizeRange = ASLayoutContextMake(CGSizeMake(cellWidth, 0), ASPrimitiveTraitCollectionMakeDefault());
-  expectedSizeRange.max.height = CGFLOAT_MAX;
-  
+  ASMutableLayoutContext *expectedContext = [ASMutableLayoutContext layoutContextWithMinSize:CGSizeMake(cellWidth, 0)
+                                                                                     maxSize:CGSizeMake(cellWidth, CGFLOAT_MAX)
+                                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+
   for (NSInteger i = 0; i < node.numberOfSections; i++) {
     for (NSInteger j = 0; j < [node numberOfRowsInSection:i]; j++) {
       NSIndexPath *indexPath = [NSIndexPath indexPathForItem:j inSection:i];
       ASTestTextCellNode *cellNode = (id)[node nodeForRowAtIndexPath:indexPath];
-      ASXCTAssertEqualLayoutContexts(cellNode.contextForCalculatedLayout, expectedSizeRange);
+      XCTAssertEqualObjects(cellNode.contextForCalculatedLayout, expectedSizeRange);
       // We will have to accept a relayout on main thread, since the index bar won't show
       // up until some of the cells are inserted.
       XCTAssertLessThanOrEqual(cellNode.numberOfLayoutsOnMainThread, 1);

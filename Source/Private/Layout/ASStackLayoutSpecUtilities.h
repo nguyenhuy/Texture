@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASStackLayoutSpec.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 
 typedef struct {
   ASStackLayoutDirection direction;
@@ -56,14 +57,17 @@ inline void setStackValueToPoint(const ASStackLayoutDirection direction, const C
   (direction == ASStackLayoutDirectionVertical) ? (point.y = stack) : (point.x = stack);
 }
 
-inline ASLayoutContext directionLayoutContext(const ASLayoutContext &layoutContext,
-                                              const ASStackLayoutDirection direction,
-                                              const CGFloat stackMin,
-                                              const CGFloat stackMax,
-                                              const CGFloat crossMin,
-                                              const CGFloat crossMax)
+inline ASLayoutContext *directionLayoutContext(ASLayoutContext *layoutContext,
+                                               const ASStackLayoutDirection direction,
+                                               const CGFloat stackMin,
+                                               const CGFloat stackMax,
+                                               const CGFloat crossMin,
+                                               const CGFloat crossMax)
 {
-  return {directionSize(direction, stackMin, crossMin), directionSize(direction, stackMax, crossMax), layoutContext.traitCollection};
+  ASMutableLayoutContext *result = [layoutContext mutableCopy];
+  result.min = directionSize(direction, stackMin, crossMin);
+  result.max = directionSize(direction, stackMax, crossMax);
+  return result;
 }
 
 inline ASStackLayoutAlignItems alignment(ASStackLayoutAlignSelf childAlignment, ASStackLayoutAlignItems stackAlignment)

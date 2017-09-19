@@ -34,7 +34,7 @@
 
 @interface ASDisplayNode (YogaInternal)
 @property (nonatomic, weak) ASDisplayNode *yogaParent;
-- (ASLayoutContext)_locked_contextForLayoutPass;
+- (ASLayoutContext *)_locked_contextForLayoutPass;
 @end
 
 @implementation ASDisplayNode (Yoga)
@@ -244,14 +244,15 @@
   self.yogaCalculatedLayout = nil;
 }
 
-- (void)calculateLayoutFromYogaRoot:(ASLayoutContext)rootLayoutContext
+- (void)calculateLayoutFromYogaRoot:(ASLayoutContext *)rootLayoutContext
 {
   ASDisplayNode *yogaParent = self.yogaParent;
+  ASLayoutContext *unconstrainedLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:rootLayoutContext.traitCollection];
 
   if (yogaParent) {
     ASYogaLog("ESCALATING to Yoga root: %@", self);
     // TODO(appleguy): Consider how to get the constrainedSize for the yogaRoot when escalating manually.
-    [yogaParent calculateLayoutFromYogaRoot:ASLayoutContextMakeWithUnconstrainedSizeRange(rootLayoutContext.traitCollection)];
+    [yogaParent calculateLayoutFromYogaRoot:unconstrainedLayoutContext];
     return;
   }
 
@@ -262,7 +263,7 @@
     node.yogaLayoutInProgress = YES;
   });
 
-  if (ASLayoutContextEqualToLayoutContext(rootLayoutContext, ASLayoutContextMakeWithUnconstrainedSizeRange(rootLayoutContext.traitCollection))) {
+  if ([rootLayoutContext isEqual:unconstrainedLayoutContext]) {
     rootLayoutContext = [self _locked_contextForLayoutPass];
   }
 

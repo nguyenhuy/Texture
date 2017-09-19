@@ -150,7 +150,7 @@ static void positionItemsInLine(const ASStackUnpositionedLine &line,
 
 ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnpositionedLayout &layout,
                                                          const ASStackLayoutSpecStyle &style,
-                                                         const ASLayoutContext &layoutContext)
+                                                         ASLayoutContext *layoutContext)
 {
   const auto &lines = layout.lines;
   if (lines.empty()) {
@@ -190,5 +190,5 @@ ASStackPositionedLayout ASStackPositionedLayout::compute(const ASStackUnposition
   }
 
   const CGSize finalSize = directionSize(direction, layout.stackDimensionSum, layout.crossDimensionSum);
-  return {std::move(positionedItems), ASLayoutContextClamp(layoutContext, finalSize)};
+  return {std::move(positionedItems), [layoutContext clamp:finalSize]};
 }

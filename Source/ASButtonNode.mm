@@ -518,7 +518,7 @@
   [self updateBackgroundImage];
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext
 {
   UIEdgeInsets contentEdgeInsets;
   ASButtonNodeImageAlignment imageAlignment;

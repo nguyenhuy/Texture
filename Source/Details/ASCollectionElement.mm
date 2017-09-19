@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionElement.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 #import <AsyncDisplayKit/ASCellNode+Internal.h>
 #import <mutex>
 
@@ -34,7 +35,7 @@
 - (instancetype)initWithNodeModel:(id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(NSString *)supplementaryElementKind
-                    layoutContext:(ASLayoutContext)layoutContext
+                    layoutContext:(ASLayoutContext *)layoutContext
                        owningNode:(id<ASRangeManagingNode>)owningNode
 {
   NSAssert(nodeBlock != nil, @"Node block must not be nil");

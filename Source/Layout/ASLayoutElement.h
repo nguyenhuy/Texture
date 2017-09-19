@@ -17,11 +17,13 @@
 
 #import <AsyncDisplayKit/ASLayoutElementPrivate.h>
 #import <AsyncDisplayKit/ASLayoutElementExtensibility.h>
-#import <AsyncDisplayKit/ASDimensionInternal.h>
-#import <AsyncDisplayKit/ASStackLayoutElement.h>
+
 #import <AsyncDisplayKit/ASAbsoluteLayoutElement.h>
-#import <AsyncDisplayKit/ASTraitCollection.h>
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
+#import <AsyncDisplayKit/ASDimensionInternal.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
+#import <AsyncDisplayKit/ASStackLayoutElement.h>
+#import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASLayout;
 @class ASLayoutSpec;
@@ -95,7 +97,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  *
  * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
  */
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext;
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext;
 
 /**
  * Call this on children layoutElements to compute their layouts within your implementation of -calculateLayoutThatFits:.
@@ -114,7 +116,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  *
  * @return An ASLayout instance defining the layout of the receiver (and its children, if the box layout model is used).
  */
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext parentSize:(CGSize)parentSize;
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext parentSize:(CGSize)parentSize;
 
 /**
  * Override this method to compute your layoutElement's layout.
@@ -131,7 +133,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  * @param layoutContext A layout context. This is computed as described in the description. The ASLayout you
  *                        return MUST have a size between the two sizes of the layout context.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext;
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext;
 
 /**
  * In certain advanced cases, you may want to override this method. Overriding this method allows you to receive the
@@ -140,7 +142,7 @@ typedef NS_ENUM(NSUInteger, ASLayoutElementType) {
  *
  * @warning Overriding this method should be done VERY rarely.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 

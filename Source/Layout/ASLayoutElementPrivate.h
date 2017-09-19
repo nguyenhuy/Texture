@@ -46,21 +46,21 @@ NS_ASSUME_NONNULL_END
 #pragma mark - ASLayoutElementLayoutDefaults
 
 #define ASLayoutElementLayoutCalculationDefaults \
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext\
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext\
 {\
   return [self layoutThatFits:layoutContext parentSize:layoutContext.max];\
 }\
 \
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext parentSize:(CGSize)parentSize\
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext parentSize:(CGSize)parentSize\
 {\
   return [self calculateLayoutThatFits:layoutContext restrictedToSize:self.style.size relativeToParentSize:parentSize];\
 }\
 \
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext\
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext\
                      restrictedToSize:(ASLayoutElementSize)size\
                  relativeToParentSize:(CGSize)parentSize\
 {\
-  const ASLayoutContext resolvedContext = ASLayoutContextIntersect(layoutContext, ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection));\
+  ASLayoutContext *resolvedContext = [layoutContext intersectWithLayoutContext:ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection)];\
   return [self calculateLayoutThatFits:resolvedContext];\
 }\
 

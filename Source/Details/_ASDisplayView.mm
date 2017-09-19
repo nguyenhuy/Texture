@@ -215,7 +215,8 @@
 {
   ASDisplayNode *node = _asyncdisplaykit_node; // Create strong reference to weak ivar.
   ASPrimitiveTraitCollection traitCollection = node.contextForCalculatedLayout.traitCollection;
-  return node ? [node layoutThatFits:ASLayoutContextMake(size, traitCollection)].size : [super sizeThatFits:size];
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:size traitCollection:traitCollection];
+  return node ? [node layoutThatFits:layoutContext].size : [super sizeThatFits:size];
 }
 
 - (void)setNeedsDisplay

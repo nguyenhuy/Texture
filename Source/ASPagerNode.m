@@ -176,11 +176,11 @@
 
 #pragma mark - ASCollectionDelegate
 
-- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode
+- (ASLayoutContext *)collectionNode:(ASCollectionNode *)collectionNode
   layoutContextForItemAtIndexPath:(NSIndexPath *)indexPath
               withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 {
-  return ASLayoutContextMake([self pageSize], traitCollection);
+  return [ASLayoutContext layoutContextWithExactSize:[self pageSize] traitCollection:traitCollection];
 }
 
 #pragma mark - Data Source Proxy

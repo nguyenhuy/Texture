@@ -623,7 +623,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A layout context for the node at this index path.
  */
-- (ASLayoutContext)tableNode:(ASTableNode *)tableNode layoutContextForRowAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+- (ASLayoutContext *)tableNode:(ASTableNode *)tableNode layoutContextForRowAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Receive a message that the tableView is near the end of its data set and more data should be fetched if necessary.

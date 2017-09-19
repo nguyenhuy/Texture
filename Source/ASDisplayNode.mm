@@ -191,9 +191,9 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASDisplayNodeAssert(!ASDisplayNodeSubclassOverridesSelector(self, @selector(recursivelyClearPreloadedData)), @"Subclass %@ must not override recursivelyClearFetchedData method.", classString);
   } else {
     // Check if subnodes where modified during the creation of the layout
-	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASLayoutContext layoutContext) {
+	  __block IMP originalLayoutSpecThatFitsIMP = ASReplaceMethodWithBlock(self, @selector(_locked_layoutElementThatFits:), ^(ASDisplayNode *_self, ASLayoutContext *layoutContext) {
 		  NSArray *oldSubnodes = _self.subnodes;
-		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASLayoutContext))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), layoutContext);
+		  ASLayoutSpec *layoutElement = ((ASLayoutSpec *( *)(id, SEL, ASLayoutContext *))originalLayoutSpecThatFitsIMP)(_self, @selector(_locked_layoutElementThatFits:), layoutContext);
 		  NSArray *subnodes = _self.subnodes;
 		  ASDisplayNodeAssert(oldSubnodes.count == subnodes.count, @"Adding or removing nodes in layoutSpecBlock or layoutSpecThatFits: is not allowed and can cause unexpected behavior.");
 		  for (NSInteger i = 0; i < oldSubnodes.count; i++) {
@@ -941,7 +941,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
 
 #pragma mark Calculation
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
@@ -957,8 +957,8 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
     ASSignpostStart(ASSignpostCalculateLayout);
   }
 
-  ASLayoutContext styleAndParentContext = ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection);
-  const ASLayoutContext resolvedContext = ASLayoutContextIntersect(layoutContext, styleAndParentContext);
+  ASLayoutContext *styleAndParentContext = ASLayoutElementSizeResolve(self.style.size, parentSize, layoutContext.traitCollection);
+  ASLayoutContext *resolvedContext = [layoutContext intersectWithLayoutContext:styleAndParentContext];
   ASLayout *result = [self calculateLayoutThatFits:resolvedContext];
   as_log_verbose(ASLayoutLog(), "Calculated layout %@", result);
 
@@ -969,7 +969,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return result;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
 
@@ -1011,7 +1011,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   if (_layoutSpecBlock == NULL && (_methodOverrides & ASDisplayNodeMethodOverrideLayoutSpecThatFits) == 0) {
     CGSize size = [self calculateSizeThatFits:layoutContext.max];
     ASDisplayNodeLogEvent(self, @"calculatedSize: %@", NSStringFromCGSize(size));
-    return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, size) sublayouts:nil];
+    return [ASLayout layoutWithLayoutElement:self size:[layoutContext clamp:size] sublayouts:nil];
   }
   
   // Size calcualtion with layout elements
@@ -1085,7 +1085,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   return ASIsCGSizeValidForSize(constrainedSize) ? constrainedSize : CGSizeZero;
 }
 
-- (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASLayoutContext)layoutContext
+- (id<ASLayoutElement>)_locked_layoutElementThatFits:(ASLayoutContext *)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   
@@ -1105,7 +1105,7 @@ static ASDisplayNodeMethodOverrides GetASDisplayNodeMethodOverrides(Class c)
   }
 }
 
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext
 {
   __ASDisplayNodeCheckForLayoutMethodOverrides;
   
@@ -3543,7 +3543,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDisplayNodeLayout c = *_calculatedDisplayNodeLayout;
     [props addObject:@{ @"calculatedLayout": c.layout }];
     [props addObject:@{ @"calculatedVersion": @(c.version) }];
-    [props addObject:@{ @"calculatedLayoutContext" : NSStringFromASLayoutContext(c.layoutContext) }];
+    [props addObject:@{ @"calculatedLayoutContext" : c.layoutContext }];
     if (c.requestedLayoutFromAbove) {
       [props addObject:@{ @"calculatedRequestedLayoutFromAbove": @"YES" }];
     }
@@ -3552,7 +3552,7 @@ ASDISPLAYNODE_INLINE BOOL subtreeIsRasterized(ASDisplayNode *node) {
     ASDisplayNodeLayout p = *_pendingDisplayNodeLayout;
     [props addObject:@{ @"pendingLayout": p.layout }];
     [props addObject:@{ @"pendingVersion": @(p.version) }];
-    [props addObject:@{ @"pendingLayoutContext" : NSStringFromASLayoutContext(p.layoutContext) }];
+    [props addObject:@{ @"pendingLayoutContext" : p.layoutContext }];
     if (p.requestedLayoutFromAbove) {
       [props addObject:@{ @"pendingRequestedLayoutFromAbove": (id)kCFNull }];
     }

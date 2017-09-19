@@ -20,7 +20,7 @@
 #import <AsyncDisplayKit/ASBackgroundLayoutSpec.h>
 #import <AsyncDisplayKit/ASCenterLayoutSpec.h>
 
-static const ASLayoutContext kLayoutContext = ASLayoutContextMake({320, 320}, {320, 320}, ASPrimitiveTraitCollectionMakeDefault());
+static ASLayoutContext **kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{320, 320} maxSize:{320, 320} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
 
 @interface ASBackgroundLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 

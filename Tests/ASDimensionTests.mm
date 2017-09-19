@@ -18,6 +18,7 @@
 #import <XCTest/XCTest.h>
 #import "ASXCTExtensions.h"
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 
 
 @interface ASDimensionTests : XCTestCase
@@ -52,11 +53,11 @@
   // result:      |----|
 
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext range = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
-  ASLayoutContext other = ASLayoutContextMake({7,7}, {15,15}, traitCollection);
-  ASLayoutContext result = ASLayoutContextIntersect(range, other);
-  ASLayoutContext expected = ASLayoutContextMake({7,7}, {10,10}, traitCollection);
-  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
+  ASLayoutContext *range = [ASLayoutContext layoutContextWithMinSize:{0,0} maxSize:{10,10} traitCollection:traitCollection];
+  ASLayoutContext *other = [ASLayoutContext layoutContextWithMinSize:{7,7} maxSize:{15,15} traitCollection:traitCollection];
+  ASLayoutContext *result = [range intersectWithLayoutContext:other];
+  ASLayoutContext *expected = [ASLayoutContext layoutContextWithMinSize:{7,7} maxSize:{10,10} traitCollection:traitCollection];
+  XCTAssertEqualObjects(result, expected, @"Expected %@ but got %@", expected, result);
 }
 
 - (void)testIntersectingSizeRangeWithRangeThatContainsItReturnsSameRange
@@ -66,11 +67,11 @@
   // result:    |-----|
 
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext range = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
-  ASLayoutContext other = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
-  ASLayoutContext result = ASLayoutContextIntersect(range, other);
-  ASLayoutContext expected = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
-  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
+  ASLayoutContext *range = [ASLayoutContext layoutContextWithMinSize:{2,2} maxSize:{8,8} traitCollection:traitCollection];
+  ASLayoutContext *other = [ASLayoutContext layoutContextWithMinSize:{0,0} maxSize:{10,10} traitCollection:traitCollection];
+  ASLayoutContext *result = [range intersectWithLayoutContext:other];
+  ASLayoutContext *expected = [ASLayoutContext layoutContextWithMinSize:{2,2} maxSize:{8,8} traitCollection:traitCollection];
+  XCTAssertEqualObjects(result, expected, @"Expected %@ but got %@", expected, result);
 }
 
 - (void)testIntersectingSizeRangeWithRangeContainedWithinItReturnsContainedRange
@@ -80,11 +81,11 @@
   // result:    |-----|
 
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext range = ASLayoutContextMake({0,0}, {10,10}, traitCollection);
-  ASLayoutContext other = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
-  ASLayoutContext result = ASLayoutContextIntersect(range, other);
-  ASLayoutContext expected = ASLayoutContextMake({2,2}, {8,8}, traitCollection);
-  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
+  ASLayoutContext *range = [ASLayoutContext layoutContextWithMinSize:{0,0} maxSize:{10,10} traitCollection:traitCollection];
+  ASLayoutContext *other = [ASLayoutContext layoutContextWithMinSize:{2,2} maxSize:{8,8} traitCollection:traitCollection];
+  ASLayoutContext *result = [range intersectWithLayoutContext:other];
+  ASLayoutContext *expected = [ASLayoutContext layoutContextWithMinSize:{2,2} maxSize:{8,8} traitCollection:traitCollection];
+  XCTAssertEqualObjects(result, expected, @"Expected %@ but got %@", expected, result);
 }
 
 - (void)testIntersectingSizeRangeWithNonOverlappingRangeToRightReturnsSinglePointNearestOtherRange
@@ -94,11 +95,11 @@
   // result:       *
 
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext range = ASLayoutContextMake({0,0}, {5,5}, traitCollection);
-  ASLayoutContext other = ASLayoutContextMake({10,10}, {15,15}, traitCollection);
-  ASLayoutContext result = ASLayoutContextIntersect(range, other);
-  ASLayoutContext expected = ASLayoutContextMake({5,5}, {5,5}, traitCollection);
-  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
+  ASLayoutContext *range = [ASLayoutContext layoutContextWithMinSize:{0,0} maxSize:{5,5} traitCollection:traitCollection];
+  ASLayoutContext *other = [ASLayoutContext layoutContextWithMinSize:{10,10} maxSize:{15,15} traitCollection:traitCollection];
+  ASLayoutContext *result = [range intersectWithLayoutContext:other];
+  ASLayoutContext *expected = [ASLayoutContext layoutContextWithMinSize:{5,5} maxSize:{5,5} traitCollection:traitCollection];
+  XCTAssertEqualObjects(result, expected, @"Expected %@ but got %@", expected, result);
 }
 
 - (void)testIntersectingSizeRangeWithNonOverlappingRangeToLeftReturnsSinglePointNearestOtherRange
@@ -108,11 +109,11 @@
   // result:          *
 
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext range = ASLayoutContextMake({10,10}, {15,15}, traitCollection);
-  ASLayoutContext other = ASLayoutContextMake({0,0}, {5,5}, traitCollection);
-  ASLayoutContext result = ASLayoutContextIntersect(range, other);
-  ASLayoutContext expected = ASLayoutContextMake({10,10}, {10,10}, traitCollection);
-  XCTAssertTrue(ASLayoutContextEqualToLayoutContext(result, expected), @"Expected %@ but got %@", NSStringFromASLayoutContext(expected), NSStringFromASLayoutContext(result));
+  ASLayoutContext *range = [ASLayoutContext layoutContextWithMinSize:{10,10} maxSize:{15,15} traitCollection:traitCollection];
+  ASLayoutContext *other = [ASLayoutContext layoutContextWithMinSize:{0,0} maxSize:{5,5} traitCollection:traitCollection];
+  ASLayoutContext *result = [range intersectWithLayoutContext:other];
+  ASLayoutContext *expected = [ASLayoutContext layoutContextWithMinSize:{10,10} maxSize:{10,10} traitCollection:traitCollection];
+  XCTAssertEqualObjects(result, expected, @"Expected %@ but got %@", expected, result);
 }
 
 @end

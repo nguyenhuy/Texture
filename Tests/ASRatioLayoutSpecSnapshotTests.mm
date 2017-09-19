@@ -19,7 +19,7 @@
 
 #import <AsyncDisplayKit/ASRatioLayoutSpec.h>
 
-static const ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {100, 100}, ASPrimitiveTraitCollectionMakeDefault());
+static ASLayoutContext **kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{0, 0} maxSize:{100, 100} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
 
 @interface ASRatioLayoutSpecSnapshotTests : ASLayoutSpecSnapshotTestCase
 @end

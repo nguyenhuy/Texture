@@ -77,19 +77,21 @@
   return self;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
   ASDN::MutexLocker l(__instanceLock__);  // Lock for using our instance variables.
 
-  ASLayoutContext contentLayoutContext = layoutContext;
+  ASMutableLayoutContext *contentLayoutContext = [layoutContext mutableCopy];
+  CGSize max = contentLayoutContext.max;
   if (ASScrollDirectionContainsVerticalDirection(_scrollableDirections)) {
-    contentLayoutContext.max.height = CGFLOAT_MAX;
+    max.height = CGFLOAT_MAX;
   }
   if (ASScrollDirectionContainsHorizontalDirection(_scrollableDirections)) {
-    contentLayoutContext.max.width = CGFLOAT_MAX;
+    max.width = CGFLOAT_MAX;
   }
+  contentLayoutContext.max = max;
   
   ASLayout *layout = [super calculateLayoutThatFits:contentLayoutContext
                                    restrictedToSize:size

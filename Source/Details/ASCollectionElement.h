@@ -19,6 +19,7 @@
 #import <AsyncDisplayKit/ASTraitCollection.h>
 
 @class ASDisplayNode;
+@class ASLayoutContext;
 @protocol ASRangeManagingNode;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,14 +28,14 @@ AS_SUBCLASSING_RESTRICTED
 @interface ASCollectionElement : NSObject
 
 @property (nonatomic, readonly, copy, nullable) NSString *supplementaryElementKind;
-@property (nonatomic, assign) ASLayoutContext layoutContext;
+@property (nonatomic, strong) ASLayoutContext *layoutContext;
 @property (nonatomic, readonly, weak) id<ASRangeManagingNode> owningNode;
 @property (nonatomic, readonly, nullable) id nodeModel;
 
 - (instancetype)initWithNodeModel:(nullable id)nodeModel
                         nodeBlock:(ASCellNodeBlock)nodeBlock
          supplementaryElementKind:(nullable NSString *)supplementaryElementKind
-                    layoutContext:(ASLayoutContext)layoutContext
+                    layoutContext:(ASLayoutContext *)layoutContext
                        owningNode:(id<ASRangeManagingNode>)owningNode;
 
 /**

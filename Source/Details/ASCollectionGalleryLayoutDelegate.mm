@@ -129,7 +129,7 @@
     finalSpec = [ASInsetLayoutSpec insetLayoutSpecWithInsets:sectionInset child:stackSpec];
   }
 
-  ASLayoutContext finalSpecLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections, context.traitCollection);
+  ASLayoutContext *finalSpecLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(pageSize, scrollableDirections, context.traitCollection);
   ASLayout *layout = [finalSpec layoutThatFits:finalSpecLayoutContext];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {

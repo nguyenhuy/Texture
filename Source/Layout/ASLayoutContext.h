@@ -10,6 +10,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 
+#pragma once
 #import <Foundation/Foundation.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>

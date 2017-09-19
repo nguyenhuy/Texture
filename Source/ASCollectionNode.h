@@ -707,7 +707,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A context for layout for the item at this index path.
  */
-- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode
+- (ASLayoutContext *)collectionNode:(ASCollectionNode *)collectionNode
   layoutContextForItemAtIndexPath:(NSIndexPath *)indexPath
               withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 

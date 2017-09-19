@@ -219,6 +219,7 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
   ASCellNode *node = element.node;
   CGSize elementSize = attrs.frame.size;
   if (! CGSizeEqualToSize(elementSize, node.calculatedSize)) {
+    // TODO: Continue here
     [node layoutThatFits:ASCollectionLayoutElementSizeRangeFromSize(elementSize)];
   }
 
@@ -361,11 +362,11 @@ static const ASScrollDirection kASStaticScrollDirection = (ASScrollDirectionRigh
 
 # pragma mark - Convenient inline functions
 
-ASDISPLAYNODE_INLINE ASSizeRange ASCollectionLayoutElementSizeRangeFromSize(CGSize size)
+ASDISPLAYNODE_INLINE ASLayoutContext *ASCollectionLayoutElementLayoutContextFromSize(CGSize size, ASPrimitiveTraitCollection traitCollection)
 {
   // The layout delegate consulted us that this element must fit within this size,
   // and the only way to achieve that without asking it again is to use an exact size range here.
-  return ASSizeRangeMake(size);
+  return [ASLayoutContext layoutContextWithExactSize:size traitCollection:traitCollection];
 }
 
 ASDISPLAYNODE_INLINE void ASCollectionLayoutSetSizeToElement(CGSize size, ASCollectionElement *element)

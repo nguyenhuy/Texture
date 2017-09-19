@@ -52,7 +52,7 @@ NSString * const ASTransitionContextToLayoutKey = @"org.asyncdisplaykit.ASTransi
   return [_layoutDelegate transitionContext:self layoutForKey:key];
 }
 
-- (ASLayoutContext)layoutContextForKey:(NSString *)key
+- (ASLayoutContext *)layoutContextForKey:(NSString *)key
 {
   return [_layoutDelegate transitionContext:self layoutContextForKey:key];
 }

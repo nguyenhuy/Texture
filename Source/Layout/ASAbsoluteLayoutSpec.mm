@@ -64,7 +64,7 @@
 
 #pragma mark - ASLayoutSpec
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   ASPrimitiveTraitCollection traitCollection = layoutContext.traitCollection;
   CGSize size = {
@@ -82,10 +82,10 @@
       layoutContext.max.height - layoutPosition.y
     };
 
-    const ASLayoutContext childContext = ASLayoutElementSizeResolveAutoSize(child.style.size,
-                                                                            size,
-                                                                            traitCollection,
-                                                                            ASLayoutContextMake(CGSizeZero, autoMaxSize, traitCollection));
+    ASLayoutContext *childContext = ASLayoutElementSizeResolveAutoSize(child.style.size,
+                                                                       size,
+                                                                       traitCollection,
+                                                                       [ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:autoMaxSize traitCollection:traitCollection]);
     
     ASLayout *sublayout = [child layoutThatFits:childContext parentSize:size];
     sublayout.position = layoutPosition;
@@ -106,7 +106,7 @@
     }
   }
   
-  return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, size) sublayouts:sublayouts];
+  return [ASLayout layoutWithLayoutElement:self size:[layoutContext clamp:size] sublayouts:sublayouts];
 }
 
 @end

@@ -16,9 +16,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASBaseDefines.h>
 
 @class ASDisplayNode;
+@class ASLayoutContext;
 
 typedef BOOL (^as_condition_block_t)(void);
 
@@ -27,6 +28,6 @@ ASDISPLAYNODE_EXTERN_C_BEGIN
 BOOL ASDisplayNodeRunRunLoopUntilBlockIsTrue(as_condition_block_t block);
 
 void ASDisplayNodeSizeToFitSize(ASDisplayNode *node, CGSize size);
-void ASDisplayNodeSizeToFitLayoutContext(ASDisplayNode *node, ASLayoutContext layoutContext);
+void ASDisplayNodeSizeToFitLayoutContext(ASDisplayNode *node, ASLayoutContext *layoutContext);
 
 ASDISPLAYNODE_EXTERN_C_END

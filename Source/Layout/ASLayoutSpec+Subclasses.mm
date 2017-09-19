@@ -44,7 +44,7 @@
   return NO;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   return [ASLayout layoutWithLayoutElement:self size:CGSizeZero];
 }

@@ -56,12 +56,12 @@
 
 #pragma mark Measurement Pass
 
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext
 {
   return [self layoutThatFits:layoutContext parentSize:layoutContext.max];
 }
 
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext parentSize:(CGSize)parentSize
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext parentSize:(CGSize)parentSize
 {
   ASDN::MutexLocker l(__instanceLock__);
 
@@ -150,13 +150,13 @@ ASLayoutElementStyleExtensibilityForwarding
   return _calculatedDisplayNodeLayout->layout.size;
 }
 
-- (ASLayoutContext)contextForCalculatedLayout
+- (ASLayoutContext *)contextForCalculatedLayout
 {
   ASDN::MutexLocker l(__instanceLock__);
   return [self _locked_contextForCalculatedLayout];
 }
 
-- (ASLayoutContext)_locked_contextForCalculatedLayout
+- (ASLayoutContext *)_locked_contextForCalculatedLayout
 {
   if (_pendingDisplayNodeLayout != nullptr) {
     return _pendingDisplayNodeLayout->layoutContext;
@@ -225,13 +225,13 @@ ASLayoutElementStyleExtensibilityForwarding
   CGSize boundsSizeForLayout = ASCeilSizeValues(self.bounds.size);
 
   // Figure out layout context to use
-  ASLayoutContext layoutContext;
+  ASLayoutContext *layoutContext;
   if (_pendingDisplayNodeLayout != nullptr) {
     layoutContext = _pendingDisplayNodeLayout->layoutContext;
   } else if (_calculatedDisplayNodeLayout->layout != nil) {
     layoutContext = _calculatedDisplayNodeLayout->layoutContext;
   } else {
-    layoutContext = ASLayoutContextMake(boundsSizeForLayout, [self _locked_traitCollectionForLayoutPass]);
+    layoutContext = [ASLayoutContext layoutContextWithExactSize:boundsSizeForLayout traitCollection:[self _locked_traitCollectionForLayoutPass]];
   }
 
   __instanceLock__.unlock();
@@ -328,7 +328,7 @@ ASLayoutElementStyleExtensibilityForwarding
     as_log_verbose(ASLayoutLog(), "Measuring with previous constrained size.");
     // Use the last known constrainedSize passed from a parent during layout (if never, use bounds).
     NSUInteger version = _layoutVersion;
-    ASLayoutContext layoutContext = [self _locked_contextForLayoutPass];
+    ASLayoutContext *layoutContext = [self _locked_contextForLayoutPass];
     ASLayout *layout = [self calculateLayoutThatFits:layoutContext
                                     restrictedToSize:self.style.size
                                 relativeToParentSize:boundsSizeForLayout];
@@ -375,7 +375,7 @@ ASLayoutElementStyleExtensibilityForwarding
   }
 }
 
-- (ASLayoutContext)_locked_contextForLayoutPass
+- (ASLayoutContext *)_locked_contextForLayoutPass
 {
   // TODO: The logic in -_u_setNeedsLayoutFromAbove seems correct and doesn't use this method.
   // logic seems correct.  For what case does -this method need to do the CGSizeEqual checks?
@@ -399,7 +399,7 @@ ASLayoutElementStyleExtensibilityForwarding
     // In this case neither the _pendingDisplayNodeLayout or the _calculatedDisplayNodeLayout constrained size can
     // be reused, so the current bounds is used. This is usual the case if a frame was set manually that differs to
     // the one returned from layoutThatFits: or layoutThatFits: was never called
-    return ASLayoutContextMake(boundsSizeForLayout, [self _locked_traitCollectionForLayoutPass]);
+    return [ASLayoutContext layoutContextWithExactSize:boundsSizeForLayout traitCollection:[self _locked_traitCollectionForLayoutPass]];
   }
 }
 
@@ -512,7 +512,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
 
-  ASLayoutContext layoutContext;
+  ASLayoutContext *layoutContext;
   {
     ASDN::MutexLocker l(__instanceLock__);
     layoutContext = [self _locked_contextForLayoutPass];
@@ -525,14 +525,14 @@ ASLayoutElementStyleExtensibilityForwarding
   
 }
 
-- (void)transitionLayoutWithLayoutContext:(ASLayoutContext)layoutContext
+- (void)transitionLayoutWithLayoutContext:(ASLayoutContext *)layoutContext
                                  animated:(BOOL)animated
                        shouldMeasureAsync:(BOOL)shouldMeasureAsync
                     measurementCompletion:(void (^)())completion
 {
   ASDisplayNodeAssertMainThread();
   as_activity_create_for_scope("Transition node layout");
-  as_log_debug(ASLayoutLog(), "Transition layout for %@ layoutContext %@ anim %d asyncMeasure %d", self, NSStringFromASLayoutContext(layoutContext), animated, shouldMeasureAsync);
+  as_log_debug(ASLayoutLog(), "Transition layout for %@ layoutContext %@ anim %d asyncMeasure %d", self, layoutContext, animated, shouldMeasureAsync);
   
   if (layoutContext.max.width <= 0.0 || layoutContext.max.height <= 0.0) {
     // Using CGSizeZero for the size range can cause negative values in client layout code.
@@ -999,7 +999,7 @@ ASLayoutElementStyleExtensibilityForwarding
 {
   ASDisplayNodeAssertMainThread();
 
-  ASLayoutContext layoutContext = constrainedSize;
+  ASMutableLayoutContext *layoutContext = [constrainedSize mutableCopy];
   {
     ASDN::MutexLocker l(__instanceLock__);
     layoutContext.traitCollection = [self _locked_traitCollectionForLayoutPass];

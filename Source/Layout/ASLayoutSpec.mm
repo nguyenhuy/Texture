@@ -86,7 +86,7 @@
 
 ASLayoutElementLayoutCalculationDefaults
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   return [ASLayout layoutWithLayoutElement:self size:layoutContext.min];
 }
@@ -283,7 +283,7 @@ ASLayoutElementStyleExtensibilityForwarding
   return self;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   NSArray *children = self.children;
   NSMutableArray *sublayouts = [NSMutableArray arrayWithCapacity:children.count];

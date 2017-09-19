@@ -31,6 +31,3 @@
 
 #define ASXCTAssertNotEqualDimensions(r0, r1, ...) \
   _XCTPrimitiveAssertNotEqualObjects(self, NSStringFromASDimension(r0), @#r0, NSStringFromASDimension(r1), @#r1, __VA_ARGS__)
-
-#define ASXCTAssertEqualLayoutContexts(r0, r1, ...) \
-  _XCTPrimitiveAssertEqualObjects(self, NSStringFromASLayoutContext(r0), @#r0, NSStringFromASLayoutContext(r1), @#r1, __VA_ARGS__)

@@ -17,8 +17,9 @@
 
 #pragma once
 #import <Foundation/Foundation.h>
-#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
+
+@class ASLayoutContext;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,7 +34,7 @@ extern BOOL ASPointIsNull(CGPoint point);
  * @param rootLayoutElement The root node to calculate the layout for.
  * @param layoutContext The context to calculate the root layout within.
  */
-extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASLayoutContext layoutContext);
+extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, ASLayoutContext *layoutContext);
 
 /**
  * Safely computes the layout of the given node by guarding against nil nodes.
@@ -41,7 +42,7 @@ extern ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, co
  * @param layoutContext The context to calculate the node layout within.
  * @param parentSize The parent size of the node to calculate the layout for.
  */
-extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, const ASLayoutContext layoutContext, const CGSize parentSize);
+extern ASLayout *ASCalculateLayout(id<ASLayoutElement>layoutElement, ASLayoutContext *layoutContext, const CGSize parentSize);
 
 ASDISPLAYNODE_EXTERN_C_END
 

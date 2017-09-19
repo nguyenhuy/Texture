@@ -2183,7 +2183,8 @@ static bool stringContainsPointer(NSString *description, id p) {
 - (void)testThatItsSafeToAutomeasureANodeMidTransition
 {
   ASDisplayNode *supernode = [[ASDisplayNode alloc] init];
-  [supernode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())];
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:CGSizeMake(100, 100) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  [supernode layoutThatFits:layoutContext];
   ASDisplayNode *node = [[ASDisplayNode alloc] init];
   node.bounds = CGRectMake(0, 0, 50, 50);
   [supernode addSubnode:node];
@@ -2266,7 +2267,9 @@ static bool stringContainsPointer(NSString *description, id p) {
   node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode *node, ASSizeRange constrainedSize) {
     return [ASOverlayLayoutSpec overlayLayoutSpecWithChild:[ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:subnode] overlay:subnode];
   };
-  XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:ASLayoutContextMake(CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())],
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(100, 100)
+                                                               traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  XCTAssertThrowsSpecificNamed([node calculateLayoutThatFits:layoutContext],
                                NSException,
                                NSInternalInconsistencyException);
 }

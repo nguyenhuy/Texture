@@ -20,6 +20,7 @@
 #import <queue>
 
 #import <AsyncDisplayKit/ASDimension.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 #import <AsyncDisplayKit/ASLayoutSpecUtilities.h>
 #import <AsyncDisplayKit/ASLayoutSpec+Subclasses.h>
 
@@ -376,14 +377,14 @@ static std::atomic_bool static_retainsSublayoutLayoutElements = ATOMIC_VAR_INIT(
 
 @end
 
-ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, const ASLayoutContext layoutContext, const CGSize parentSize)
+ASLayout *ASCalculateLayout(id<ASLayoutElement> layoutElement, ASLayoutContext *layoutContext, const CGSize parentSize)
 {
   ASDisplayNodeCAssertNotNil(layoutElement, @"Not valid layoutElement passed in.");
   
   return [layoutElement layoutThatFits:layoutContext parentSize:parentSize];
 }
 
-ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, const ASLayoutContext layoutContext)
+ASLayout *ASCalculateRootLayout(id<ASLayoutElement> rootLayoutElement, ASLayoutContext *layoutContext)
 {
   ASLayout *layout = ASCalculateLayout(rootLayoutElement, layoutContext, layoutContext.max);
   // Here could specific verfication happen

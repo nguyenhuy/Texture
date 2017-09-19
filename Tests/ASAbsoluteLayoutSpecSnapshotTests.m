@@ -30,13 +30,13 @@
 - (void)testSizingBehaviour
 {
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  [self testWithLayoutContext:ASLayoutContextMake(CGSizeMake(150, 200), CGSizeMake(INFINITY, INFINITY), traitCollection)
-               identifier:@"underflowChildren"];
-  [self testWithLayoutContext:ASLayoutContextMake(CGSizeZero, CGSizeMake(50, 100), traitCollection)
-               identifier:@"overflowChildren"];
+  [self testWithLayoutContext:[ASLayoutContext layoutContextWithMinSize:CGSizeMake(150, 200) maxSize:CGSizeMake(INFINITY, INFINITY) traitCollection:traitCollection]
+                   identifier:@"underflowChildren"];
+  [self testWithLayoutContext:[ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:CGSizeMake(50, 100) traitCollection:traitCollection]
+                   identifier:@"overflowChildren"];
   // Expect the spec to wrap its content because children sizes are between constrained size
-  [self testWithLayoutContext:ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY / 2, INFINITY / 2), traitCollection)
-               identifier:@"wrappedChildren"];
+  [self testWithLayoutContext:[ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:CGSizeMake(INFINITY / 2, INFINITY / 2) traitCollection:traitCollection]
+                   identifier:@"wrappedChildren"];
 }
 
 - (void)testChildrenMeasuredWithAutoMaxSize
@@ -47,11 +47,13 @@
   ASDisplayNode *secondChild = ASDisplayNodeWithBackgroundColor([UIColor blueColor], (CGSize){100, 100});
   secondChild.style.layoutPosition = CGPointMake(10, 60);
 
-  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeMake(10, 10), CGSizeMake(110, 160), ASPrimitiveTraitCollectionMakeDefault());
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(10, 10)
+                                                                     maxSize:CGSizeMake(110, 160)
+                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testWithChildren:@[firstChild, secondChild] layoutContext:layoutContext identifier:nil];
 }
 
-- (void)testWithLayoutContext:(ASLayoutContext)layoutContext identifier:(NSString *)identifier
+- (void)testWithLayoutContext:(ASLayoutContext *)layoutContext identifier:(NSString *)identifier
 {
   ASDisplayNode *firstChild = ASDisplayNodeWithBackgroundColor([UIColor redColor], (CGSize){50, 50});
   firstChild.style.layoutPosition = CGPointMake(0, 0);
@@ -62,7 +64,7 @@
   [self testWithChildren:@[firstChild, secondChild] layoutContext:layoutContext identifier:identifier];
 }
 
-- (void)testWithChildren:(NSArray *)children layoutContext:(ASLayoutContext)layoutContext identifier:(NSString *)identifier
+- (void)testWithChildren:(NSArray *)children layoutContext:(ASLayoutContext *)layoutContext identifier:(NSString *)identifier
 {
   ASDisplayNode *backgroundNode = ASDisplayNodeWithBackgroundColor([UIColor whiteColor]);
 

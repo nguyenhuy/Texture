@@ -150,7 +150,7 @@ static BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
 {
   for (NSInteger i = 10; i < 500; i += 50) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_editableTextNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
+    CGSize calculatedSize = [_editableTextNode layoutThatFits:[ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:constrainedSize traitCollection:ASPrimitiveTraitCollectionMakeDefault()]].size;
     XCTAssertTrue(calculatedSize.width <= constrainedSize.width, @"Calculated width (%f) should be less than or equal to constrained width (%f)", calculatedSize.width, constrainedSize.width);
     XCTAssertTrue(calculatedSize.height <= constrainedSize.height, @"Calculated height (%f) should be less than or equal to constrained height (%f)", calculatedSize.height, constrainedSize.height);
   }
@@ -160,8 +160,11 @@ static BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
 {
   for (NSInteger i = 10; i < 500; i += 50) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_editableTextNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
-    CGSize recalculatedSize = [_editableTextNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
+    ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero
+                                                                       maxSize:constrainedSize
+                                                               traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+    CGSize calculatedSize = [_editableTextNode layoutThatFits:layoutContext].size;
+    CGSize recalculatedSize = [_editableTextNode layoutThatFits:layoutContext].size;
     
     XCTAssertTrue(CGSizeEqualToSizeWithIn(calculatedSize, recalculatedSize, 4.0), @"Recalculated size %@ should be same as original size %@", NSStringFromCGSize(recalculatedSize), NSStringFromCGSize(calculatedSize));
   }
@@ -171,8 +174,11 @@ static BOOL CGSizeEqualToSizeWithIn(CGSize size1, CGSize size2, CGFloat delta)
 {
   for (CGFloat i = 10; i < 500; i *= 1.3) {
     CGSize constrainedSize = CGSizeMake(i, i);
-    CGSize calculatedSize = [_editableTextNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
-    CGSize recalculatedSize = [_editableTextNode layoutThatFits:ASLayoutContextMake(CGSizeZero, constrainedSize, ASPrimitiveTraitCollectionMakeDefault())].size;
+    ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero
+                                                                       maxSize:constrainedSize
+                                                               traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+    CGSize calculatedSize = [_editableTextNode layoutThatFits:layoutContext].size;
+    CGSize recalculatedSize = [_editableTextNode layoutThatFits:layoutContext].size;
 
     XCTAssertTrue(CGSizeEqualToSizeWithIn(calculatedSize, recalculatedSize, 11.0), @"Recalculated size %@ should be same as original size %@", NSStringFromCGSize(recalculatedSize), NSStringFromCGSize(calculatedSize));
   }

@@ -29,7 +29,8 @@
     return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsMake(5, 5, 5, 5) child:subnode];
   };
 
-  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
   ASSnapshotVerifyNode(node, nil);
 }
 

@@ -185,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This method should not be called directly outside of ASDisplayNode; use -layoutThatFits: or -calculatedLayout instead.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext;
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext;
 
 /**
  * ASDisplayNode's implementation of -layoutThatFits:parentSize: calls this method to resolve the node's size
@@ -196,7 +196,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @warning Overriding this method should be done VERY rarely.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize;
 
@@ -233,7 +233,7 @@ NS_ASSUME_NONNULL_BEGIN
  * exception. A future version of the framework may support using both, calling them serially, with the .layoutSpecBlock
  * superseding any values set by the method override.
  */
-- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext)layoutContext;
+- (ASLayoutSpec *)layoutSpecThatFits:(ASLayoutContext *)layoutContext;
 
 /**
  * @abstract Invalidate previously measured and cached layout.

@@ -89,8 +89,9 @@
     
     return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[stack1, stack2, node5]];
   };
-  
-  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
   [node.view layoutIfNeeded];
 
   XCTAssertEqual(node.subnodes[0], node1);
@@ -166,8 +167,9 @@
       return [ASAbsoluteLayoutSpec absoluteLayoutSpecWithChildren:@[node1, stackLayout]];
     }
   };
-  
-  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
   [node.view layoutIfNeeded];
   XCTAssertEqual(node.subnodes[0], node1);
   XCTAssertEqual(node.subnodes[1], node2);
@@ -192,8 +194,9 @@
   [displayNode view];
   
   XCTestExpectation *expectation = [self expectationWithDescription:@"Call measurement completion block on main"];
-  
-  [displayNode transitionLayoutWithLayoutContext:ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault())
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  [displayNode transitionLayoutWithLayoutContext:layoutContext
                                         animated:YES
                               shouldMeasureAsync:YES
                            measurementCompletion:^{
@@ -231,7 +234,8 @@
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
     // Measurement happens in the background
-    ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
+    ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollectionASPrimitiveTraitCollectionMakeDefault()];
+    ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
     
     // Dispatch back to the main thread to let the insertion / deletion of subnodes happening
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -246,8 +250,9 @@
         // Change state and measure in the background
         node.layoutState = @2;
         [node setNeedsLayout];
-    
-        ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
+
+        ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+        ASDisplayNodeSizeToFitLayoutContext(node, layoutContext);
         
         // Dispatch back to the main thread to let the insertion / deletion of subnodes happening
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -292,8 +297,9 @@
   [node2 view];
   
   XCTestExpectation *expectation = [self expectationWithDescription:@"Fix IHM layout transition also if one node is already loaded"];
-  
-  ASDisplayNodeSizeToFitLayoutContext(node, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
+
+  ASLayoutContext *unconstrainedLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(node, unconstrainedLayoutContext);
   [node.view layoutIfNeeded];
   XCTAssertEqual(node.subnodes[0], node1);
   

@@ -448,7 +448,7 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
  * @return The layout context for the header, or a layout context with zero min and max sizes if there is no header in this section.
  *
  * If you want the header to completely determine its own size, return a layout context with an unconstrained size range,
- * created via ASLayoutContextMakeWithUnconstrainedSizeRange().
+ * created via +[ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:].
  *
  * @note Only the scrollable dimension of the sizes in the returned layout context will be used. In a vertical flow,
  * only the height will be used. In a horizontal flow, only the width will be used. The other dimension
@@ -457,7 +457,7 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
  * @discussion If you do not implement this method, Texture will fall back to calling @c collectionView:layout:referenceSizeForHeaderInSection:
  * and using that as the exact size range. If you don't implement that method, Texture will read the @c headerReferenceSize from the layout.
  */
-- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode layoutContextForHeaderInSection:(NSInteger)section withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+- (ASLayoutContext *)collectionNode:(ASCollectionNode *)collectionNode layoutContextForHeaderInSection:(NSInteger)section withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Asks the delegate for the layout context that should be used to measure the footer in the given flow layout section.
@@ -469,7 +469,7 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
  * @return The layout context for the footer, or a layout context with zero min and max sizes if there is no footer in this section.
  *
  * If you want the footer to completely determine its own size, return a layout context with an unconstrained size range,
- * created via ASLayoutContextMakeWithUnconstrainedSizeRange().
+ * created via +[ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:].
  *
  * @note Only the scrollable dimension of the sizes in the returned layout context will be used. In a vertical flow,
  * only the height will be used. In a horizontal flow, only the width will be used. The other dimension
@@ -478,7 +478,7 @@ ASDISPLAYNODE_DEPRECATED_MSG("Renamed to ASCollectionDelegate.")
  * @discussion If you do not implement this method, Texture will fall back to calling @c collectionView:layout:referenceSizeForFooterInSection:
  * and using that as the exact size range. If you don't implement that method, Texture will read the @c footerReferenceSize from the layout.
  */
-- (ASLayoutContext)collectionNode:(ASCollectionNode *)collectionNode layoutContextForFooterInSection:(NSInteger)section withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+- (ASLayoutContext *)collectionNode:(ASCollectionNode *)collectionNode layoutContextForFooterInSection:(NSInteger)section withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Asks the delegate for the size of the header in the specified section.

@@ -62,10 +62,10 @@ ASLayoutElementStyleExtensibilityForwarding
 
 ASLayoutElementLayoutCalculationDefaults
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
-  ASDisplayNodeAssert(CGSizeEqualToSize(_itemSize, ASLayoutContextClamp(layoutContext, _itemSize)),
-                      @"Item size %@ can't fit within the bounds of constrained size %@", NSStringFromCGSize(_itemSize), NSStringFromASLayoutContext(layoutContext));
+  ASDisplayNodeAssert(CGSizeEqualToSize(_itemSize, [layoutContext clamp:_itemSize]),
+                      @"Item size %@ can't fit within the bounds of constrained size %@", NSStringFromCGSize(_itemSize), layoutContext);
   return [ASLayout layoutWithLayoutElement:self size:_itemSize];
 }
 

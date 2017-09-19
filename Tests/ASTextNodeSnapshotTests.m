@@ -39,7 +39,9 @@
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"judar"
                                                             attributes:@{NSFontAttributeName : [UIFont italicSystemFontOfSize:24]}];
   textNode.textContainerInset = UIEdgeInsetsMake(0, 2, 0, 2);
-  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault()));
+
+  ASLayoutContext *unconstrainedLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(textNode, unconstrainedLayoutContext);
   
   ASSnapshotVerifyNode(textNode, nil);
 }
@@ -54,8 +56,11 @@
                                                             attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:30] }];
   
   textNode.textContainerInset = UIEdgeInsetsMake(10, 10, 10, 10);
-  
-  ASLayout *layout = [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 80), ASPrimitiveTraitCollectionMakeDefault())];
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero
+                                                                     maxSize:CGSizeMake(100, 80)
+                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASLayout *layout = [textNode layoutThatFits:layoutContext];
   textNode.frame = CGRectMake(50, 50, layout.size.width, layout.size.height);
 
   [backgroundView addSubview:textNode.view];
@@ -77,7 +82,10 @@
                                                             attributes:@{ NSFontAttributeName : [UIFont systemFontOfSize:30] }];
 
   textNode.textContainerInset = UIEdgeInsetsMake(5, 10, 10, 5);
-  ASLayout *layout = [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault())];
+
+  ASLayoutContext * layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASLayout *layout = [textNode layoutThatFits:layoutContext];
+
   textNode.frame = CGRectMake(50, 50, layout.size.width, layout.size.height);
 
   [backgroundView addSubview:textNode.view];
@@ -94,7 +102,8 @@
 {
   ASTextNode *textNode = [[ASTextNode alloc] init];
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
-  [textNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 50), ASPrimitiveTraitCollectionMakeDefault())];
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:CGSizeMake(100, 50) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  [textNode layoutThatFits:layoutContext];
   ASSnapshotVerifyNode(textNode, nil);
 }
 
@@ -104,7 +113,8 @@
   textNode.attributedText = [[NSAttributedString alloc] initWithString:@"Quality is Important" attributes:@{ NSForegroundColorAttributeName: [UIColor blueColor], NSFontAttributeName: [UIFont italicSystemFontOfSize:24] }];
   // Set exclusion paths to trigger slow path
   textNode.exclusionPaths = @[ [UIBezierPath bezierPath] ];
-  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 50), ASPrimitiveTraitCollectionMakeDefault()));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:CGSizeMake(100, 50) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(textNode, layoutContext);
   ASSnapshotVerifyNode(textNode, nil);
 }
 
@@ -116,7 +126,8 @@
   textNode.shadowOpacity = 0.3;
   textNode.shadowRadius = 3;
   textNode.shadowOffset = CGSizeMake(0, 1);
-  ASDisplayNodeSizeToFitLayoutContext(textNode, ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault()));
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  ASDisplayNodeSizeToFitLayoutContext(textNode, layoutContext);
   ASSnapshotVerifyNode(textNode, nil);
 }
 

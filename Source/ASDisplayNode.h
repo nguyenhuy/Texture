@@ -61,7 +61,7 @@ typedef void (^ASDisplayNodeContextModifier)(CGContextRef context, id _Nullable 
 /**
  * ASDisplayNode layout spec block. This block can be used instead of implementing layoutSpecThatFits: in subclass
  */
-typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext layoutContext);
+typedef ASLayoutSpec * _Nonnull(^ASLayoutSpecBlock)(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext *layoutContext);
 
 /**
  * AsyncDisplayKit non-fatal error block. This block can be used for handling non-fatal errors. Useful for reporting
@@ -785,7 +785,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
  */
-- (ASLayout *)layoutThatFits:(ASLayoutContext)layoutContext;
+- (ASLayout *)layoutThatFits:(ASLayoutContext *)layoutContext;
 
 @end
 
@@ -809,7 +809,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  * an exception. A future version of the framework may support using both, calling them serially, with the
  * .layoutSpecBlock superseding any values set by the method override.
  *
- * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext layoutContext) {};
+ * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASLayoutContext *layoutContext) {};
  */
 @property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
 
@@ -830,7 +830,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @return The context used by -layoutThatFits:.
  */
-@property (nonatomic, readonly, assign) ASLayoutContext contextForCalculatedLayout;
+@property (nonatomic, readonly, strong) ASLayoutContext *contextForCalculatedLayout;
 
 @end
 
@@ -879,7 +879,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  * @see animateLayoutTransition:
  */
-- (void)transitionLayoutWithLayoutContext:(ASLayoutContext)layoutContext
+- (void)transitionLayoutWithLayoutContext:(ASLayoutContext *)layoutContext
                                  animated:(BOOL)animated
                        shouldMeasureAsync:(BOOL)shouldMeasureAsync
                     measurementCompletion:(nullable void(^)(void))completion;

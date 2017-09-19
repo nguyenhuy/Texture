@@ -41,7 +41,7 @@ extern NSString * const ASTransitionContextToLayoutKey;
 /**
  * @abstract Retrieve either the "from" or "to" layout context
  */
-- (ASLayoutContext)layoutContextForKey:(NSString *)key;
+- (ASLayoutContext *)layoutContextForKey:(NSString *)key;
 
 /**
  * @abstract Retrieve either the "from" or "to" constrainedSize

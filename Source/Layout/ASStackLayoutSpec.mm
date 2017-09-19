@@ -134,7 +134,7 @@
   _spacing = spacing;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   NSArray *children = self.children;
   if (children.count == 0) {

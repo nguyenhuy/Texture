@@ -61,6 +61,7 @@ ASDISPLAYNODE_INLINE void ASLayoutElementSizeConstrain(CGFloat minVal, CGFloat e
     }
 }
 
+// TODO Change to use min and max CGSizes
 ASLayoutContext *ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection, ASLayoutContext *autoLayoutContext)
 {
   CGSize resolvedExact = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.width, size.height), parentSize, {NAN, NAN});

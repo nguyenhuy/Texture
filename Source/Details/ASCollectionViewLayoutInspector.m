@@ -25,7 +25,7 @@
 
 // Returns a constrained size to let the cells layout itself as far as possible based on the scrollable direction
 // of the collection view
-ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection) {
+ASLayoutContext *NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection) {
   CGSize maxSize = collectionView.bounds.size;
   UIEdgeInsets contentInset = collectionView.contentInset;
   if (ASScrollDirectionContainsHorizontalDirection(collectionView.scrollableDirections)) {
@@ -35,7 +35,7 @@ ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collection
     maxSize.width -= (contentInset.left + contentInset.right);
     maxSize.height = CGFLOAT_MAX;
   }
-  return ASLayoutContextMake(CGSizeZero, maxSize, traitCollection);
+  return [ASLayoutContext layoutContextWithMinSize:CGSizeZero maxSize:maxSize traitCollection:traitCollection];
 }
 
 #pragma mark - ASCollectionViewLayoutInspector
@@ -61,28 +61,31 @@ ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collection
   }
 }
 
-- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+- (ASLayoutContext *)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   ASCollectionNode *collectionNode = collectionView.collectionNode;
-  ASLayoutContext result;
+  ASLayoutContext *unconstrainedLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:traitCollection];
+  ASLayoutContext *result;
   if (_delegateFlags.implementsLayoutContextForItemAtIndexPathWithTraitCollection) {
     result = [collectionView.asyncDelegate collectionNode:collectionNode layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   } else if (_delegateFlags.implementsConstrainedSizeForItemAtIndexPathDeprecated) {
-    result = [collectionView.asyncDelegate collectionNode:collectionNode constrainedSizeForItemAtIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[collectionView.asyncDelegate collectionNode:collectionNode constrainedSizeForItemAtIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
   } else if (_delegateFlags.implementsConstrainedSizeForNodeAtIndexPathDeprecated) {
-    result = [collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
 #pragma clang diagnostic pop
   } else {
     // With 2.0 `collectionView:constrainedSizeForNodeAtIndexPath:` was moved to the delegate. Assert if not implemented on the delegate but on the data source
     ASDisplayNodeAssert([collectionView.asyncDataSource respondsToSelector:@selector(collectionView:constrainedSizeForNodeAtIndexPath:)] == NO, @"collectionView:constrainedSizeForNodeAtIndexPath: was moved from the ASCollectionDataSource to the ASCollectionDelegate.");
-    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+    result = unconstrainedLayoutContext;
   }
 
-  if (ASLayoutContextEqualToLayoutContext(result, ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection))) {
+  if ([result isEqual:unconstrainedLayoutContext]) {
     result = NodeLayoutContextForScrollDirection(collectionView, traitCollection);
   }
   return result;

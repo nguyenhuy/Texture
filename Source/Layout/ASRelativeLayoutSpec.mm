@@ -58,7 +58,7 @@
   _sizingOption = sizingOption;
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   // If we have a finite size in any direction, pass this so that the child can resolve percentages against it.
   // Otherwise pass ASLayoutElementParentDimensionUndefined as the size will depend on the content
@@ -72,19 +72,22 @@
     (_horizontalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : layoutContext.min.width,
     (_verticalPosition != ASRelativeLayoutSpecPositionNone) ? 0 : layoutContext.min.height,
   };
-  ASLayout *sublayout = [self.child layoutThatFits:ASLayoutContextMake(minChildSize, layoutContext.max, layoutContext.traitCollection) parentSize:size];
+  ASLayoutContext *sublayoutContext = [ASLayoutContext layoutContextWithMinSize:minChildSize
+                                                                        maxSize:layoutContext.max
+                                                                traitCollection:layoutContext.traitCollection];
+  ASLayout *sublayout = [self.child layoutThatFits:sublayoutContext parentSize:size];
   
   // If we have an undetermined height or width, use the child size to define the layout size
-  size = ASLayoutContextClamp(layoutContext, {
+  size = [layoutContext clamp:{
     isfinite(size.width) == NO ? sublayout.size.width : size.width,
     isfinite(size.height) == NO ? sublayout.size.height : size.height
-  });
+  }];
   
   // If minimum size options are set, attempt to shrink the size to the size of the child
-  size = ASLayoutContextClamp(layoutContext, {
+  size = [layoutContext clamp:{
     MIN(size.width, (_sizingOption & ASRelativeLayoutSpecSizingOptionMinimumWidth) != 0 ? sublayout.size.width : size.width),
     MIN(size.height, (_sizingOption & ASRelativeLayoutSpecSizingOptionMinimumHeight) != 0 ? sublayout.size.height : size.height)
-  });
+  }];
   
   // Compute the position for the child on each axis according to layout parameters
   CGFloat xPosition = [self proportionOfAxisForAxisPosition:_horizontalPosition];

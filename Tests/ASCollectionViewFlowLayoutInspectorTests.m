@@ -152,10 +152,10 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(collectionView.bounds.size.width, 125.0) traitCollection:traitCollection];
 
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -176,9 +176,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(collectionView.bounds.size.width, 125.0) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -200,9 +200,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(collectionView.bounds.size.width, 125.0) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -222,9 +222,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(collectionView.bounds.size.width, 125.0), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(collectionView.bounds.size.width, 125.0) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -247,9 +247,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(125.0, collectionView.bounds.size.height) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -270,9 +270,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(125.0, collectionView.bounds.size.height) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the values returned in the delegate implementation");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -294,9 +294,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.width), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(125.0, collectionView.bounds.size.width) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -316,9 +316,9 @@
   
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeMake(125.0, collectionView.bounds.size.height), traitCollection);
-  ASXCTAssertEqualLayoutContexts(context, contextCompare, @"should have a size constrained by the size set on the layout");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  ASLayoutContext *contextCompare = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(125.0, collectionView.bounds.size.height) traitCollection:traitCollection];
+  XCTAssertEqualObjects(context, contextCompare, @"should have a size constrained by the size set on the layout");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -334,9 +334,8 @@
   collectionView.asyncDelegate = delegate;
   ASCollectionViewFlowLayoutInspector *inspector = ASDynamicCast(collectionView.layoutInspector, ASCollectionViewFlowLayoutInspector);
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
-  ASLayoutContext contextCompare = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
-  XCTAssert(CGSizeEqualToSize(context.min, contextCompare.min) && CGSizeEqualToSize(context.max, contextCompare.max), @"should have a zero size");
+  ASLayoutContext *context = [inspector collectionView:collectionView layoutContextForSupplementaryNodeOfKind:UICollectionElementKindSectionFooter atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] withTraitCollection:traitCollection];
+  XCTAssert(CGSizeEqualToSize(context.min, CGSizeZero) && CGSizeEqualToSize(context.max, CGSizeZero), @"should have a zero size");
   
   collectionView.asyncDataSource = nil;
   collectionView.asyncDelegate = nil;
@@ -401,9 +400,9 @@
   
   id dataSourceAndDelegate = [OCMockObject mockForProtocol:@protocol(InspectorTestDataSourceDelegateProtocol)];
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithZeroSizeAndTraitCollection:traitCollection];
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext)];
+  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext *)];
   [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
   node.dataSource = dataSourceAndDelegate;
   
@@ -427,9 +426,9 @@
   ASCollectionView *collectionView = node.view;
   id dataSourceAndDelegate = [OCMockObject mockForProtocol:@protocol(InspectorTestDataSourceDelegateProtocol)];
   ASPrimitiveTraitCollection traitCollection = ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeZero, traitCollection);
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithZeroSizeAndTraitCollection:traitCollection];
   NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:0];
-  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext)];
+  NSValue *value = [NSValue value:&layoutContext withObjCType:@encode(ASLayoutContext *)];
   
   [[[dataSourceAndDelegate stub] andReturnValue:value] collectionNode:node layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
   node.dataSource = dataSourceAndDelegate;

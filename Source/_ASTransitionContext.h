@@ -30,7 +30,7 @@
 - (NSArray<ASDisplayNode *> *)removedSubnodesWithTransitionContext:(_ASTransitionContext *)context;
 
 - (ASLayout *)transitionContext:(_ASTransitionContext *)context layoutForKey:(NSString *)key;
-- (ASLayoutContext)transitionContext:(_ASTransitionContext *)context layoutContextForKey:(NSString *)key;
+- (ASLayoutContext *)transitionContext:(_ASTransitionContext *)context layoutContextForKey:(NSString *)key;
 
 @end
 

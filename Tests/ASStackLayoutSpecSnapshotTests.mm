@@ -75,7 +75,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
 - (void)testStackLayoutSpecWithJustify:(ASStackLayoutJustifyContent)justify
                             flexFactor:(CGFloat)flex
-                         layoutContext:(ASLayoutContext)layoutContext
+                         layoutContext:(ASLayoutContext *)layoutContext
                             identifier:(NSString *)identifier
 {
   ASStackLayoutSpecStyle style = {
@@ -89,7 +89,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 }
 
 - (void)testStackLayoutSpecWithStyle:(ASStackLayoutSpecStyle)style
-                       layoutContext:(ASLayoutContext)layoutContext
+                       layoutContext:(ASLayoutContext *)layoutContext
                             subnodes:(NSArray *)subnodes
                           identifier:(NSString *)identifier
 {
@@ -98,7 +98,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
 - (void)testStackLayoutSpecWithStyle:(ASStackLayoutSpecStyle)style
                             children:(NSArray *)children
-                       layoutContext:(ASLayoutContext)layoutContext
+                       layoutContext:(ASLayoutContext *)layoutContext
                             subnodes:(NSArray *)subnodes
                           identifier:(NSString *)identifier
 {
@@ -130,7 +130,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.verticalAlignment = verticalAlignment;
   
   CGSize exactSize = CGSizeMake(200, 200);
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake(exactSize, exactSize, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithExactSize:exactSize traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:subnodes identifier:identifier];
 }
 
@@ -145,12 +145,12 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.children = textNodes;
   stackLayoutSpec.alignItems = baselineAlignment;
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(150, 0) maxSize:CGSizeMake(150, CGFLOAT_MAX) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:textNodes identifier:identifier];
 }
 
 - (void)testStackLayoutSpec:(ASStackLayoutSpec *)stackLayoutSpec
-              layoutContext:(ASLayoutContext)layoutContext
+              layoutContext:(ASLayoutContext *)layoutContext
                    subnodes:(NSArray *)subnodes
                  identifier:(NSString *)identifier
 {
@@ -165,7 +165,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
 - (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
                                 lineSpacing:(CGFloat)lineSpacing
-                              layoutContext:(ASLayoutContext)layoutContext
+                              layoutContext:(ASLayoutContext *)layoutContext
                                  identifier:(NSString *)identifier
 {
   ASStackLayoutSpecStyle style = {
@@ -189,7 +189,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 }
 
 - (void)testStackLayoutSpecWithAlignContent:(ASStackLayoutAlignContent)alignContent
-                              layoutContext:(ASLayoutContext)layoutContext
+                              layoutContext:(ASLayoutContext *)layoutContext
                                  identifier:(NSString *)identifier
 {
   [self testStackLayoutSpecWithAlignContent:alignContent lineSpacing:0.0 layoutContext:layoutContext identifier:identifier];
@@ -213,7 +213,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testUnderflowBehaviors
 {
   // width 300px; height 0-300px
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyStart"];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyCenter"];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyEnd"];
@@ -225,7 +225,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 - (void)testOverflowBehaviors
 {
   // width 110px; height 0-300px
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 0}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{110, 0} maxSize:{110, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentStart flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyStart"];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentCenter flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyCenter"];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentEnd flexFactor:0 layoutContext:kLayoutContext identifier:@"justifyEnd"];
@@ -244,7 +244,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.flexShrink = 1;
   
   // Width is 75px--that's less than the sum of the widths of the children, which is 100px.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({75, 0}, {75, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{75, 0} maxSize:{75, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -256,11 +256,11 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 150}, subnodes[1]);
 
   // width 300px; height 0-150px.
-  static ASLayoutContext kUnderflowSize = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kUnderflowSize = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
   
   // width 200px; height 0-150px.
-  static ASLayoutContext kOverflowSize = ASLayoutContextMake({200, 0}, {200, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kOverflowSize = [ASLayoutContext layoutContextWithMinSize:{200, 0} maxSize:{200, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kOverflowSize subnodes:subnodes identifier:@"overflow"];
 }
 
@@ -274,11 +274,11 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 50}, subnodes[2]);
   
   // width 0-300px; height 300px
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{0, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
   
   // width 300px; height 300px
-  static ASLayoutContext kFixedHeight = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kFixedHeight = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kFixedHeight subnodes:subnodes identifier:@"fixedHeight"];
 }
 
@@ -295,7 +295,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   setCGSizeToNode({150, 50}, subnodes[2]);
 
   // width 0-300px; height 300px
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{0, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
 }
 
@@ -320,14 +320,14 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     background:backgroundNode]];
   
   // width 300px; height 0-300px
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testLayoutSpec:layoutSpec layoutContext:kVariableHeight subnodes:@[backgroundNode] identifier:@"variableHeight"];
 }
 
 - (void)testChildSpacing
 {
   // width 0-INF; height 0-INF
-  static ASLayoutContext kAnySize = ASLayoutContextMake({0, 0}, {INFINITY, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kAnySize = [ASLayoutContext layoutContextWithMinSize:{0, 0} maxSize:{INFINITY, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   ASStackLayoutSpecStyle style = {.direction = ASStackLayoutDirectionVertical};
 
   NSArray<ASDisplayNode *> *subnodes = defaultSubnodes();
@@ -372,7 +372,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[2].style.spacingBefore = 30;
 
   // width 0-300px; height 300px
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({0, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{0, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:subnodes identifier:@"variableHeight"];
 }
 
@@ -386,7 +386,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
   // width 300px; height 0-INF
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:@[child] identifier:nil];
 }
 
@@ -400,21 +400,21 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
   // width 300px; height 0-INF
-  static ASLayoutContext kVariableHeight = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableHeight = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableHeight subnodes:@[child] identifier:nil];
 }
 
 - (void)testJustifiedSpaceBetweenWithRemainingSpace
 {
   // width 301px; height 0-300px;
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({301, 0}, {301, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{301, 0} maxSize:{301, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceBetween flexFactor:0 layoutContext:kLayoutContext identifier:nil];
 }
 
 - (void)testJustifiedSpaceAroundWithRemainingSpace
 {
   // width 305px; height 0-300px;
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({305, 0}, {305, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{305, 0} maxSize:{305, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithJustify:ASStackLayoutJustifyContentSpaceAround flexFactor:0 layoutContext:kLayoutContext identifier:nil];
 }
 
@@ -430,7 +430,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   child1.style.flexGrow = 1;
   child1.style.flexShrink = 1;
   
-  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kFixedWidth = [ASLayoutContext layoutContextWithMinSize:{150, 0} maxSize:{150, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style children:@[child1, subnode2] layoutContext:kFixedWidth subnodes:@[subnode1, subnode2] identifier:nil];
 }
 
@@ -448,7 +448,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[0].style.flexShrink = 1;
   subnodes[1].style.flexShrink = 1;
 
-  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, 100}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kFixedWidth = [ASLayoutContext layoutContextWithMinSize:{150, 0} maxSize:{150, 100} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kFixedWidth subnodes:subnodes identifier:nil];
 }
 
@@ -462,7 +462,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnode2.style.alignSelf = ASStackLayoutAlignSelfCenter;
 
   NSArray<ASDisplayNode *> *subnodes = @[subnode1, subnode2];
-  static ASLayoutContext kFixedWidth = ASLayoutContextMake({150, 0}, {150, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kFixedWidth = [ASLayoutContext layoutContextWithMinSize:{150, 0} maxSize:{150, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kFixedWidth subnodes:subnodes identifier:nil];
 }
 
@@ -483,7 +483,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kExactSize = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
@@ -504,7 +504,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kExactSize = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
@@ -525,7 +525,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASLayoutContext kExactSize = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kExactSize = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kExactSize subnodes:subnodes identifier:nil];
 }
 
@@ -546,7 +546,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASLayoutContext kVariableSize = ASLayoutContextMake({200, 200}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableSize = [ASLayoutContext layoutContextWithMinSize:{200, 200} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   // all children should be 200px wide
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableSize subnodes:subnodes identifier:nil];
 }
@@ -568,14 +568,14 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   subnodes[1].style.spacingBefore = 20;
   subnodes[2].style.spacingBefore = 30;
 
-  static ASLayoutContext kVariableSize = ASLayoutContextMake({50, 50}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableSize = [ASLayoutContext layoutContextWithMinSize:{50, 50} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   // all children should be 150px wide
   [self testStackLayoutSpecWithStyle:style layoutContext:kVariableSize subnodes:subnodes identifier:nil];
 }
 
 - (void)testEmptyStack
 {
-  static ASLayoutContext kVariableSize = ASLayoutContextMake({50, 50}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kVariableSize = [ASLayoutContext layoutContextWithMinSize:{50, 50} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:{} layoutContext:kVariableSize subnodes:@[] identifier:nil];
 }
 
@@ -592,11 +592,11 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   }
 
   // width 300px; height 0-150px.
-  static ASLayoutContext kUnderflowSize = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kUnderflowSize = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kUnderflowSize subnodes:subnodes identifier:@"underflow"];
 
   // width 200px; height 0-150px.
-  static ASLayoutContext kOverflowSize = ASLayoutContextMake({200, 0}, {200, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kOverflowSize = [ASLayoutContext layoutContextWithMinSize:{200, 0} maxSize:{200, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kOverflowSize subnodes:subnodes identifier:@"overflow"];
 }
 
@@ -613,7 +613,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The result should be that the red box is twice as wide as the blue and gree boxes after flexing.
   subnodes[0].style.flexBasis = ASDimensionMakeWithFraction(0.5);
 
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({200, 0}, {200, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{200, 0} maxSize:{200, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -630,7 +630,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     subnode.style.flexBasis = ASDimensionMakeWithPoints(20);
   }
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, 150}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, 150} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -668,7 +668,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
     ]
    background:subnodes[0]];
 
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 0} maxSize:{300, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testLayoutSpec:layoutSpec layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -682,7 +682,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 350 results in a positive violation of 200.
   // Due to each flexible subnode specifying a flex grow factor of 1 the violation will be distributed evenly.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{350, 350} maxSize:{350, 350} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -696,7 +696,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 350 results in a positive violation of 200.
   // Due to each flexible child component specifying a flex grow factor of 0.5 the violation will be distributed evenly.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{350, 350} maxSize:{350, 350} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -712,7 +712,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 350 results in a positive violation of 200.
   // The first and third subnodes specify a flex grow factor of 1 and will flex by 50.
   // The second subnode specifies a flex grow factor of 2 and will flex by 100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{350, 350} maxSize:{350, 350} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -728,7 +728,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 350 results in a positive violation of 200.
   // The first and third child components specify a flex grow factor of 0.25 and will flex by 50.
   // The second child component specifies a flex grow factor of 0.25 and will flex by 100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({350, 350}, {350, 350}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{350, 350} maxSize:{350, 350} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -748,7 +748,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a positive violation of 200.
   // The first and third subnode specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second and fourth subnode specify a flex grow factor of 1 and will flex by 100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -768,7 +768,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a positive violation of 200.
   // The first and third child components specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second and fourth child components specify a flex grow factor of 0.5 and will flex by 100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -789,7 +789,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third subnodes specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second child subnode specifies a flex grow factor of 3 and will flex by 150.
   // The fourth child subnode specifies a flex grow factor of 1 and will flex by 50.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -810,7 +810,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third child components specify a flex shrink factor of 1 and 0, respectively. They won't flex.
   // The second child component specifies a flex grow factor of 0.75 and will flex by 150.
   // The fourth child component specifies a flex grow factor of 0.25 and will flex by 50.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -830,7 +830,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 300 results in a positive violation of 175.
   // The second and third subnodes specify a flex grow factor of 1 and will flex by 88 and 87, respectively.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -850,7 +850,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // In this scenario a width of 300 results in a positive violation of 175.
   // The second and third child components specify a flex grow factor of 0.5 and will flex by 88 and 87, respectively.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -870,7 +870,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 1 and will flex by -120 and -80, respectively.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -890,7 +890,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.5 and will flex by -120 and -80, respectively.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -911,7 +911,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 2 and will flex by -109 and -72, respectively.
   // The second subnode specifies a flex shrink factor of 1 and will flex by -18.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -932,7 +932,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.4 and will flex by -109 and -72, respectively.
   // The second child component specifies a flex shrink factor of 0.2 and will flex by -18.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -952,7 +952,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second and fourth subnodes specify a flex grow factor of 1 and will flex by -100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -972,7 +972,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second and fourth child components specify a flex shrink factor of 0.5 and will flex by -100.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -996,7 +996,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third subnodes specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second subnode specifies a flex grow factor of 1 and will flex by -28.
   // The fourth subnode specifies a flex grow factor of 3 and will flex by -171.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1020,7 +1020,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // The first and third child components specify a flex grow factor of 1 and 0, respectively. They won't flex.
   // The second child component specifies a flex shrink factor of 0.25 and will flex by -28.
   // The fourth child component specifies a flex shrink factor of 0.75 and will flex by -171.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1041,7 +1041,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third subnodes specify a flex shrink factor of 1 and will flex by 50.
   // The second subnode specifies a flex shrink factor of 2 and will flex by -57. It will have a width of 43.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1062,7 +1062,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 400 results in a negative violation of 200.
   // The first and third child components specify a flex shrink factor of 0.25 and will flex by 50.
   // The second child specifies a flex shrink factor of 0.50 and will flex by -57. It will have a width of 43.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({400, 400}, {400, 400}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{400, 400} maxSize:{400, 400} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1082,7 +1082,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // In this scenario a width of 40 results in a negative violation of 10.
   // The first child will not flex.
   // The second child specifies a flex shrink factor of 1 but it has a zero size, so the factor won't be respected and it will not shrink.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 50}, {40, 50}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{40, 50} maxSize:{40, 50} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1097,7 +1097,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   stackLayoutSpec.children = @[child];
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {300, INFINITY}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{0, 0} maxSize:{300, INFINITY} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:@[child] identifier:nil];
 }
 
@@ -1179,7 +1179,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   NSArray<ASDisplayNode *> *subnodes = @[textNodes[0], textNodes[1], stretchedNode];
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(150, 0), CGSizeMake(150, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(150, 0) maxSize:CGSizeMake(150, CGFLOAT_MAX) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:horizontalStack layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1192,7 +1192,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.alignItems = ASStackLayoutAlignItemsBaselineFirst;
   stackLayoutSpec.justifyContent = ASStackLayoutJustifyContentSpaceBetween;
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(300, 0) maxSize:CGSizeMake(300, CGFLOAT_MAX) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:textNodes identifier:nil];
 }
 
@@ -1215,7 +1215,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   stackLayoutSpec.alignItems = ASStackLayoutAlignItemsBaselineLast;
   stackLayoutSpec.justifyContent = ASStackLayoutJustifyContentSpaceBetween;
   
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake(CGSizeMake(300, 0), CGSizeMake(300, CGFLOAT_MAX), ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(300, 0) maxSize:CGSizeMake(300, CGFLOAT_MAX) traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpec:stackLayoutSpec layoutContext:kLayoutContext subnodes:children identifier:nil];
 }
 
@@ -1247,7 +1247,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // width is 230px, enough to fit all items without taking all spacings into account
   // Test that all spacings are included and therefore the last item is pushed to a second line.
   // See: https://github.com/TextureGroup/Texture/pull/472
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({230, 300}, {230, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{230, 300} maxSize:{230, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1286,7 +1286,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // width is 190px, enough to fit 3 items into a line
   // Test that interitem spacing is reset on new lines. Otherwise, lines after the 1st line would have only 2 items.
   // See: https://github.com/TextureGroup/Texture/pull/472
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({190, 300}, {190, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{190, 300} maxSize:{190, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1296,7 +1296,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 {
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 300}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{110, 300} maxSize:{110, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:@"alignContentStart"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:@"alignContentCenter"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:@"alignContentEnd"];
@@ -1309,7 +1309,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
 {
   // 6 lines, each line has 1 item, each item has a size of {50, 50}
   // width is 40px. It's 10px smaller than the width of each item (40px vs 50px) to test that items are still correctly collected into lines
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 260}, {40, 260}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{40, 260} maxSize:{40, 260} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:@"alignContentStart"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:@"alignContentCenter"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:@"alignContentEnd"];
@@ -1322,7 +1322,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
   // height is unconstrained. It causes no cross size violation and the end results are all similar to ASStackLayoutAlignContentStart.
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 0}, {110, CGFLOAT_MAX}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{110, 0} maxSize:{110, CGFLOAT_MAX} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart layoutContext:kLayoutContext identifier:nil];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter layoutContext:kLayoutContext identifier:nil];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd layoutContext:kLayoutContext identifier:nil];
@@ -1359,7 +1359,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 300}, {110, 300}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{110, 300} maxSize:{110, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithStyle:style layoutContext:kLayoutContext subnodes:subnodes identifier:nil];
 }
 
@@ -1370,7 +1370,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 3 lines, each line has 2 items, each item has a size of {50, 50}
   // 10px between lines
   // width is 110px. It's 10px bigger than the required width of each line (110px vs 100px) to test that items are still correctly collected into lines
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({110, 320}, {110, 320}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{110, 320} maxSize:{110, 320} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentStart"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentCenter"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentEnd"];
@@ -1384,7 +1384,7 @@ static NSArray<ASTextNode*> *defaultTextNodes()
   // 6 lines, each line has 1 item, each item has a size of {50, 50}
   // 10px between lines
   // width is 40px. It's 10px smaller than the width of each item (40px vs 50px) to test that items are still correctly collected into lines
-  static ASLayoutContext kLayoutContext = ASLayoutContextMake({40, 310}, {40, 310}, ASPrimitiveTraitCollectionMakeDefault());
+  static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{40, 310} maxSize:{40, 310} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentStart lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentStart"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentCenter lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentCenter"];
   [self testStackLayoutSpecWithAlignContent:ASStackLayoutAlignContentEnd lineSpacing:10 layoutContext:kLayoutContext identifier:@"alignContentEnd"];

@@ -17,7 +17,8 @@
 
 #pragma once
 
-#import <AsyncDisplayKit/ASDimension.h>
+#import <UIKit/UIGeometry.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 
 @class ASLayout;
 
@@ -27,7 +28,7 @@
  */
 struct ASDisplayNodeLayout {
   ASLayout *layout;
-  ASLayoutContext layoutContext;
+  ASLayoutContext *layoutContext;
   CGSize parentSize;
   BOOL requestedLayoutFromAbove;
   NSUInteger version;
@@ -39,17 +40,17 @@ struct ASDisplayNodeLayout {
    * @param parentSize Parent size used to create the layout
    * @param version The version of the source layout data – see ASDisplayNode's _layoutVersion. 
    */
-  ASDisplayNodeLayout(ASLayout *layout, ASLayoutContext layoutContext, CGSize parentSize, NSUInteger version)
+  ASDisplayNodeLayout(ASLayout *layout, ASLayoutContext *layoutContext, CGSize parentSize, NSUInteger version)
   : layout(layout), layoutContext(layoutContext), parentSize(parentSize), requestedLayoutFromAbove(NO), version(version) {};
   
   /*
    * Creates a layout without any layout associated. By default this display node layout is dirty.
    */
   ASDisplayNodeLayout()
-  : layout(nil), layoutContext(ASLayoutContextMakeWithZeroSize(ASPrimitiveTraitCollectionMakeDefault())), parentSize({0, 0}), requestedLayoutFromAbove(NO), version(0) {};
+  : layout(nil), layoutContext([ASLayoutContext layoutContextWithZeroSizeAndTraitCollection:(ASPrimitiveTraitCollectionMakeDefault())]), parentSize({0, 0}), requestedLayoutFromAbove(NO), version(0) {};
   
   /**
    * Returns whether this is valid for a given layout context, parent size, and version
    */
-  BOOL isValid(ASLayoutContext layoutContext, CGSize parentSize, NSUInteger version);
+  BOOL isValid(ASLayoutContext *layoutContext, CGSize parentSize, NSUInteger version);
 };

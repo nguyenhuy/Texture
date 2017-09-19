@@ -73,9 +73,9 @@
                                                                         children:children];
   stackSpec.concurrent = YES;
 
-  ASLayoutContext stackLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(context.viewportSize,
-                                                                                              context.scrollableDirections,
-                                                                                              context.traitCollection);
+  ASLayoutContext *stackLayoutContext = ASLayoutContextForCollectionLayoutThatFitsViewportSize(context.viewportSize,
+                                                                                               context.scrollableDirections,
+                                                                                               context.traitCollection);
   ASLayout *layout = [stackSpec layoutThatFits:stackLayoutContext];
 
   return [[ASCollectionLayoutState alloc] initWithContext:context layout:layout getElementBlock:^ASCollectionElement * _Nullable(ASLayout * _Nonnull sublayout) {

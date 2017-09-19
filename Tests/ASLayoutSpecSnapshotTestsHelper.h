@@ -33,7 +33,7 @@
  They will be added to the host in the same order as the array.
  */
 - (void)testLayoutSpec:(ASLayoutSpec *)layoutSpec
-         layoutContext:(ASLayoutContext)layoutContext
+         layoutContext:(ASLayoutContext *)layoutContext
               subnodes:(NSArray *)subnodes
             identifier:(NSString *)identifier;
 @end

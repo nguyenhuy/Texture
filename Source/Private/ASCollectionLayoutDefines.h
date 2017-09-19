@@ -13,15 +13,16 @@
 #import <UIKit/UIKit.h>
 
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASScrollDirection.h>
 #import <AsyncDisplayKit/ASTraitCollection.h>
+
+@class ASLayoutContext;
 
 NS_ASSUME_NONNULL_BEGIN
 
 ASDISPLAYNODE_EXTERN_C_BEGIN
 
-FOUNDATION_EXPORT ASLayoutContext ASLayoutContextForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections, ASPrimitiveTraitCollection traitCollection) AS_WARN_UNUSED_RESULT;
+FOUNDATION_EXPORT ASLayoutContext *ASLayoutContextForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections, ASPrimitiveTraitCollection traitCollection) AS_WARN_UNUSED_RESULT;
 
 ASDISPLAYNODE_EXTERN_C_END
 

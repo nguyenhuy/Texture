@@ -249,7 +249,7 @@ static NSString * const kRate = @"rate";
   }
 }
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   __instanceLock__.lock();
   ASDisplayNode *playerNode = _playerNode;
@@ -266,13 +266,13 @@ static NSString * const kRate = @"rate";
   NSArray *sublayouts = nil;
   if (playerNode != nil) {
     // The _playerNode wraps AVPlayerLayer, and therefore should extend across the entire video node.
-    ASLayoutContext playerNodeLayoutContext = ASLayoutContextMake(calculatedSize, layoutContext.traitCollection);
+    ASLayoutContext *playerNodeLayoutContext = [ASLayoutContext layoutContextWithExactSize:calculatedSize traitCollection:layoutContext.traitCollection];
     CGSize playerNodeSize = [playerNode layoutThatFits:playerNodeLayoutContext].size;
     ASLayout *playerNodeSublayout = [ASLayout layoutWithLayoutElement:playerNode size:playerNodeSize position:CGPointZero sublayouts:nil];
     sublayouts = @[playerNodeSublayout];
   }
 
-  return [ASLayout layoutWithLayoutElement:self size:ASLayoutContextClamp(layoutContext, calculatedSize) sublayouts:sublayouts];
+  return [ASLayout layoutWithLayoutElement:self size:[layoutContext clamp:calculatedSize] sublayouts:sublayouts];
 }
 
 - (void)generatePlaceholderImage

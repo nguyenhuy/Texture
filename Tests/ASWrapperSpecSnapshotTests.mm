@@ -28,7 +28,7 @@
 {
   ASDisplayNode *child = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   
-  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault());
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testWithChildren:@[child] layoutContext:layoutContext identifier:nil];
 }
 
@@ -37,11 +37,11 @@
   ASDisplayNode *firstChild = ASDisplayNodeWithBackgroundColor([UIColor redColor], {50, 50});
   ASDisplayNode *secondChild = ASDisplayNodeWithBackgroundColor([UIColor greenColor], {100, 100});
   
-  ASLayoutContext layoutContext = ASLayoutContextMake(CGSizeZero, CGSizeMake(INFINITY, INFINITY), ASPrimitiveTraitCollectionMakeDefault());
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   [self testWithChildren:@[secondChild, firstChild] layoutContext:layoutContext identifier:nil];
 }
 
-- (void)testWithChildren:(NSArray *)children layoutContext:(ASLayoutContext)layoutContext identifier:(NSString *)identifier
+- (void)testWithChildren:(NSArray *)children layoutContext:(ASLayoutContext *)layoutContext identifier:(NSString *)identifier
 {
   ASDisplayNode *backgroundNode = ASDisplayNodeWithBackgroundColor([UIColor whiteColor]);
 

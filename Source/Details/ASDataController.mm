@@ -169,9 +169,9 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       }
 
       // Layout the node if the size range is valid.
-      ASLayoutContext layoutContext = context.layoutContext;
+      ASLayoutContext *layoutContext = context.layoutContext;
       // Also check trait collection. If it's undefined, log and skip
-      if (ASLayoutContextHasSignificantArea(layoutContext)) {
+      if (layoutContext.hasSignificantArea) {
         [self _layoutNode:node withLayoutContext:layoutContext];
       }
     });
@@ -184,9 +184,9 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
 /**
  * Measure and layout the given node with the constrained size range.
  */
-- (void)_layoutNode:(ASCellNode *)node withLayoutContext:(ASLayoutContext)layoutContext
+- (void)_layoutNode:(ASCellNode *)node withLayoutContext:(ASLayoutContext *)layoutContext
 {
-  ASDisplayNodeAssert(ASLayoutContextHasSignificantArea(layoutContext), @"Attempt to layout cell node with invalid size range %@", NSStringFromASLayoutContext(layoutContext));
+  ASDisplayNodeAssert(layoutContext.hasSignificantArea, @"Attempt to layout cell node with invalid size range %@", layoutContext);
   CGRect frame = CGRectZero;
   frame.size = [node layoutThatFits:layoutContext].size;
   node.frame = frame;
@@ -322,6 +322,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   LOG(@"Populating elements of kind: %@, for index paths: %@", kind, indexPaths);
   id<ASDataControllerSource> dataSource = self.dataSource;
   id<ASRangeManagingNode> node = self.node;
+  ASLayoutContext *defaultLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
   for (NSIndexPath *indexPath in indexPaths) {
     ASCellNodeBlock nodeBlock;
     id nodeModel;
@@ -349,7 +350,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
       nodeBlock = [dataSource dataController:self supplementaryNodeBlockOfKind:kind atIndexPath:indexPath];
     }
     
-    ASLayoutContext layoutContext = ASLayoutContextMakeWithUnconstrainedSizeRange(ASPrimitiveTraitCollectionMakeDefault());
+    ASLayoutContext *layoutContext = defaultLayoutContext;
     if (shouldFetchLayoutContexts) {
       layoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPath];
     }
@@ -399,7 +400,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
  * Returns layout context for the node of the given kind and at the given index path.
  * NOTE: index path must be in the data-source index space.
  */
-- (ASLayoutContext)layoutContextForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext *)layoutContextForNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   ASDisplayNodeAssertMainThread();
 
@@ -407,7 +408,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   id<ASDataControllerSource> dataSource = _dataSource;
 
   if (dataSource == nil || indexPath == nil) {
-    return ASLayoutContextMakeWithZeroSize(traitCollection);
+    return [ASLayoutContext layoutContextWithZeroSizeAndTraitCollection:traitCollection];
   }
   
   if ([kind isEqualToString:ASDataControllerRowNodeKind]) {
@@ -420,7 +421,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
   }
   
   ASDisplayNodeAssert(NO, @"Unknown constrained size for node of kind %@ by data source %@", kind, dataSource);
-  return ASLayoutContextMakeWithZeroSize(traitCollection);
+  return [ASLayoutContext layoutContextWithZeroSizeAndTraitCollection:traitCollection];
 }
 
 #pragma mark - Batching (External API)
@@ -735,7 +736,7 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     }
 
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-    ASLayoutContext layoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+    ASLayoutContext *layoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
     [self _layoutNode:node withLayoutContext:layoutContext];
 
     BOOL matchesSize = [dataSource dataController:self presentedSizeForElement:element matchesSize:node.frame.size];
@@ -778,9 +779,9 @@ typedef dispatch_block_t ASDataControllerCompletionBlock;
     }
 
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
-    ASLayoutContext newLayoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
+    ASLayoutContext *newLayoutContext = [self layoutContextForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
 
-    if (ASLayoutContextHasSignificantArea(newLayoutContext)) {
+    if (newLayoutContext.hasSignificantArea) {
       element.layoutContext = newLayoutContext;
 
       // Node may not be allocated yet (e.g node virtualization or same size optimization)

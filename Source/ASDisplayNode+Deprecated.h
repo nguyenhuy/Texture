@@ -15,6 +15,8 @@
 #import <AsyncDisplayKit/ASDisplayNode.h>
 #import <AsyncDisplayKit/ASDimension+Deprecated.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ASDisplayNode (Deprecated)
 
 /**
@@ -22,7 +24,7 @@
  *
  * @return The minimum and maximum constrained sizes used by calculateLayoutThatFits:.
  */
-@property (nonatomic, readonly, assign) ASSizeRange constrainedSizeForCalculatedLayout ASDISPLAYNODE_DEPRECATED_MSG("Use .contextForCalculatedLayout instead.");
+@property (nonatomic, strong, readonly, nullable) ASSizeRange constrainedSizeForCalculatedLayout ASDISPLAYNODE_DEPRECATED_MSG("Use .contextForCalculatedLayout instead.");
 
 /**
  * @abstract Transitions the current layout with a new constrained size. Must be called on main thread.
@@ -44,3 +46,5 @@
                 measurementCompletion:(nullable void(^)())completion ASDISPLAYNODE_DEPRECATED_MSG("Use -transitionLayoutWithLayoutContext:animated:shouldMeasureAsync:measurementCompletion: instead.");
 
 @end
+
+NS_ASSUME_NONNULL_END

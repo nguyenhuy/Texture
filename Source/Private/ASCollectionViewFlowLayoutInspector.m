@@ -76,33 +76,36 @@
   }
 }
 
-- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+- (ASLayoutContext *)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   ASCollectionNode *collectionNode = collectionView.collectionNode;
-  ASLayoutContext result;
+  ASLayoutContext *unconstrainedLayoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:traitCollection];
+  ASLayoutContext *result;
   if (_delegateFlags.implementsLayoutContextForItemAtIndexPathWithTraitCollection) {
     result = [collectionView.asyncDelegate collectionNode:collectionNode layoutContextForItemAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   } else if (_delegateFlags.implementsConstrainedSizeForItemAtIndexPathDeprecated) {
-    result = [collectionView.asyncDelegate collectionNode:collectionNode constrainedSizeForItemAtIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[collectionView.asyncDelegate collectionNode:collectionNode constrainedSizeForItemAtIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
   } else if (_delegateFlags.implementsConstrainedSizeForNodeAtIndexPathDeprecated) {
-    result = [collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath];
-    result.traitCollection = traitCollection;
+    ASMutableLayoutContext *mutableResult = [[collectionView.asyncDelegate collectionView:collectionView constrainedSizeForNodeAtIndexPath:indexPath] mutableCopy];
+    mutableResult.traitCollection = traitCollection;
+    result = mutableResult;
 #pragma clang diagnostic pop
   } else {
     // With 2.0 `collectionView:constrainedSizeForNodeAtIndexPath:` was moved to the delegate. Assert if not implemented on the delegate but on the data source
     ASDisplayNodeAssert([collectionView.asyncDataSource respondsToSelector:@selector(collectionView:constrainedSizeForNodeAtIndexPath:)] == NO, @"collectionView:constrainedSizeForNodeAtIndexPath: was moved from the ASCollectionDataSource to the ASCollectionDelegate.");
-    result = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+    result = unconstrainedLayoutContext;
   }
 
   // If we got no size range:
-  if (ASLayoutContextEqualToLayoutContext(result, ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection))) {
+  if ([result isEqual:unconstrainedLayoutContext]) {
     // Use itemSize if they set it.
     CGSize itemSize = _layout.itemSize;
     if (CGSizeEqualToSize(itemSize, kDefaultItemSize) == NO) {
-      result = ASLayoutContextMake(itemSize, traitCollection);
+      result = [ASLayoutContext layoutContextWithExactSize:itemSize traitCollection:traitCollection];
     } else {
       // Compute constraint from scroll direction otherwise.
       result = NodeLayoutContextForScrollDirection(collectionView, traitCollection);
@@ -112,49 +115,53 @@
   return result;
 }
 
-- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
+- (ASLayoutContext *)collectionView:(ASCollectionView *)collectionView layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection
 {
   ASCollectionNode *collectionNode = collectionView.collectionNode;
-  ASLayoutContext result;
+  ASMutableLayoutContext *result;
   if (ASObjectIsEqual(kind, UICollectionElementKindSectionHeader)) {
     if (_delegateFlags.implementsLayoutContextForHeaderWithTraitCollection) {
-      result = [[self delegateForCollectionView:collectionView] collectionNode:collectionNode layoutContextForHeaderInSection:indexPath.section withTraitCollection:traitCollection];
+      result = [[[self delegateForCollectionView:collectionView] collectionNode:collectionNode layoutContextForHeaderInSection:indexPath.section withTraitCollection:traitCollection] mutableCopy];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     } else if (_delegateFlags.implementsSizeRangeForHeaderDeprecated) {
-      result = [[self delegateForCollectionView:collectionView] collectionNode:collectionNode sizeRangeForHeaderInSection:indexPath.section];
+      result = [[[self delegateForCollectionView:collectionView] collectionNode:collectionNode sizeRangeForHeaderInSection:indexPath.section] mutableCopy];
       result.traitCollection = traitCollection;
     } else if (_delegateFlags.implementsReferenceSizeForHeaderDeprecated) {
       CGSize exactSize = [[self delegateForCollectionView:collectionView] collectionView:collectionView layout:_layout referenceSizeForHeaderInSection:indexPath.section];
-      result = ASLayoutContextMake(exactSize, traitCollection);
+      result = [ASMutableLayoutContext layoutContextWithExactSize:exactSize traitCollection:traitCollection];
 #pragma clang diagnostic pop
     } else {
-      result = ASLayoutContextMake(_layout.headerReferenceSize, traitCollection);
+      result = [ASMutableLayoutContext layoutContextWithExactSize:_layout.headerReferenceSize traitCollection:traitCollection];
     }
   } else if (ASObjectIsEqual(kind, UICollectionElementKindSectionFooter)) {
     if (_delegateFlags.implementsLayoutContextForFooterWithTraitCollection) {
-      result = [[self delegateForCollectionView:collectionView] collectionNode:collectionNode layoutContextForFooterInSection:indexPath.section withTraitCollection:traitCollection];
+      result = [[[self delegateForCollectionView:collectionView] collectionNode:collectionNode layoutContextForFooterInSection:indexPath.section withTraitCollection:traitCollection] mutableCopy];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     } else if (_delegateFlags.implementsSizeRangeForFooterDeprecated) {
-      result = [[self delegateForCollectionView:collectionView] collectionNode:collectionNode sizeRangeForFooterInSection:indexPath.section];
+      result = [[[self delegateForCollectionView:collectionView] collectionNode:collectionNode sizeRangeForFooterInSection:indexPath.section] mutableCopy];
       result.traitCollection = traitCollection;
     } else if (_delegateFlags.implementsReferenceSizeForFooterDeprecated) {
       CGSize exactSize = [[self delegateForCollectionView:collectionView] collectionView:collectionView layout:_layout referenceSizeForFooterInSection:indexPath.section];
-      result = ASLayoutContextMake(exactSize, traitCollection);
+      result = [ASMutableLayoutContext layoutContextWithExactSize:exactSize traitCollection:traitCollection];
 #pragma clang diagnostic pop
     } else {
-      result = ASLayoutContextMake(_layout.footerReferenceSize, traitCollection);
+      result = [ASMutableLayoutContext layoutContextWithExactSize:_layout.footerReferenceSize traitCollection:traitCollection];
     }
   } else {
     ASDisplayNodeFailAssert(@"Unexpected supplementary kind: %@", kind);
-    return ASLayoutContextMakeWithZeroSize(traitCollection);
+    return [ASMutableLayoutContext layoutContextWithZeroSizeAndTraitCollection:traitCollection];
   }
 
   if (_layout.scrollDirection == UICollectionViewScrollDirectionVertical) {
-    result.min.width = result.max.width = CGRectGetWidth(collectionView.bounds);
+    CGFloat width = CGRectGetWidth(collectionView.bounds);
+    result.min = CGSizeMake(width, result.min.height);
+    result.max = CGSizeMake(width, result.max.height);
   } else {
-    result.min.height = result.max.height = CGRectGetHeight(collectionView.bounds);
+    CGFloat height = CGRectGetHeight(collectionView.bounds);
+    result.min = CGSizeMake(result.min.width, height);
+    result.max = CGSizeMake(result.max.width, height);
   }
   return result;
 }
@@ -163,10 +170,10 @@
 {
   ASCollectionNode *collectionNode = collectionView.collectionNode;
   ASPrimitiveTraitCollection traitCollection = collectionNode ? collectionNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext layoutContext = [self collectionView:collectionView
-               layoutContextForSupplementaryNodeOfKind:kind
-                                           atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]
-                                   withTraitCollection:traitCollection];
+  ASLayoutContext *layoutContext = [self collectionView:collectionView
+                layoutContextForSupplementaryNodeOfKind:kind
+                                            atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]
+                                    withTraitCollection:traitCollection];
   if (_layout.scrollDirection == UICollectionViewScrollDirectionVertical) {
     return (layoutContext.max.height > 0 ? 1 : 0);
   } else {

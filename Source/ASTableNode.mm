@@ -647,7 +647,7 @@
 
 #pragma mark - ASRangeManagingNode
 
-- (ASLayoutContext)layoutContext
+- (ASLayoutContext *)layoutContext
 {
   return self.contextForCalculatedLayout;
 }

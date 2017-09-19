@@ -64,22 +64,22 @@
 
 #pragma mark - ASLayoutElement
 
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
 {
   std::vector<CGSize> sizeOptions;
   
   if (ASPointsValidForSize(layoutContext.max.width)) {
-    sizeOptions.push_back(ASLayoutContextClamp(layoutContext, {
+    sizeOptions.push_back([layoutContext clamp:{
       layoutContext.max.width,
       ASFloorPixelValue(_ratio * layoutContext.max.width)
-    }));
+    }]);
   }
   
   if (ASPointsValidForSize(layoutContext.max.height)) {
-    sizeOptions.push_back(ASLayoutContextClamp(layoutContext, {
+    sizeOptions.push_back([layoutContext clamp:{
       ASFloorPixelValue(layoutContext.max.height / _ratio),
       layoutContext.max.height
-    }));
+    }]);
   }
 
   // Choose the size closest to the desired ratio.
@@ -88,7 +88,7 @@
   });
 
   // If there is no max size in *either* dimension, we can't apply the ratio, so just pass our size range through.
-  const ASLayoutContext childContext = (bestSize == sizeOptions.end()) ? layoutContext : ASLayoutContextIntersect(layoutContext, ASLayoutContextMake(*bestSize, *bestSize, layoutContext.traitCollection));
+  ASLayoutContext *childContext = (bestSize == sizeOptions.end()) ? layoutContext : [layoutContext intersectWithLayoutContext:[ASLayoutContext layoutContextWithExactSize:*bestSize traitCollection:layoutContext.traitCollection]];
   const CGSize parentSize = (bestSize == sizeOptions.end()) ? ASLayoutElementParentSizeUndefined : *bestSize;
   ASLayout *sublayout = [self.child layoutThatFits:childContext parentSize:parentSize];
   sublayout.position = CGPointZero;

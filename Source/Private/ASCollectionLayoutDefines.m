@@ -11,17 +11,19 @@
 //
 
 #import <AsyncDisplayKit/ASCollectionLayoutDefines.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 
-extern ASLayoutContext ASLayoutContextForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections, ASPrimitiveTraitCollection traitCollection)
+extern ASLayoutContext *ASLayoutContextForCollectionLayoutThatFitsViewportSize(CGSize viewportSize, ASScrollDirection scrollableDirections, ASPrimitiveTraitCollection traitCollection)
 {
-  ASLayoutContext layoutContext = ASLayoutContextMakeWithUnconstrainedSizeRange(traitCollection);
+  CGSize min = CGSizeZero;
+  CGSize max = CGSizeMake(INFINITY, INFINITY);
   if (ASScrollDirectionContainsVerticalDirection(scrollableDirections) == NO) {
-    layoutContext.min.height = viewportSize.height;
-    layoutContext.max.height = viewportSize.height;
+    min.height = viewportSize.height;
+    max.height = viewportSize.height;
   }
   if (ASScrollDirectionContainsHorizontalDirection(scrollableDirections) == NO) {
-    layoutContext.min.width = viewportSize.width;
-    layoutContext.max.width = viewportSize.width;
+    min.width = viewportSize.width;
+    max.width = viewportSize.width;
   }
-  return layoutContext;
+  return [ASLayoutContext layoutContextWithMinSize:min maxSize:max traitCollection:traitCollection];
 }

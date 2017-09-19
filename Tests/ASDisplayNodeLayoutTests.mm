@@ -62,8 +62,11 @@
     [node addSubnode:someOtherNode];
     return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:someOtherNode];
   };
-  
-  XCTAssertThrows([displayNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())], @"Should throw if subnode was added in layoutSpecThatFits:");
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero
+                                                                     maxSize:CGSizeMake(100, 100)
+                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  XCTAssertThrows([displayNode layoutThatFits:layoutContext], @"Should throw if subnode was added in layoutSpecThatFits:");
 }
 
 - (void)testNotAllowModifyingSubnodesInLayoutSpecThatFits
@@ -78,8 +81,11 @@
     [node addSubnode:[ASDisplayNode new]];
     return [ASInsetLayoutSpec insetLayoutSpecWithInsets:UIEdgeInsetsZero child:someOtherNode];
   };
-  
-  XCTAssertThrows([displayNode layoutThatFits:ASLayoutContextMake(CGSizeZero, CGSizeMake(100, 100), ASPrimitiveTraitCollectionMakeDefault())], @"Should throw if subnodes where modified in layoutSpecThatFits:");
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithMinSize:CGSizeZero
+                                                                     maxSize:CGSizeMake(100, 100)
+                                                             traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+  XCTAssertThrows([displayNode layoutThatFits:layoutContext], @"Should throw if subnodes where modified in layoutSpecThatFits:");
 }
 #endif
 
@@ -106,7 +112,7 @@
   [displayNode.view layoutIfNeeded];
   XCTAssertEqual(numberOfLayoutSpecThatFitsCalls, 1, @"Should measure during layout if not measured");
   
-  [displayNode layoutThatFits:ASLayoutContextMake(nodeSize, nodeSize, ASPrimitiveTraitCollectionMakeDefault())];
+  [displayNode layoutThatFits:[ASLayoutContext layoutContextWithExactSize:nodeSize traitCollection:ASPrimitiveTraitCollectionMakeDefault()]];
   XCTAssertEqual(numberOfLayoutSpecThatFitsCalls, 1, @"Should not remeasure with same bounds");
 }
 
@@ -117,8 +123,10 @@
   node.layoutSpecBlock = ^ASLayoutSpec *(ASDisplayNode *node, ASSizeRange constrainedSize) {
     return [ASWrapperLayoutSpec wrapperWithLayoutElement:displayNode];
   };
-  
-  XCTAssertThrows([node layoutThatFits:ASLayoutContextMake(CGSizeMake(0, FLT_MAX), ASPrimitiveTraitCollectionMakeDefault())]);
+
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:CGSizeMake(0, FLT_MAX)
+                                                               traitCollection:ASPrimitiveTraitCollectionMakeDefault())];
+  XCTAssertThrows([node layoutThatFits:layoutContext];
 }
 
 - (void)testThatLayoutCreatedWithInvalidSizeCausesException
@@ -163,8 +171,9 @@
   XCTestExpectation *expectation = [self expectationWithDescription:@"Execute measure and layout pass"];
   
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    
-    [rootNode layoutThatFits:ASLayoutContextMake(kSize, ASPrimitiveTraitCollectionMakeDefault())];
+    ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithExactSize:kSize
+                                                                 traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+    [rootNode layoutThatFits:layoutContext];
     
     dispatch_async(dispatch_get_main_queue(), ^{
       XCTAssertNoThrow([rootNode.view layoutIfNeeded]);

@@ -74,7 +74,7 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
  Inset will compute a new constrained size for it's child after applying insets and re-positioning
  the child to respect the inset.
  */
-- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext)layoutContext
+- (ASLayout *)calculateLayoutThatFits:(ASLayoutContext *)layoutContext
                      restrictedToSize:(ASLayoutElementSize)size
                  relativeToParentSize:(CGSize)parentSize
 {
@@ -91,18 +91,10 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
   // if either y-axis inset is infinite, let child be intrinsic height
   const CGFloat minHeight = (isinf(_insets.top) || isinf(_insets.bottom)) ? 0 : layoutContext.min.height;
 
-  const ASLayoutContext insetLayoutContext = {
-    {
-      MAX(0, minWidth - insetsX),
-      MAX(0, minHeight - insetsY),
-    },
-    {
-      MAX(0, layoutContext.max.width - insetsX),
-      MAX(0, layoutContext.max.height - insetsY),
-    },
-    layoutContext.traitCollection
-  };
-  
+  ASLayoutContext *insetLayoutContext = [ASLayoutContext layoutContextWithMinSize:{ MAX(0, minWidth - insetsX), MAX(0, minHeight - insetsY) }
+                                                                          maxSize:{ MAX(0, layoutContext.max.width - insetsX), MAX(0, layoutContext.max.height - insetsY) }
+                                                                  traitCollection:layoutContext.traitCollection];
+
   const CGSize insetParentSize = {
     MAX(0, parentSize.width - insetsX),
     MAX(0, parentSize.height - insetsY)
@@ -110,10 +102,10 @@ static CGFloat centerInset(CGFloat outer, CGFloat inner)
   
   ASLayout *sublayout = [self.child layoutThatFits:insetLayoutContext parentSize:insetParentSize];
 
-  const CGSize computedSize = ASLayoutContextClamp(layoutContext, {
+  const CGSize computedSize = [layoutContext clamp:{
     finite(sublayout.size.width + _insets.left + _insets.right, layoutContext.max.width),
     finite(sublayout.size.height + _insets.top + _insets.bottom, layoutContext.max.height),
-  });
+  }];
 
   const CGFloat x = finite(_insets.left, layoutContext.max.width -
                            (finite(_insets.right,

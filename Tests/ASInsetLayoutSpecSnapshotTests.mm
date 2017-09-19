@@ -67,7 +67,7 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
     
-    static ASLayoutContext kLayoutContext = ASLayoutContextMake({0, 0}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+    static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{0, 0} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
     [self testLayoutSpec:layoutSpec
            layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]
@@ -90,7 +90,7 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
 
-    static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+    static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
     [self testLayoutSpec:layoutSpec
            layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]
@@ -114,7 +114,7 @@ static NSString *nameForInsets(UIEdgeInsets insets)
       child:foregroundNode]
      background:backgroundNode];
 
-    static ASLayoutContext kLayoutContext = ASLayoutContextMake({300, 300}, {300, 300}, ASPrimitiveTraitCollectionMakeDefault());
+    static ASLayoutContext *kLayoutContext = [ASLayoutContext layoutContextWithMinSize:{300, 300} maxSize:{300, 300} traitCollection:ASPrimitiveTraitCollectionMakeDefault()];
     [self testLayoutSpec:layoutSpec
            layoutContext:kLayoutContext
                 subnodes:@[backgroundNode, foregroundNode]

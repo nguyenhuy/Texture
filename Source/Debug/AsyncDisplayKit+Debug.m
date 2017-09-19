@@ -620,8 +620,10 @@ static BOOL __shouldShowRangeDebugOverlay = NO;
   [self setBarDebugLabelsWithSize:subCellHeight];
   [self setBarSubviewOrder];
 
+  ASLayoutContext *layoutContext = [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:ASPrimitiveTraitCollectionMakeDefault()];
+
   CGRect rect       = CGRectIntegral(CGRectMake(0, 0, boundsSize.width, floorf(boundsSize.height / 2.0)));
-  rect.size         = [_debugText layoutThatFits:ASLayoutContextMakeWithUnconstrainedSizeRange(ASPrimitiveTraitCollectionMakeDefault())].size;
+  rect.size         = [_debugText layoutThatFits:layoutContext].size;
   rect.origin.x     = (boundsSize.width - rect.size.width) / 2.0;
   _debugText.frame  = rect;
   rect.origin.y    += rect.size.height;

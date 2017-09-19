@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection);
+extern ASLayoutContext *NodeLayoutContextForScrollDirection(ASCollectionView *collectionView, ASPrimitiveTraitCollection traitCollection);
 
 @protocol ASCollectionViewLayoutInspecting <NSObject>
 
@@ -41,12 +41,12 @@ extern ASLayoutContext NodeLayoutContextForScrollDirection(ASCollectionView *col
  * Asks the inspector to provide a layout context for the given collection view node.
  */
 // TODO: Make this non-optional once -collectionView:constrainedSizeForNodeAtIndexPath: is gone.
-- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+- (ASLayoutContext *)collectionView:(ASCollectionView *)collectionView layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Asks the inspector to provide a layout context for the given supplementary node.
  */
-- (ASLayoutContext)collectionView:(ASCollectionView *)collectionView layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
+- (ASLayoutContext *)collectionView:(ASCollectionView *)collectionView layoutContextForSupplementaryNodeOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath withTraitCollection:(ASPrimitiveTraitCollection)traitCollection;
 
 /**
  * Asks the inspector for the number of supplementary views for the given kind in the specified section.

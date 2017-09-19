@@ -1716,11 +1716,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   return block;
 }
 
-- (ASLayoutContext)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
+- (ASLayoutContext *)dataController:(ASDataController *)dataController layoutContextForNodeAtIndexPath:(NSIndexPath *)indexPath
 {
   ASTableNode *tableNode = self.tableNode;
   ASPrimitiveTraitCollection traitCollection = tableNode ? tableNode.layoutContext.traitCollection : ASPrimitiveTraitCollectionMakeDefault();
-  ASLayoutContext result;
+  ASLayoutContext *result;
   if (_asyncDelegateFlags.tableNodeLayoutContextForRow) {
     result = [_asyncDelegate tableNode:tableNode layoutContextForRowAtIndexPath:indexPath withTraitCollection:traitCollection];
 #pragma clang diagnostic push
@@ -1728,20 +1728,20 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   } else if (_asyncDelegateFlags.tableNodeConstrainedSizeForRowDeprecated) {
     ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:tableNode constrainedSizeForRowAtIndexPath:indexPath];
     // ignore widths in the returned size range (for TableView)
-    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
-                                 CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height),
-                                 traitCollection);
+    result = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height)
+                                               maxSize:CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height)
+                                       traitCollection:traitCollection];
   } else if (_asyncDelegateFlags.tableViewConstrainedSizeForRowDeprecated) {
     ASSizeRange delegateConstrainedSize = [_asyncDelegate tableView:self constrainedSizeForRowAtIndexPath:indexPath];
     // ignore widths in the returned size range (for TableView)
-    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
-                                 CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height),
-                                 traitCollection);
+    result = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height)
+                                               maxSize:CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height)
+                                       traitCollection:traitCollection];
 #pragma clang diagnostic pop
   } else {
-    result = ASLayoutContextMake(CGSizeMake(_nodesConstrainedWidth, 0),
-                                 CGSizeMake(_nodesConstrainedWidth, CGFLOAT_MAX),
-                                 traitCollection);
+    result = [ASLayoutContext layoutContextWithMinSize:CGSizeMake(_nodesConstrainedWidth, 0)
+                                               maxSize:CGSizeMake(_nodesConstrainedWidth, CGFLOAT_MAX)
+                                       traitCollection:traitCollection];
   }
   return result;
 }
@@ -1806,15 +1806,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   }
   
   CGFloat contentViewWidth = tableViewCell.contentView.bounds.size.width;
-  ASLayoutContext layoutContext = node.contextForCalculatedLayout;
+  ASLayoutContext *layoutContext = node.contextForCalculatedLayout;
   
   // Table view cells should always fill its content view width.
   // Normally the content view width equals to the constrained size width (which equals to the table view width).
   // If there is a mismatch between these values, for example after the table view entered or left editing mode,
   // content view width is preferred and used to re-measure the cell node.
   if (CGSizeEqualToSize(node.calculatedSize, CGSizeZero) == NO && contentViewWidth != layoutContext.max.width) {
-    layoutContext.min.width = contentViewWidth;
-    layoutContext.max.width = contentViewWidth;
+    ASMutableLayoutContext *newLayoutContext = [layoutContext mutableCopy];
+    newLayoutContext.min = CGSizeMake(contentViewWidth, newLayoutContext.min.height);
+    newLayoutContext.max = CGSizeMake(contentViewWidth, newLayoutContext.max.height);
 
     // Re-measurement is done on main to ensure thread affinity. In the worst case, this is as fast as UIKit's implementation.
     //
@@ -1823,7 +1824,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     // Also, in many cases, some nodes may not need to be re-measured at all, such as when user enters and then immediately leaves editing mode.
     // To avoid premature optimization and making such assumption, as well as to keep ASTableView simple, re-measurement is strictly done on main.
     CGSize oldSize = node.bounds.size;
-    const CGSize calculatedSize = [node layoutThatFits:layoutContext].size;
+    const CGSize calculatedSize = [node layoutThatFits:newLayoutContext].size;
     node.frame = { .size = calculatedSize };
 
     // If the node height changed, trigger a height requery.
