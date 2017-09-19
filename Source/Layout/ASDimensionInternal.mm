@@ -16,6 +16,7 @@
 //
 
 #import <AsyncDisplayKit/ASDimensionInternal.h>
+#import <AsyncDisplayKit/ASLayoutContext.h>
 
 #pragma mark - ASLayoutElementSize
 
@@ -60,7 +61,7 @@ ASDISPLAYNODE_INLINE void ASLayoutElementSizeConstrain(CGFloat minVal, CGFloat e
     }
 }
 
-ASLayoutContext ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection, ASLayoutContext autoLayoutContext)
+ASLayoutContext *ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection, ASLayoutContext *autoLayoutContext)
 {
   CGSize resolvedExact = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.width, size.height), parentSize, {NAN, NAN});
   CGSize resolvedMin = ASLayoutSizeResolveSize(ASLayoutSizeMake(size.minWidth, size.minHeight), parentSize, autoLayoutContext.min);
@@ -69,5 +70,13 @@ ASLayoutContext ASLayoutElementSizeResolveAutoSize(ASLayoutElementSize size, con
   CGSize rangeMin, rangeMax;
   ASLayoutElementSizeConstrain(resolvedMin.width, resolvedExact.width, resolvedMax.width, &rangeMin.width, &rangeMax.width);
   ASLayoutElementSizeConstrain(resolvedMin.height, resolvedExact.height, resolvedMax.height, &rangeMin.height, &rangeMax.height);
-  return ASLayoutContextMake(rangeMin, rangeMax, traitCollection);
+  return [ASLayoutContext layoutContextWithMinSize:rangeMin maxSize:rangeMax traitCollection:traitCollection];
+}
+
+ASLayoutContext *ASLayoutElementSizeResolve(ASLayoutElementSize size, const CGSize parentSize, ASPrimitiveTraitCollection traitCollection)
+{
+  return ASLayoutElementSizeResolveAutoSize(size,
+                                            parentSize,
+                                            traitCollection,
+                                            [ASLayoutContext layoutContextWithUnconstrainedSizeRangeAndTraitCollection:traitCollection]);
 }

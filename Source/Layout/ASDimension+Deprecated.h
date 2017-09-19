@@ -18,6 +18,8 @@
 #pragma once
 #import <AsyncDisplayKit/ASDimension.h>
 
+@class ASLayoutContext;
+
 ASDISPLAYNODE_EXTERN_C_BEGIN
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // TODO Mass rename ASSizeRange in the framework and deprecated needed APIs
 // TODO Deprecate all funcs in this header
-typedef ASLayoutContext ASSizeRange;
+typedef ASLayoutContext * ASSizeRange;
 
 /**
  * A size range with all dimensions zero.
@@ -38,36 +40,24 @@ extern ASSizeRange const ASSizeRangeZero;
 extern ASSizeRange const ASSizeRangeUnconstrained;
 
 /**
- * Returns whether a size range has > 0.1 max width and max height.
- */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeHasSignificantArea(ASSizeRange sizeRange)
-{
-  return ASLayoutContextHasSignificantArea(sizeRange);
-}
-
-/**
  * Creates an ASSizeRange with provided min and max size.
  */
-ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize min, CGSize max)
-{
-  return ASLayoutContextMake(min, max, ASPrimitiveTraitCollectionMakeDefault());
-}
+extern ASOVERLOADABLE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize min, CGSize max);
 
 /**
  * Creates an ASSizeRange with provided size as both min and max.
  */
-ASOVERLOADABLE ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize exactSize)
-{
-  return ASLayoutContextMake(exactSize, exactSize, ASPrimitiveTraitCollectionMakeDefault());
-}
+extern ASOVERLOADABLE AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMake(CGSize exactSize);
+
+/**
+ * Returns whether a size range has > 0.1 max width and max height.
+ */
+extern AS_WARN_UNUSED_RESULT BOOL ASSizeRangeHasSignificantArea(ASSizeRange sizeRange);
 
 /**
  * Clamps the provided CGSize between the [min, max] bounds of this ASSizeRange.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT CGSize ASSizeRangeClamp(ASSizeRange sizeRange, CGSize size)
-{
-  return ASLayoutContextClamp(sizeRange, size);
-}
+extern AS_WARN_UNUSED_RESULT CGSize ASSizeRangeClamp(ASSizeRange sizeRange, CGSize size);
 
 /**
  * Intersects another size range. If the other size range does not overlap in either dimension, this size range
@@ -78,10 +68,7 @@ extern AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeIntersect(ASSizeRange sizeRa
 /**
  * Returns whether two size ranges are equal in min and max size.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT BOOL ASSizeRangeEqualToSizeRange(ASSizeRange lhs, ASSizeRange rhs)
-{
-  return ASLayoutContextEqualToLayoutContext(lhs, rhs);
-}
+extern AS_WARN_UNUSED_RESULT BOOL ASSizeRangeEqualToSizeRange(ASSizeRange lhs, ASSizeRange rhs);
 
 /**
  * Returns a string representation of a size range
