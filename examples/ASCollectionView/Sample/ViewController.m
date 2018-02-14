@@ -51,7 +51,7 @@ static CGSize const kItemSize = (CGSize){180, 90};
 #else
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   layout.headerReferenceSize = CGSizeMake(50.0, 50.0);
-  layout.footerReferenceSize = CGSizeMake(50.0, 50.0);
+  layout.footerReferenceSize = CGSizeMake(0.11, 0.11);
   layout.itemSize = kItemSize;
   self.collectionNode = [[ASCollectionNode alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
   [self.collectionNode registerSupplementaryNodeOfKind:UICollectionElementKindSectionHeader];
@@ -109,7 +109,10 @@ static CGSize const kItemSize = (CGSize){180, 90};
 {
   // This method is deprecated because we reccommend using ASCollectionNode instead of ASCollectionView.
   // This functionality & example project remains for users who insist on using ASCollectionView.
-  [self.collectionNode reloadData];
+//  [self.collectionNode reloadData];
+  UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionNode.collectionViewLayout;
+  layout.footerReferenceSize = CGSizeEqualToSize(layout.footerReferenceSize, CGSizeMake(0.11, 0.11)) ? CGSizeMake(50.0, 50.0) : CGSizeMake(0.11, 0.11);
+  [self.collectionNode relayoutItems];
 }
 
 #pragma mark - ASCollectionGalleryLayoutPropertiesProviding
