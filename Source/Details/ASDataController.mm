@@ -283,6 +283,37 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 }
 
 /**
+ * Agressively repopulates supplementary nodes of all kinds for all sections.
+ *
+ * @param map The element map into which to apply the change.
+ * @param traitCollection The trait collection needed to initialize elements
+ * @param shouldFetchSizeRanges Whether constrained sizes should be fetched from data source
+ * @param previousMap The previous map
+ */
+- (void)_repopulateSupplementaryNodesIntoMap:(ASMutableElementMap *)map
+                             traitCollection:(ASPrimitiveTraitCollection)traitCollection
+                       shouldFetchSizeRanges:(BOOL)shouldFetchSizeRanges
+                                 previousMap:(ASElementMap *)previousMap
+{
+  ASDisplayNodeAssertMainThread();
+  
+  NSUInteger sectionCount = [self itemCountsFromDataSource].size();
+  if (sectionCount > 0) {
+    NSIndexSet *sectionIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, sectionCount)];
+
+    for (NSString *kind in [self supplementaryKindsInSections:sectionIndexes]) {
+      [self _insertElementsIntoMap:map
+                              kind:kind
+                       forSections:sectionIndexes
+                   traitCollection:traitCollection
+             shouldFetchSizeRanges:shouldFetchSizeRanges
+                         changeSet:nil // Change set is not needed to populate supplementary nodes
+                       previousMap:previousMap];
+    }
+  }
+}
+
+/**
  * Inserts new elements of a certain kind for some sections
  *
  * @param kind The kind of the elements, e.g ASDataControllerRowNodeKind
@@ -822,13 +853,21 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 - (void)_relayoutAllNodes
 {
   ASDisplayNodeAssertMainThread();
-  for (ASCollectionElement *element in _visibleMap) {
-    // Ignore this element if it is no longer in the latest data. It is still recognized in the UIKit world but will be deleted soon.
-    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
-    if (indexPathInPendingMap == nil) {
-      continue;
-    }
 
+  // Aggressively repopulate all supplemtary elements
+  // Assuming this method is run on the main serial queue, _pending and _visible maps are synced and can be manipulated directly.
+  // TODO: If there is a layout delegate, it should be able to handle relayouts. Verify that and bail early.
+  ASMutableElementMap *newMap = [_pendingMap mutableCopy];
+  [newMap removeAllSupplementaryElements];
+  [self _repopulateSupplementaryNodesIntoMap:newMap
+                             traitCollection:[self.node primitiveTraitCollection]
+                       shouldFetchSizeRanges:YES
+                                 previousMap:_pendingMap];
+  _pendingMap = [newMap copy];
+  _visibleMap = _pendingMap;
+
+  for (ASCollectionElement *element in _visibleMap) {
+    NSIndexPath *indexPathInPendingMap = [_pendingMap indexPathForElement:element];
     NSString *kind = element.supplementaryElementKind ?: ASDataControllerRowNodeKind;
     ASSizeRange newConstrainedSize = [self constrainedSizeForNodeOfKind:kind atIndexPath:indexPathInPendingMap];
 
