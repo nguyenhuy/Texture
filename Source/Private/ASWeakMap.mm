@@ -10,7 +10,6 @@
 #import <AsyncDisplayKit/ASWeakMap.h>
 
 @interface ASWeakMapEntry ()
-@property (nonatomic, readonly) id key;
 @property id value;
 @end
 

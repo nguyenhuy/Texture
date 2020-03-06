@@ -75,7 +75,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 @property (nonatomic) ASDisplayNodeContextModifier willDisplayNodeContentWithRenderingContext;
 @property (nonatomic) ASDisplayNodeContextModifier didDisplayNodeContentWithRenderingContext;
 @property (nonatomic) asimagenode_modification_block_t imageModificationBlock;
-@property UIUserInterfaceStyle userInterfaceStyle API_AVAILABLE(tvos(10.0), ios(12.0));
 @end
 
 @implementation ASImageNodeContentsKey
@@ -101,10 +100,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
       && _willDisplayNodeContentWithRenderingContext == other.willDisplayNodeContentWithRenderingContext
       && _didDisplayNodeContentWithRenderingContext == other.didDisplayNodeContentWithRenderingContext
       && _imageModificationBlock == other.imageModificationBlock;
-    if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-      // iOS 12, tvOS 10 and later (userInterfaceStyle only available in iOS12+)
-      areKeysEqual = areKeysEqual && _userInterfaceStyle == other.userInterfaceStyle;
-    }
     return areKeysEqual;
   } else {
     return NO;
@@ -183,7 +178,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
 
   _imageNodeFlags.cropEnabled = YES;
   _imageNodeFlags.forceUpscaling = NO;
-  _imageNodeFlags.regenerateFromImageAsset = NO;
   _cropRect = CGRectMake(0.5, 0.5, 0, 0);
   _cropDisplayBounds = CGRectNull;
   _placeholderColor = ASDisplayNodeDefaultPlaceholderColor();
@@ -306,19 +300,27 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   
   {
     ASLockScopeSelf();
-    UIImage *drawImage = _image;
     if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-      if (_imageNodeFlags.regenerateFromImageAsset && drawImage != nil) {
-        _imageNodeFlags.regenerateFromImageAsset = NO;
+      if (_image
+          && _image.imageAsset
+          && _image.traitCollection.userInterfaceStyle != UIUserInterfaceStyleUnspecified
+          && _image.traitCollection.userInterfaceStyle != _primitiveTraitCollection.userInterfaceStyle) {
         UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
-        UIImage *generatedImage = [drawImage.imageAsset imageWithTraitCollection:tc];
-        if ( generatedImage != nil ) {
-          drawImage = generatedImage;
+        UIImage *generatedImage = [_image.imageAsset imageWithTraitCollection:tc];
+        if (generatedImage != nil && ![_image isEqual:generatedImage]) {
+          if (CFEqual(_image.CGImage, generatedImage.CGImage)) {
+            NSLog(@"Huy: equal CGImage");
+          } else {
+            NSLog(@"Huy: Unique");
+          }
+          _image = generatedImage;
+        } else {
+          NSLog(@"Huy: equal UIImage");
         }
       }
     }
 
-    drawParameters->_image = drawImage;
+    drawParameters->_image = _image;
     drawParameters->_contentsScale = _contentsScaleForDisplay;
     drawParameters->_cropEnabled = _imageNodeFlags.cropEnabled;
     drawParameters->_forceUpscaling = _imageNodeFlags.forceUpscaling;
@@ -439,10 +441,6 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
   contentsKey.willDisplayNodeContentWithRenderingContext = willDisplayNodeContentWithRenderingContext;
   contentsKey.didDisplayNodeContentWithRenderingContext = didDisplayNodeContentWithRenderingContext;
   contentsKey.imageModificationBlock = imageModificationBlock;
-
-  if (AS_AVAILABLE_IOS_TVOS(12, 10)) {
-    contentsKey.userInterfaceStyle = drawParameter->_traitCollection.userInterfaceStyle;
-  }
 
   if (isCancelled()) {
     return nil;
@@ -789,20 +787,6 @@ static ASWeakMap<ASImageNodeContentsKey *, UIImage *> *cache = nil;
     NSForegroundColorAttributeName: [UIColor redColor]
   };
 }
-
-- (void)asyncTraitCollectionDidChangeWithPreviousTraitCollection:(ASPrimitiveTraitCollection)previousTraitCollection {
-  [super asyncTraitCollectionDidChangeWithPreviousTraitCollection:previousTraitCollection];
-
-  if (AS_AVAILABLE_IOS_TVOS(13, 10)) {
-    AS::MutexLocker l(__instanceLock__);
-      // update image if userInterfaceStyle was changed (dark mode)
-      if (_image != nil
-          && _primitiveTraitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-        _imageNodeFlags.regenerateFromImageAsset = YES;
-      }
-  }
-}
-
 
 @end
 

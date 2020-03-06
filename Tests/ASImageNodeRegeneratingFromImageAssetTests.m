@@ -1,3 +1,6 @@
+// TODO: Update snapshot  tests here as well? https://github.com/TextureGroup/Texture/commit/1961a5a94838b86935cbf60a14de0f9a4a4f0dae#diff-a00c5214a77e580ae672284b693c37f7R193
+// TODO: Compare image address instead of isEqual: because we want the least number of objects retained
+
 //
 //  ASImageNodeRegeneratingFromImageAssetTests.m
 //  Texture
@@ -11,7 +14,36 @@
 #import <AsyncDisplayKit/AsyncDisplayKit.h>
 #import <AsyncDisplayKit/ASWeakMap.h>
 
+@interface ASImageNode (ASImageNodeRegeneratingFromImageAssetTests)
+- (UIImage *)sourceImage; // Input for the node's latest render operation
+- (UIImage *)resultImage; // Result of the node's latest render operation
+@end
+
+@implementation ASImageNode (ASImageNodeRegeneratingFromImageAssetTests)
+
+- (ASWeakMapEntry *)contentsCacheEntry
+{
+  return [self valueForKey:@"_weakCacheEntry"];
+}
+
+- (UIImage *)sourceImage
+{
+  return [self.contentsCacheEntry.key valueForKey:@"image"];
+}
+
+- (UIImage *)resultImage
+{
+  return self.contentsCacheEntry.value;
+}
+
+@end
+
 @interface ASImageNodeRegeneratingFromImageAssetTests : XCTestCase
+
+@property (nonatomic, strong) ASImageNode *imageNode;
+@property (nonatomic, strong) UITraitCollection *lightMode API_AVAILABLE(ios(13));
+@property (nonatomic, strong) UITraitCollection *darkMode API_AVAILABLE(ios(13));
+
 @end
 
 @implementation ASImageNodeRegeneratingFromImageAssetTests
@@ -22,82 +54,187 @@
   ASConfiguration *config = [ASConfiguration new];
   config.experimentalFeatures = ASExperimentalTraitCollectionDidChangeWithPreviousCollection;
   [ASConfigurationManager test_resetWithConfiguration:config];
+
+  self.imageNode = [[ASImageNode alloc] init];
+  self.imageNode.bounds = CGRectMake(0, 0, 10, 10);
+
+  if (AS_AVAILABLE_IOS(13)) {
+    self.lightMode = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+    self.darkMode = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark];
+  }
 }
+
+#pragma mark - Helper methods
 
 - (UIImageAsset *)imageAssetForImagesWithSolidColors:(NSArray<UIColor *> *)colors
                                     traitCollections:(NSArray<UITraitCollection *> *)traitCollections
 {
-    XCTAssertEqual(colors.count, traitCollections.count);
+  XCTAssertEqual(colors.count, traitCollections.count);
 
-    UIImageAsset *result = [[UIImageAsset alloc] init];
+  UIImageAsset *result = [[UIImageAsset alloc] init];
 
-    for (NSUInteger i = 0; i < colors.count; i++) {
-        UIColor *color = colors[i];
-        UITraitCollection *traitCollection = traitCollections[i];
-        UIImage *image = [UIImage as_resizableRoundedImageWithCornerRadius:0.0 cornerColor:nil fillColor:color];
-        [result registerImage:image withTraitCollection:traitCollection];
-    }
+  for (NSUInteger i = 0; i < colors.count; i++) {
+    UIColor *color = colors[i];
+    UITraitCollection *traitCollection = traitCollections[i];
+    UIImage *image = [UIImage as_resizableRoundedImageWithCornerRadius:0.0 cornerColor:nil fillColor:color];
+    [result registerImage:image withTraitCollection:traitCollection];
+  }
 
-    return result;
+  return result;
+}
+
+- (void)triggerFirstRenderingWithImage:(UIImage *)sourceImage
+                   withTraitCollection:(UITraitCollection *)traitCollection
+{
+  [self.imageNode setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection(traitCollection)];
+  [self.imageNode setImage:sourceImage];
+  [self.imageNode recursivelyEnsureDisplaySynchronously:YES];
+  XCTAssertNotNil(self.imageNode.sourceImage);
+  XCTAssertTrue([self.imageNode.sourceImage isEqual:sourceImage]);
+  XCTAssertNotNil(self.imageNode.resultImage);
+}
+
+- (void)testRegenerateThroughTraitCollectionChanges:(NSArray<UITraitCollection *> *)traitCollections
+                                     withImageAsset:(UIImageAsset *)asset
+{
+  for (UITraitCollection *traitCollection in traitCollections) {
+    UIImage *lastResultImage = self.imageNode.resultImage;
+    UIImage *currentSourceImage = [asset imageWithTraitCollection:traitCollection];
+
+    [self.imageNode setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection(traitCollection)];
+    [self.imageNode recursivelyEnsureDisplaySynchronously:YES];
+
+    XCTAssertNotNil(self.imageNode.sourceImage);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:currentSourceImage]);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:self.imageNode.image]);
+
+    XCTAssertNotNil(self.imageNode.resultImage);
+    XCTAssertFalse([self.imageNode.resultImage isEqual:lastResultImage]);
+    lastResultImage = self.imageNode.resultImage;
+
+    [self.imageNode setNeedsDisplay];
+    [self.imageNode recursivelyEnsureDisplaySynchronously:YES];
+
+    XCTAssertNotNil(self.imageNode.sourceImage);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:currentSourceImage]);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:self.imageNode.image]);
+
+    XCTAssertTrue([self.imageNode.resultImage isEqual:lastResultImage]);
+  }
+}
+
+- (void)testAvoidRegeneratingThroughTraitCollectionChanges:(NSArray<UITraitCollection *> *)traitCollections
+{
+  UIImage *sourceImage = self.imageNode.sourceImage;
+  UIImage *resultImage = self.imageNode.resultImage;
+
+  for (UITraitCollection *traitCollection in traitCollections) {
+    [self.imageNode setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection(traitCollection)];
+    [self.imageNode recursivelyEnsureDisplaySynchronously:YES];
+
+    XCTAssertNotNil(self.imageNode.sourceImage);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:sourceImage]);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:self.imageNode.image]);
+
+    XCTAssertNotNil(self.imageNode.resultImage);
+    XCTAssertTrue([self.imageNode.resultImage isEqual:resultImage]);
+
+    [self.imageNode setNeedsDisplay];
+    [self.imageNode recursivelyEnsureDisplaySynchronously:YES];
+
+    XCTAssertNotNil(self.imageNode.sourceImage);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:sourceImage]);
+    XCTAssertTrue([self.imageNode.sourceImage isEqual:self.imageNode.image]);
+
+    XCTAssertTrue([self.imageNode.resultImage isEqual:resultImage]);
+  }
+}
+
+#pragma mark - Tests
+
+/**
+ * When the user interface style changes (light mode to dark mode and vice versa)
+ * and each mode has its own image in the asset, ASImageNode needs to regenerate
+ * its source image and re-render.
+ */
+- (void)testRegenerateIfEachModeHasItsOwnImageInAsset
+{
+  if (AS_AVAILABLE_IOS(13)) {
+    UIImageAsset *asset = [self imageAssetForImagesWithSolidColors:@[ [UIColor whiteColor], [UIColor blackColor] ]
+                                                  traitCollections:@[ self.lightMode, self.darkMode ]];
+
+    [self triggerFirstRenderingWithImage:[asset imageWithTraitCollection:self.lightMode]
+                     withTraitCollection:self.lightMode];
+
+    [self testRegenerateThroughTraitCollectionChanges:@[ self.darkMode, self.lightMode ]
+                                       withImageAsset:asset];
+  }
 }
 
 /**
- * When the user interface style changes (dark mode to light mode and vice versa),
- * images that are from an asset should be regenerated, stored and rendered properly.
+ * When the user interface style changes (light mode to dark mode and vice versa)
+ * and all modes share the same CGImage but their UIImages are slightly different,
+ * ASImageNode needs to regenerate its source image and re-render.
  */
-- (void)testRegeneratedAssetImageIsProperlyStoredAndRendered
+- (void)testRegenerateEvenIfAllModesShareTheSameCGImageInAsset
 {
-    if (@available(iOS 13.0, *)) {
-        NSArray *colors = @[ [UIColor whiteColor], [UIColor blackColor] ];
-        NSArray *traitCollections = @[ [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight],
-                                       [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark] ];
-        UIImageAsset *asset = [self imageAssetForImagesWithSolidColors:colors
-                                                      traitCollections:traitCollections];
-        UIImage *lightImage = [asset imageWithTraitCollection:traitCollections[0]];
-        UIImage *darkImage = [asset imageWithTraitCollection:traitCollections[1]];
+  if (AS_AVAILABLE_IOS(13)) {
+    UIImageAsset *asset = [self imageAssetForImagesWithSolidColors:@[ [UIColor whiteColor] ]
+                                                  traitCollections:@[ self.lightMode ]];
+    UIImage *sourceImageForLightMode = [asset imageWithTraitCollection:self.lightMode];
+    UIImage *sourceImageForDarkMode = [sourceImageForLightMode imageWithTintColor:[UIColor blackColor]];
+    [asset registerImage:sourceImageForDarkMode withTraitCollection:self.darkMode];
 
-        ASImageNode *imageNode = [[ASImageNode alloc] init];
-        imageNode.bounds = CGRectMake(0, 0, 1, 1);
-        [imageNode setImage:lightImage];
+    XCTAssertTrue(CFEqual(sourceImageForLightMode.CGImage, sourceImageForDarkMode.CGImage));
 
-        // First assert that the node renders the light image
-        XCTestExpectation *lightImageRendered = [self expectationWithDescription:@"Light image rendered"];
-        [imageNode setDidDisplayNodeContentWithRenderingContext:^(CGContextRef  _Nonnull context, id  _Nullable drawParameters) {
-            UIImage *renderedImage = [drawParameters valueForKey:@"_image"];
-            XCTAssertNotNil(renderedImage);
-            XCTAssertTrue([lightImage isEqual:renderedImage]);
-            [lightImageRendered fulfill];
-        }];
-        [imageNode recursivelyEnsureDisplaySynchronously:YES];
+    [self triggerFirstRenderingWithImage:sourceImageForLightMode withTraitCollection:self.lightMode];
 
-        // Switch to dark mode and assert that the node renders dark image
-        XCTestExpectation *darkImageRendered = [self expectationWithDescription:@"Dark image rendered"];
-        //        __weak ASImageNode *weakImageNode = imageNode;
-        [imageNode setPrimitiveTraitCollection:ASPrimitiveTraitCollectionFromUITraitCollection(traitCollections[1])];
-        [imageNode setDidDisplayNodeContentWithRenderingContext:^(CGContextRef  _Nonnull context, id  _Nullable drawParameters) {
-            UIImage *renderedImage = [drawParameters valueForKey:@"_image"];
-            XCTAssertNotNil(renderedImage);
-            XCTAssertTrue([darkImage isEqual:renderedImage]);
-//            XCTAssertTrue([weakImageNode.image isEqual:darkImage]); // Expect to fail
-            // TODO asset the raster data as well
-            [darkImageRendered fulfill];
-        }];
-        [imageNode recursivelyEnsureDisplaySynchronously:YES];
+    [self testRegenerateThroughTraitCollectionChanges:@[ self.darkMode, self.lightMode ]
+                                       withImageAsset:asset];
+  }
+}
 
-        // Trigger re-rendering and assert that the node still renders dark image
-        [imageNode setNeedsDisplay];
-        XCTestExpectation *darkImageRerendered = [self expectationWithDescription:@"Dark image re-rendered"];
-        [imageNode setDidDisplayNodeContentWithRenderingContext:^(CGContextRef  _Nonnull context, id  _Nullable drawParameters) {
-//            UIImage *renderedImage = [drawParameters valueForKey:@"_image"];
-//            XCTAssertNotNil(renderedImage);
-//            XCTAssertTrue([darkImage isEqual:renderedImage]);  // Expect to fail
-//            XCTAssertTrue([weakImageNode.image isEqual:darkImage]); // Expect to fail
-            [darkImageRerendered fulfill];
-        }];
-        [imageNode recursivelyEnsureDisplaySynchronously:YES];
+/**
+ * When the user interface style changes (light mode to dark mode and vice versa)
+ * and the image asset has 1 image for 1 particular mode, ASImageNode needs to
+ * avoid regenerating and re-rendering, but keeps the rendered image throughout instead.
+ */
+- (void)testAvoidRegeneratingIfOnlyOneModeHasItsOwnImageInAsset
+{
+  if (AS_AVAILABLE_IOS(13)) {
+    UIImageAsset *asset = [self imageAssetForImagesWithSolidColors:@[ [UIColor whiteColor] ]
+                                                  traitCollections:@[ self.lightMode ]];
+    UIImage *sourceImage = [asset imageWithTraitCollection:self.lightMode];
 
-        [self waitForExpectations:@[ lightImageRendered, darkImageRendered, darkImageRerendered ] timeout:1];
-    }
+    [self triggerFirstRenderingWithImage:sourceImage withTraitCollection:self.lightMode];
+
+    [self testAvoidRegeneratingThroughTraitCollectionChanges:@[ self.darkMode, self.lightMode ]];
+  }
+}
+
+/**
+ * When the user interface style changes (light mode to dark mode and vice versa)
+ * and its image's trait collection is undefinied except display scale (common for images downloaded by PINRemoteImage),
+ * ASImageNode needs to avoid regenerating and re-rendering, but keeps the rendered image throughout instead.
+ */
+- (void)testAvoidRegeneratingIfImageHasUndefiniedTraitCollectionExceptDisplayScale
+{
+  if (AS_AVAILABLE_IOS(13)) {
+    UIImage *sourceImage = [UIImage as_resizableRoundedImageWithCornerRadius:0.0
+                                                                 cornerColor:nil
+                                                                   fillColor:[UIColor whiteColor]];
+    XCTAssertNotNil(sourceImage.imageAsset);
+    XCTAssertNotNil(sourceImage.traitCollection);
+    CGFloat displayScale = sourceImage.traitCollection.displayScale;
+    XCTAssertGreaterThanOrEqual(displayScale, 1.0);
+    // The image's trait collection has nothing but a display scale
+    XCTAssertTrue([sourceImage.traitCollection isEqual:[UITraitCollection traitCollectionWithDisplayScale:displayScale]]);
+
+
+    [self triggerFirstRenderingWithImage:sourceImage withTraitCollection:self.lightMode];
+
+    [self testAvoidRegeneratingThroughTraitCollectionChanges:@[ self.darkMode, self.lightMode ]];
+  }
 }
 
 @end
