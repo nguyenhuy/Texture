@@ -307,13 +307,15 @@ typedef void (^ASImageNodeDrawParametersBlock)(ASWeakMapEntry *entry);
           && _image.traitCollection.userInterfaceStyle != _primitiveTraitCollection.userInterfaceStyle) {
         UITraitCollection *tc = [UITraitCollection traitCollectionWithUserInterfaceStyle:_primitiveTraitCollection.userInterfaceStyle];
         UIImage *generatedImage = [_image.imageAsset imageWithTraitCollection:tc];
-        if (generatedImage != nil && ![_image isEqual:generatedImage]) {
+        if (generatedImage && ![_image isEqual:generatedImage]) {
           if (CFEqual(_image.CGImage, generatedImage.CGImage)) {
             NSLog(@"Huy: equal CGImage");
           } else {
             NSLog(@"Huy: Unique");
           }
           _image = generatedImage;
+
+          //  Release in background, or call a helper method
         } else {
           NSLog(@"Huy: equal UIImage");
         }
