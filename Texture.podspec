@@ -50,6 +50,11 @@ Pod::Spec.new do |spec|
     igl.dependency 'Texture/Core'
   end
 
+  spec.subspec 'IGListDiffKit' do |igld|
+    igld.dependency 'IGListDiffKit', '~> 4.0'
+    igld.dependency 'Texture/Core'
+  end
+
   spec.subspec 'Yoga' do |yoga|
     yoga.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) YOGA=1' }
     yoga.dependency 'Yoga', '1.6.0'
