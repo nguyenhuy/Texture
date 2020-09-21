@@ -62,6 +62,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
   BOOL _synchronized;
   NSMutableSet<ASDataControllerSynchronizationBlock> *_onDidFinishSynchronizingBlocks;
 
+  BOOL _mainThreadOnlyMode;
+
   struct {
     unsigned int supplementaryNodeKindsInSections:1;
     unsigned int supplementaryNodesOfKindInSection:1;
@@ -104,6 +106,8 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
   _synchronized = YES;
   _onDidFinishSynchronizingBlocks = [[NSMutableSet alloc] init];
+
+  _mainThreadOnlyMode = _ASActivateExperimentalFeature(ASExperimentalMainThreadOnlyDataController);
   
   const char *queueName = [[NSString stringWithFormat:@"org.AsyncDisplayKit.ASDataController.editingTransactionQueue:%p", self] cStringUsingEncoding:NSASCIIStringEncoding];
   _editingTransactionQueue = dispatch_queue_create(queueName, DISPATCH_QUEUE_SERIAL);
@@ -662,7 +666,7 @@ typedef void (^ASDataControllerSynchronizationBlock)();
 
   // Step 3 can be done on the main thread or on _editingTransactionQueue
   // depending on an experiment.
-  BOOL mainThreadOnly = ASActivateExperimentalFeature(ASExperimentalMainThreadOnlyDataController);
+  BOOL mainThreadOnly = _mainThreadOnlyMode;
   if (mainThreadOnly) {
     // In main-thread-only mode allocate and layout all nodes serially on the main thread.
     //
